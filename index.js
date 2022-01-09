@@ -175,7 +175,7 @@ client.on("interactionCreate", interaction => {
 		commands.forEach(command => {
 			if(interaction.customId.toLowerCase().startsWith(command.name)){
 				try {
-					if (msg.guild) {
+					if (interaction.guild) {
 						console.log(getTimestamp() + "[INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ') in guild "' + interaction.guild.name + '" (' + interaction.guild.id + ')');
 					} else {
 						console.log(getTimestamp() + "[INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ')');
