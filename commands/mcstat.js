@@ -42,7 +42,7 @@ class Mcstat {
 			mcip = mcip[0]
 		}
 		
-		minecraft.status(mcip, { timeout: 8000, port: Number(mcport)})
+		minecraft.status(mcip, Number(mcport), { timeout: 8000 })
 			.then((response) => {
 				if (msg.guild) {
 					const permissions = ['ATTACH_FILES'];
@@ -51,14 +51,14 @@ class Mcstat {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Minecraft Status')
 						embed.setColor(`#F36B00`)
-						embed.setDescription('**' + response.host + '**:' + response.port + '\n' + 
-											'Версия: ' + response.version + '\n' +
-											'Онлайн: ' + response.onlinePlayers + '/' + response.maxPlayers +
+						embed.setDescription('**' + mcip + '**:' + Number(mcport) + '\n' + 
+											'Версия: ' + response.version.name + '\n' +
+											'Онлайн: ' + response.players.online + '/' + response.players.max +
 											'```\n' + response.motd.clean + '```')
 				
-						msg.channel.send({ embeds: [embed]});
+						msg.channel.send({ embeds: [embed] });
 					} else {
-						const b64image = response.favicon.text
+						const b64image = response.favicon
 						const data = b64image.split(',')[1]; 
 						const buf = new Buffer.from(data, 'base64');
 						const file = new Discord.MessageAttachment(buf, 'icon.png');
@@ -66,9 +66,9 @@ class Mcstat {
 						embed.setThumbnail('attachment://icon.png')
 						embed.setTitle(client.user.username + ' - Minecraft Status')
 						embed.setColor(`#F36B00`)
-						embed.setDescription('**' + response.host + '**:' + response.port + '\n' + 
-											'Версия: ' + response.version + '\n' +
-											'Онлайн: ' + response.onlinePlayers + '/' + response.maxPlayers +
+						embed.setDescription('**' + mcip + '**:' + Number(mcport) + '\n' + 
+											'Версия: ' + response.version.name + '\n' +
+											'Онлайн: ' + response.players.online + '/' + response.players.max +
 											'```\n' + response.motd.clean + '```')
 				
 						msg.channel.send({ embeds: [embed], files: [file]});		

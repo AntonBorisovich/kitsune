@@ -183,7 +183,17 @@ client.on("interactionCreate", interaction => {
 		})
 	}
 	if (interaction.isCommand()) {
-		console.log(interaction)
+		commands.forEach(command => {
+			if (command.name == interaction.commandName) {
+				let hohol = interaction
+				hohol.author = interaction.user
+				if (typeof args !== 'undefined') {
+					command.run(client, hohol, args)
+				} else {
+					command.run(client, hohol, "")
+				}
+			}
+		})
 		
 	}
 });
