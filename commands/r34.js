@@ -86,7 +86,7 @@ class r34 {
 									embed.setDescription("[**Видео**](" + r34Pic + ")")
 									embed.setColor(`#F36B00`)
 									embed.setImage(r34PicPreview)
-									embed.setFooter("Теги: " + r34Tags.slice(2,-2))
+									embed.setFooter({ text: "Теги: " + r34Tags.slice(2,-2)})
 									msg.channel.send({ embeds: [embed] });
 									return	
 								} else {
@@ -94,7 +94,7 @@ class r34 {
 									embed.setTitle(client.user.username + ' - rule34')
 									embed.setColor(`#F36B00`)
 									embed.setImage(r34Pic)
-									embed.setFooter("Теги: " + r34Tags.slice(2,-2))
+									embed.setFooter({ text: "Теги: " + r34Tags.slice(2,-2)})
 									msg.channel.send({ embeds: [embed] });
 									return
 								}

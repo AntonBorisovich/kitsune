@@ -150,10 +150,10 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 				}
 				if (command.desc.endsWith('hide') && config.ownerID != newMessage.author.id) return
 				try {
-					if (msg.guild) {
-						console.log(getTimestamp() + "[INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
+					if (newMessage.guild) {
+						console.log(getTimestamp() + "[INFO] " + newMessage.author.tag + ' (' + newMessage.author.id + ') executed command ' + command.name + ' by editing message in channel #' + newMessage.channel.name + ' (' + newMessage.channel.id + ') in guild "' + newMessage.guild.name + '" (' + newMessage.guild.id + ')');
 					} else {
-						console.log(getTimestamp() + "[INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
+						console.log(getTimestamp() + "[INFO] " + newMessage.author.tag + ' (' + newMessage.author.id + ') executed command ' + command.name + ' by editing message in channel #' + newMessage.channel.name + ' (' + newMessage.channel.id + ')');
 					}
 					newMessage.isCommand = false
 					command.run(client, newMessage, args)

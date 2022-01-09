@@ -77,18 +77,54 @@ class waifu {
 		
 		var nsfw = ["waifu_nsfw" , "neko_nsfw", "trap", "blowjob"]
 		await nsfw.forEach(tag => {
-			if (tag.toLowerCase() == args[1].toLowerCase()) {
-				executed = true
-				if (msg.channel.nsfw) {
-					let tagg = args[1].replace(/_nsfw/g, "")
-					var url = "https://api.waifu.pics/nsfw/" + tagg;
+			if (args[1]) {
+				if (tag.toLowerCase() == args[1].toLowerCase()) {
+					executed = true
+					if (msg.channel.nsfw) {
+						let tagg = args[1].replace(/_nsfw/g, "")
+						var url = "https://api.waifu.pics/nsfw/" + tagg;
+						https.get(url, function(res) {
+							var body = "";
+
+							res.on("data", function(chunk) {
+								body += chunk;
+							});
+	 
+							res.on("end", function() {
+								let embed = new Discord.MessageEmbed()
+								embed.setTitle(client.user.username + ' - waifu')
+								embed.setColor(`#F36B00`)
+								embed.setDescription(tag)
+								embed.setImage(body.replace(/\{\"url\"\:\"/g, "").replace(/\"/g, "").replace(/\}/g, ""))
+								msg.channel.send({ embeds: [embed] });;
+								return
+							});
+						}).on("error", function(e) {
+							return
+						});
+					} else {
+						let embed = new Discord.MessageEmbed()
+						embed.setTitle(client.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Этот тег можно использовать только в NSFW каналах!")
+						msg.channel.send({ embeds: [embed] });
+					}
+				}
+			}
+		})
+		var sfw = ["waifu", "neko", "shinobu", "megumin", "bully", "cuddle", "cry", "hug", "awoo", "kiss", "lick", "pat", "smug", "bonk", "yeet", "blush", "smile", "wave", "highfive", "handhold", "nom", "bite", "glomp", "slap", "kill", "kick", "happy", "wink", "poke", "dance", "cringe"]
+		await sfw.forEach(tag => {
+			if (args[1]) {
+				if (tag == args[1].toLowerCase()) {
+					executed = true
+					var url = "https://api.waifu.pics/sfw/" + tag;
 					https.get(url, function(res) {
 						var body = "";
 
 						res.on("data", function(chunk) {
 							body += chunk;
 						});
- 
+	 
 						res.on("end", function() {
 							let embed = new Discord.MessageEmbed()
 							embed.setTitle(client.user.username + ' - waifu')
@@ -101,39 +137,7 @@ class waifu {
 					}).on("error", function(e) {
 						return
 					});
-				} else {
-					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Error')
-					embed.setColor(`#F00000`)
-					embed.setDescription("Этот тег можно использовать только в NSFW каналах!")
-					msg.channel.send({ embeds: [embed] });
 				}
-			}
-		})
-		var sfw = ["waifu", "neko", "shinobu", "megumin", "bully", "cuddle", "cry", "hug", "awoo", "kiss", "lick", "pat", "smug", "bonk", "yeet", "blush", "smile", "wave", "highfive", "handhold", "nom", "bite", "glomp", "slap", "kill", "kick", "happy", "wink", "poke", "dance", "cringe"]
-		await sfw.forEach(tag => {
-			if (tag == args[1].toLowerCase()) {
-				executed = true
-				var url = "https://api.waifu.pics/sfw/" + tag;
-				https.get(url, function(res) {
-					var body = "";
-
-					res.on("data", function(chunk) {
-						body += chunk;
-					});
- 
-					res.on("end", function() {
-						let embed = new Discord.MessageEmbed()
-						embed.setTitle(client.user.username + ' - waifu')
-						embed.setColor(`#F36B00`)
-						embed.setDescription(tag)
-						embed.setImage(body.replace(/\{\"url\"\:\"/g, "").replace(/\"/g, "").replace(/\}/g, ""))
-						msg.channel.send({ embeds: [embed] });;
-						return
-					});
-				}).on("error", function(e) {
-					return
-				});
 			}
 		})
 		if (!executed) {
