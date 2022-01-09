@@ -107,6 +107,7 @@ client.on("messageCreate", msg => {
 					} else {
 						console.log(getTimestamp() + "[INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
 					}
+					msg.isCommand = false
 					command.run(client, msg, args)
 				} catch (error) {
 					console.log(getTimestamp() + "[ERROR] " + "catched error while executing an command: \n" + String(error))
@@ -149,7 +150,12 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 				}
 				if (command.desc.endsWith('hide') && config.ownerID != newMessage.author.id) return
 				try {
-					console.log(getTimestamp() + "[INFO] " + newMessage.author.tag + ' (' + newMessage.author.id + ') executed command ' + command.name + ' by editing message in channel #' + newMessage.channel.name + ' (' + newMessage.channel.id + ') in guild "' + newMessage.guild.name + '" (' + newMessage.guild.id + ')');
+					if (msg.guild) {
+						console.log(getTimestamp() + "[INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
+					} else {
+						console.log(getTimestamp() + "[INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
+					}
+					newMessage.isCommand = false
 					command.run(client, newMessage, args)
 				} catch (error) {
 					console.log(getTimestamp() + "[ERROR] " + "catched error while executing an command: \n" + String(error))
@@ -169,7 +175,12 @@ client.on("interactionCreate", interaction => {
 		commands.forEach(command => {
 			if(interaction.customId.toLowerCase().startsWith(command.name)){
 				try {
-					console.log(getTimestamp() + "[INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ') in guild "' + interaction.guild.name + '" (' + interaction.guild.id + ')');
+					if (msg.guild) {
+						console.log(getTimestamp() + "[INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ') in guild "' + interaction.guild.name + '" (' + interaction.guild.id + ')');
+					} else {
+						console.log(getTimestamp() + "[INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ')');
+					}
+					
 					command.buttonreply(client, interaction)
 				} catch(err) {
 					console.log(getTimestamp() + "[ERROR] " + "catched error while executing an interaction: \n" + String(err))
@@ -187,6 +198,7 @@ client.on("interactionCreate", interaction => {
 			if (command.name == interaction.commandName) {
 				let hohol = interaction
 				hohol.author = interaction.user
+				hohol.isCommand = true
 				if (typeof args !== 'undefined') {
 					command.run(client, hohol, args)
 				} else {

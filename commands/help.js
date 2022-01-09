@@ -61,7 +61,7 @@ class Help {
         embed.setTitle(client.user.username + ' - Commands list')
 		embed.setColor(`#F36B00`)
 		embed.setDescription(command.toString() + '\n' + this.config.prefix + 'help <команда> для большей информации')
-		if (msg.isСommand()) {
+		if (msg.isCommand == true) {
 			msg.reply({ embeds: [embed] });
 			return
 		}
