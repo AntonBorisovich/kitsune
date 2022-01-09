@@ -1,0 +1,18 @@
+const Discord = require("discord.js")
+
+class  {
+    constructor(client, config, commands){
+        this.client = client;
+        this.config = config;
+        this.commands = commands;
+        this.desc = "";
+        this.name = "";
+    }
+
+    run(client, msg, args){
+        
+    }
+}
+
+module.exports = 
+
