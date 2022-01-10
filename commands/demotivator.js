@@ -55,7 +55,7 @@ class Dem {
 			//checking attachment availability
 			if (!msg.attachments.first()) {
 				if (msg.guild) { // if guild
-					if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY") { // if reply check reply for attach
+					if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY" && msg.reference !== null) { // if reply check reply for attach
 						const msgrep = await msg.fetchReference()
 						if (msgrep.attachments.first()) {
 							work(client, msgrep, args);
