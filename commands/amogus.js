@@ -236,13 +236,9 @@ class Amogus {
 					embed.setImage('attachment://dumpy' + sessionid + '.gif')
 					embed.setTitle(client.user.username + ' - amogus')
 					embed.setColor(`#F36B00`)
-					if (!msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY")) {
-						msg.reply({embeds: [embed], files: ["dumpy" + sessionid + ".gif"] })
-					} else {
-						msg.channel.send({embeds: [embed], files: ["dumpy" + sessionid + ".gif"] })
-					}
+					msg.channel.send({embeds: [embed], files: ["dumpy" + sessionid + ".gif"] })
 					console.log(getTimestamp() + '[INFO] finished and sended ' + sessionid + ' amogus work that was ordered by ' + msg.author.tag)}
-				, 250);
+				, 300);
 				
 				//cleaning temps
 				exec("rm /home/pi/senkobot/assets/amogus/temp/" + sessionid + ".png")
