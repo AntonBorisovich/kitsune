@@ -22,7 +22,7 @@ class Amogus {
 		this.perms = ["ATTACH_FILES"];
 		this.args = ""; 
 		this.category = "Fun";
-		this.advargs = "-h <число> - кол во строк (по умолчанию 5, максимум 15)";
+		this.advargs = "-h <число> - кол во строк (по умолчанию 5, максимум 10)";
 		this.usage = "";
         this.desc = "сделать гифку с тверкающим амогусом";
         this.advdesc = "Делает гифку с тверкающими амогусами из вашей фотокарточки\n\n";
@@ -54,6 +54,7 @@ class Amogus {
 					if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY" && msg.reference !== null) { // if reply check reply for attach
 						const msgrep = await msg.fetchReference()
 						if (msgrep.attachments.first()) {
+							msgrep.author = msg.author
 							work(client, msgrep, args);
 							return;
 						} else {
@@ -82,6 +83,7 @@ class Amogus {
 						})
 								
 						if (found) {
+							found.author = msg.author
 							work(client, found, args);
 							return;
 						}
@@ -101,6 +103,9 @@ class Amogus {
 			
 			
 			async function work(client, msg, args) {
+				function sleep(ms) {
+					return new Promise(resolve => setTimeout(resolve, ms));
+				}
 				
 				if (!msg.attachments.first().contentType) {
 					let embed = new Discord.MessageEmbed()
@@ -120,7 +125,7 @@ class Amogus {
 				}
 				
 				//checking image ratio and size
-				if ( (msg.attachments.first().width / msg.attachments.first().height) > 7 || (msg.attachments.first().height / msg.attachments.first().width) > 7 || (msg.attachments.first().size / 1048576) > 8.1) {
+				if ( (msg.attachments.first().width / msg.attachments.first().height) > 7 || (msg.attachments.first().height / msg.attachments.first().width) > 7 || (msg.attachments.first().size / 1048576) > 8) {
 					let embed = new Discord.MessageEmbed()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
@@ -136,18 +141,60 @@ class Amogus {
 				embed.setTitle(client.user.username + ' - amogus')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Подождите, операция выполняется")
+				embed.setFooter({text: '0 сек.'})
 				const message = await msg.channel.send({ embeds: [embed] });
-			
-			
-				//set session id
+				let waiting = 0
+				let _5sectimer = 0
+				let donepic = false
+				function sec2time(seconds) {
+					let sec = Math.floor(seconds)
+					let min = Math.floor(sec / 60)
+					let minout = ""
+					if (min != 0) {
+						minout = min + " мин. "
+					}
+					return minout + (sec - (60 * min)) + ' сек.';
+				}
+				function timer() {
+					if (donepic) {
+						let embed = new Discord.MessageEmbed()
+						embed.setTitle(client.user.username + ' - amogus')
+						embed.setColor(`#F36B00`)
+						embed.setDescription("Подождите, операция выполняется")
+						embed.setFooter({text: sec2time(waiting) + ' ГОТОВО!'})
+						message.edit({ embeds: [embed] });
+						setTimeout(() => {
+							message.delete();
+							return
+						}, 2000);
+						return
+					}
+					waiting = (waiting + 1)
+					sec5timer = (sec5timer + 1)
+					if (sec5timer == 5) {
+						sec5timer = 0
+						setTimeout(() => {
+							let embed = new Discord.MessageEmbed()
+							embed.setTitle(client.user.username + ' - amogus')
+							embed.setColor(`#F36B00`)
+							embed.setDescription("Подождите, операция выполняется")
+							embed.setFooter({text: sec2time(waiting)})
+							message.edit({ embeds: [embed] });
+							
+						}, 1000);
+					}
+					setTimeout(() => { timer() }, 1000);
+					return
+				}
+				timer()
+				
 				let sessionid = message.id
-				msg.channel.sendTyping()
 				
 				//custom resolution
 				let lines = 5
-				if (args[1] == '-h' && args[2] != undefined) { 
+				if (args[1] == '-h' && args[2] !== undefined) { 
 					lines = parseInt(args[2])
-					if (lines > 15) {lines = 15}
+					if (lines > 10) {lines = 10}
 					if (lines < 1 ) {lines = 1 }
 					if (isNaN(lines)) {lines = 5}
 				}
@@ -157,11 +204,12 @@ class Amogus {
 				
 				//magick
 				const exec_await = util.promisify(exec);
-				function sleep(ms) {
-					return new Promise(resolve => setTimeout(resolve, ms));
-				}
-				await sleep(3300);
+				
+				await sleep(2000);
 				await exec_await("/usr/java/jdk-17.0.1/bin/java -jar /home/pi/senkobot/assets/amogus/amogusdrip.jar --file /home/pi/senkobot/assets/amogus/temp/" + sessionid + ".png --lines " + lines + " --extraoutput " + sessionid);
+				donepic = true
+				msg.channel.sendTyping()
+				await sleep(2500);
 				
 				// END
 				
@@ -184,7 +232,6 @@ class Amogus {
 					return result
 				}
 				setTimeout(() => {
-					message.delete()
 					embed = new Discord.MessageEmbed()
 					embed.setImage('attachment://dumpy' + sessionid + '.gif')
 					embed.setTitle(client.user.username + ' - amogus')
@@ -194,7 +241,7 @@ class Amogus {
 					} else {
 						msg.channel.send({embeds: [embed], files: ["dumpy" + sessionid + ".gif"] })
 					}
-					console.log(getTimestamp() + '[INFO] finished and sended ' + sessionid + ' amogus work ordered by ' + msg.author.tag)}
+					console.log(getTimestamp() + '[INFO] finished and sended ' + sessionid + ' amogus work that was ordered by ' + msg.author.tag)}
 				, 250);
 				
 				//cleaning temps

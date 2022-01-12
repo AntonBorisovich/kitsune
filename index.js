@@ -1,4 +1,4 @@
-console.log("Starting...\n")
+console.log(getTimestamp() + " [INFO] Loading modules...\n")
 
 const Discord = require('discord.js');
 Client = Discord.Client;
@@ -11,40 +11,40 @@ let customvars = {}
 fs.readdir("./values/", async (err, files)=>{
 	let loaded = 0
     if (err) throw err;
-	console.log('Loading vars...')
+	console.log(getTimestamp() + ' [INFO] Loading vars...')
     await files.forEach((file)=>{
+		loaded = (loaded + 1)
 		let fileName = file.substring(0,file.length-5)
         let variable = require("./values/" + file)
 		customvars[fileName] = variable[fileName]
-		console.log(">var " + fileName + " = " + variable[fileName])
-		loaded = (loaded + 1)
+		console.log(" (" + loaded + "/" + files.length + ") Loaded ver " + fileName + " = " + variable[fileName] + " (" + loaded + "/" + files.length + ")")
     })
-	console.log(">>Loaded " + loaded + " vars\n")
+	console.log(getTimestamp() + " [INFO] Loaded " + loaded + " vars")
 	if (customvars.unstable || !customvars.stable) {
-		console.log('Unstable bot mode\n')
 		config = require('./testbotconfig.json');
+		console.log(getTimestamp() + ' [INFO] Loaded unstable bot config')
 	} else {
-		console.log('Stable bot mode\n')
 		config = require('./config.json');
+		console.log(getTimestamp() + ' [INFO] Loaded stable bot config')
 	}
 })
 
 let commands = []
 fs.readdir("./commands/", async (err, files)=>{
-	console.log('Loading commands...')
+	console.log(getTimestamp() + ' [INFO] Loading commands...')
 	let loaded = 0
     if (err) throw err;
     await files.forEach((file)=>{
+		loaded = (loaded + 1)
         let fileName = file.substring(0,file.length-3)
         let cmdPrototype = require("./commands/"+fileName)
         let command = new cmdPrototype(client, config, commands);
 		commands.push(command)
-		console.log(">Loaded "+command.name+" command")
-		loaded = (loaded + 1)
+		console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
     })
-	console.log(">>Loaded " + loaded + " commands\n")
+	console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
 	setTimeout(() => {	
-		console.log('Logging in Discord...')
+		console.log(getTimestamp() + ' [INFO] Logging in Discord...')
 		client.login(config.discordtoken);
 	},2500);
 })
@@ -65,13 +65,11 @@ function getTimestamp() {
 	if (seconds < 10) {
 		seconds = "0" + seconds
 	}
-	var result = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + hours + ":" + mins + ":" + seconds + " "
+	var result = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + hours + ":" + mins + ":" + seconds
 	return result
 }
 
 client.on("messageCreate", msg => {
-	//console.log("zalupa")
-	
 	//some security
 	if (config.maintenance && config.ownerID != msg.author.id || msg.author.bot) return
 	
@@ -85,7 +83,7 @@ client.on("messageCreate", msg => {
 					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms];
 					const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions);
 					if (!missing[0] == "") {
-						console.log(getTimestamp() + "[ERROR] required permissions not found: " + missing.join(', ') + " in channel #" + msg.channel.name + " (" + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
+						console.warn(getTimestamp() + " [ERROR] required permissions not found: " + missing.join(', ') + " in channel #" + msg.channel.name + " (" + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
 						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) {
 							let embed = new Discord.MessageEmbed()
 							embed.setTitle(client.user.username + ' - Error')
@@ -103,14 +101,14 @@ client.on("messageCreate", msg => {
 				
 				try {
 					if (msg.guild) {
-						console.log(getTimestamp() + "[INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
+						console.log(getTimestamp() + " [INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
 					} else {
-						console.log(getTimestamp() + "[INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
+						console.log(getTimestamp() + " [INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
 					}
 					msg.isCommand = false
 					command.run(client, msg, args)
 				} catch (error) {
-					console.log(getTimestamp() + "[ERROR] " + "catched error while executing an command: \n" + String(error))
+					console.warn(getTimestamp() + " [ERROR] " + "catched error while executing an command: \n" + String(error))
 					let embed = new Discord.MessageEmbed()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
@@ -131,11 +129,12 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 		let cmd = args[0].substring(config.prefix.length)
 		commands.forEach(command => {
 			if(command.name == cmd.toLowerCase()){
+				if (command.desc.endsWith('hide') && config.ownerID != newMessage.author.id) return
 				if (newMessage.guild) {
 					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms];
 					const missing = newMessage.channel.permissionsFor(newMessage.client.user).missing(permissions);
 					if (!missing[0] == "") {
-						console.log(getTimestamp() + "[ERROR] required permissions not found: " + missing.join(', ') + " in channel #" + newMessage.channel.name + " (" + newMessage.channel.id + ') in guild "' + newMessage.guild.name + '" (' + newMessage.guild.id + ')');
+						console.log(getTimestamp() + " [ERROR] required permissions not found: " + missing.join(', ') + " in channel #" + newMessage.channel.name + " (" + newMessage.channel.id + ') in guild "' + newMessage.guild.name + '" (' + newMessage.guild.id + ')');
 						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) {
 							let embed = new Discord.MessageEmbed()
 							embed.setTitle(client.user.username + ' - Error')
@@ -148,17 +147,16 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 						return;
 					}
 				}
-				if (command.desc.endsWith('hide') && config.ownerID != newMessage.author.id) return
 				try {
 					if (newMessage.guild) {
-						console.log(getTimestamp() + "[INFO] " + newMessage.author.tag + ' (' + newMessage.author.id + ') executed command ' + command.name + ' by editing message in channel #' + newMessage.channel.name + ' (' + newMessage.channel.id + ') in guild "' + newMessage.guild.name + '" (' + newMessage.guild.id + ')');
+						console.log(getTimestamp() + " [INFO] " + newMessage.author.tag + ' (' + newMessage.author.id + ') executed command ' + command.name + ' by editing message in channel #' + newMessage.channel.name + ' (' + newMessage.channel.id + ') in guild "' + newMessage.guild.name + '" (' + newMessage.guild.id + ')');
 					} else {
-						console.log(getTimestamp() + "[INFO] " + newMessage.author.tag + ' (' + newMessage.author.id + ') executed command ' + command.name + ' by editing message in channel #' + newMessage.channel.name + ' (' + newMessage.channel.id + ')');
+						console.log(getTimestamp() + " [INFO] " + newMessage.author.tag + ' (' + newMessage.author.id + ') executed command ' + command.name + ' by editing message in channel #' + newMessage.channel.name + ' (' + newMessage.channel.id + ')');
 					}
 					newMessage.isCommand = false
 					command.run(client, newMessage, args)
 				} catch (error) {
-					console.log(getTimestamp() + "[ERROR] " + "catched error while executing an command: \n" + String(error))
+					console.warn(getTimestamp() + " [ERROR] " + "catched error while executing an command: \n" + String(error))
 					let embed = new Discord.MessageEmbed()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
@@ -176,14 +174,14 @@ client.on("interactionCreate", interaction => {
 			if(interaction.customId.toLowerCase().startsWith(command.name)){
 				try {
 					if (interaction.guild) {
-						console.log(getTimestamp() + "[INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ') in guild "' + interaction.guild.name + '" (' + interaction.guild.id + ')');
+						console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ') in guild "' + interaction.guild.name + '" (' + interaction.guild.id + ')');
 					} else {
-						console.log(getTimestamp() + "[INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ')');
+						console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ')');
 					}
-					
+					interaction.isCommand = false
 					command.buttonreply(client, interaction)
 				} catch(err) {
-					console.log(getTimestamp() + "[ERROR] " + "catched error while executing an interaction: \n" + String(err))
+					console.warn(getTimestamp() + " [ERROR] catched error while executing an interaction: \n" + String(err))
 					let embed = new Discord.MessageEmbed()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
@@ -199,6 +197,11 @@ client.on("interactionCreate", interaction => {
 				let hohol = interaction
 				hohol.author = interaction.user
 				hohol.isCommand = true
+				if (interaction.guild) {
+					console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ') in guild "' + hohol.guild.name + '" (' + hohol.guild.id + ')');
+				} else {
+					console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ')');
+				}
 				if (typeof args !== 'undefined') {
 					command.run(client, hohol, args)
 				} else {
@@ -211,22 +214,22 @@ client.on("interactionCreate", interaction => {
 });
 
 client.on("guildCreate", guild => {
-	console.log(getTimestamp() + "[INFO] " + client.user.username + ' was joined to guild "' + guild.name + '" (' + guild.id + ')');
+	console.log(getTimestamp() + " [INFO] " + client.user.username + ' was joined to guild "' + guild.name + '" (' + guild.id + ')');
 })
 
 client.on("guildDelete", guild => {
-	console.log(getTimestamp() + "[INFO] " + client.user.username + ' was kicked from guild "' + guild.name + '" (' + guild.id + ')');
+	console.log(getTimestamp() + " [INFO] " + client.user.username + ' was kicked from guild "' + guild.name + '" (' + guild.id + ')');
 })
 
 client.once('ready', () => {
 	if (config.maintenance) {
 		client.user.setStatus('idle')
 		client.user.setActivity('Тех. работы | tech. works');
-		console.log(getTimestamp() + "[INFO] " + `${client.user.username} started in maintenance mode!`)
+		console.log(getTimestamp() + " [INFO] " + `${client.user.username} is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`)
 	} else {
 		client.user.setStatus('online')
 		client.user.setActivity(config.prefix + 'help');
-		console.log(getTimestamp() + "[INFO] " + `${client.user.username} started!`)
+		console.log(getTimestamp() + " [INFO] " + `${client.user.username} is ready to work!`)
 	}
 });
 

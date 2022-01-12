@@ -4,6 +4,7 @@ cls
 :boot
 node index
 echo.
+set proceed=""
 set /p proceed=Would you like to boot up your bot again? (y/n):
 if "%proceed%"=="y" goto boot
 if "%proceed%"=="n" goto boot
