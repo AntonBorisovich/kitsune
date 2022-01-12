@@ -144,7 +144,7 @@ class Amogus {
 				embed.setFooter({text: '0 сек.'})
 				const message = await msg.channel.send({ embeds: [embed] });
 				let waiting = 0
-				let _5sectimer = 0
+				let sec5timer = 0
 				let donepic = false
 				function sec2time(seconds) {
 					let sec = Math.floor(seconds)
