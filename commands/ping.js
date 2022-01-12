@@ -18,19 +18,19 @@ class Ping {
     run(client, msg, args){
 		try {
 			const ping = Math.round(client.ws.ping)
+			if (ping) {
+				let embed = new Discord.MessageEmbed()
+				embed.setTitle(client.user.username + ' - Ping')
+				embed.setColor(`#F36B00`)
+				embed.setDescription("Понг! (" + ping + " мс)")
+				msg.channel.send({ embeds: [embed] });	
+			}
 		} catch (err) {
 			let embed = new Discord.MessageEmbed()
 			embed.setTitle(client.user.username + ' - error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Не удалось вычислить задержку")
 			msg.channel.send({ embeds: [embed] });
-		}
-		if (ping) {
-			let embed = new Discord.MessageEmbed()
-			embed.setTitle(client.user.username + ' - Ping')
-			embed.setColor(`#F36B00`)
-			embed.setDescription("Понг! (" + ping + " мс)")
-			msg.channel.send({ embeds: [embed] });	
 		}
     }
 }
