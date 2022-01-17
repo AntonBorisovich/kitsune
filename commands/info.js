@@ -86,7 +86,7 @@ class Info {
 			var date = now.getDate()
 		}
 		if (now.getMonth() < 10) {
-			var month = `0${now.getMonth()}`
+			var month = `0${(now.getMonth() + 1)}`
 		} else {
 			var month = (now.getMonth() + 1)
 		}

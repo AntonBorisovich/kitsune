@@ -1,12 +1,15 @@
-console.log(getTimestamp() + " [INFO] Loading modules...\n")
+console.log(getTimestamp() + " [INFO] Initialization...")
 
+const os = require('os');
 const Discord = require('discord.js');
 Client = Discord.Client;
 Intents = Discord.Intents;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]});
 const fs = require("fs");
-let config
 
+console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
+
+let config
 let customvars = {}
 fs.readdir("./values/", async (err, files)=>{
 	let loaded = 0
@@ -222,14 +225,15 @@ client.on("guildDelete", guild => {
 })
 
 client.once('ready', () => {
+	//client.guilds.cache.size - TODO logging guilds count
 	if (config.maintenance) {
 		client.user.setStatus('idle')
 		client.user.setActivity('Тех. работы | tech. works');
-		console.log(getTimestamp() + " [INFO] " + `${client.user.username} is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`)
+		console.log(getTimestamp() + " [INFO] " + `${client.user.username} (${config.version}) is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`)
 	} else {
 		client.user.setStatus('online')
 		client.user.setActivity(config.prefix + 'help');
-		console.log(getTimestamp() + " [INFO] " + `${client.user.username} is ready to work!`)
+		console.log(getTimestamp() + " [INFO] " + `${client.user.username} (${config.version}) is ready to work!`)
 	}
 });
 
