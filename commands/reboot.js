@@ -42,7 +42,7 @@ class reboot {
 			if (args[1] == '-q') {  
 				executable_comm = 'pm2 restart all'
 			} else if (args[1] == '-s') {
-				executable_comm = 'shutdown'
+				executable_comm = 'pm2 stop all'
 			} else {
 				let embed = new Discord.MessageEmbed()
 				embed.setTitle(client.user.username + ' - reboot')
@@ -54,7 +54,7 @@ class reboot {
 		let embed = new Discord.MessageEmbed()
 		embed.setTitle(client.user.username + ' - reboot')
 		embed.setColor(`#F36B00`)
-		if (executable_comm != 'shutdown') {
+		if (executable_comm != 'pm2 stop all') {
 			embed.setDescription(":arrows_counterclockwise: Перезапуск...")
 		} else {
 			embed.setDescription(":mobile_phone_off: Выключение...")
@@ -66,13 +66,13 @@ class reboot {
 		setTimeout(() => {
 			console.log(getTimestamp() + ' [INFO] Logging out of Discord...')
 			client.destroy()
-		},1500);
+		},3000);
 		
 		setTimeout(() => {
 			console.log(getTimestamp() + ' [INFO] Executing "' + executable_comm + '" and closing node process')
-			await exec(executable_comm)
+			exec(executable_comm)
 			process.exit(0)
-		},5000);
+		},6000);
 	}
 }
 module.exports = reboot
