@@ -69,6 +69,14 @@ class r34 {
 						parser.parseString(body, function(err, result) {
 							//console.log(result)
 							//console.log(result.posts)
+							if (!result) {
+								let embed = new Discord.MessageEmbed()
+								embed.setTitle(client.user.username + ' - rule34')
+								embed.setColor(`#F00000`)
+								embed.setDescription("Ничего не найдено   ╮(︶▽︶)╭")
+								msg.channel.send({ embeds: [embed] });
+								return
+							}
 							var postCount = result.posts.$.count - 1;
 							if (postCount > 100) {
 								postCount = 100;

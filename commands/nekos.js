@@ -56,7 +56,7 @@ class nekos {
 		"```"
 		this.usage = "<тег>";
 		this.desc = "кидает пикчи с nekos.life";
-		this.advdesc = "Отправляет изображения с кошкодевками с сайта Nekos.life, в том числе и NSFW";
+		this.advdesc = "Отправляет изображения с сайта Nekos.life, в том числе и NSFW";
 		this.name = "nekos";
     }
 
@@ -96,7 +96,7 @@ class nekos {
 			if (tag.toLowerCase() == args[1].toLowerCase()) {
 				executed = true
 				if (msg.channel.nsfw) {
-					if (tag.toLowerCase() == "wallpaper") {
+					if (tag == "wallpaper") {
 						neko.sfw.wallpaper().then(picture => {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + " - nekos.life")
@@ -106,8 +106,7 @@ class nekos {
 						msg.channel.send({ embeds: [embed] });
 						})
 					} else {
-						let tagg = args[1].replace(/_NSFW/g, "")
-						eval('neko.nsfw.' + tagg + '().then(picture => {\n'  +
+						eval('neko.nsfw.' + tag + '().then(picture => {\n'  +
 						'let embed = new Discord.MessageEmbed()\n' +
 						'embed.setTitle(client.user.username + " - nekos.life")\n' +
 						'embed.setColor(`#F36B00`)\n' +
