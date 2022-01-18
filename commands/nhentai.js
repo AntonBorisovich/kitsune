@@ -29,13 +29,14 @@ class Nhentai {
 	}
     async run(client, msg, args){
         var argR = "";
-		if (msg.channel.nsfw) {		
+		if (msg.channel.nsfw) {
+			let message
 			try {
 				let embed = new Discord.MessageEmbed()
 				embed.setTitle(client.user.username + ' - nhentai')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Загрузка...")
-				const message = await msg.channel.send({ embeds: [embed] });
+				message = await msg.channel.send({ embeds: [embed] });
 				var doujin = ""
 				if ( args[1] != undefined && !isNaN(parseInt(args[1].replace(/#/g, ""))) ) {
 					doujin = await api.hentai(parseInt(args[1].replace(/#/g, "")));
@@ -102,7 +103,7 @@ class Nhentai {
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Такого id не существует\n" + err)
-				msg.channel.send({ embeds: [embed] });
+				message.edit({ embeds: [embed] });
 			}
 		} else {
 			let embed = new Discord.MessageEmbed()

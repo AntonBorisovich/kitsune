@@ -172,47 +172,58 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 })				
 
 client.on("interactionCreate", interaction => {
-	if (interaction.isButton()) {
-		commands.forEach(command => {
-			if(interaction.customId.toLowerCase().startsWith(command.name)){
-				try {
-					if (interaction.guild) {
-						console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ') in guild "' + interaction.guild.name + '" (' + interaction.guild.id + ')');
-					} else {
-						console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ')');
+	try {
+		let executed = false
+		if (interaction.type == "MESSAGE_COMPONENT") {
+			executed = true
+			commands.forEach(command => {
+				if(interaction.customId.toLowerCase().startsWith(command.name)){
+					try {
+						if (interaction.guild) {
+							console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ') in guild "' + interaction.guild.name + '" (' + interaction.guild.id + ')');
+						} else {
+							console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ')');
+						}
+						interaction.isCommand = false
+						command.buttonreply(client, interaction)
+					} catch(err) {
+						console.warn(getTimestamp() + " [ERROR] catched error while executing an interaction: \n" + String(err))
+						let embed = new Discord.MessageEmbed()
+						embed.setTitle(client.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("```\n" + String(err) + "\n```")
+						interaction.channel.send({ embeds: [embed] });
 					}
-					interaction.isCommand = false
-					command.buttonreply(client, interaction)
-				} catch(err) {
-					console.warn(getTimestamp() + " [ERROR] catched error while executing an interaction: \n" + String(err))
-					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Error')
-					embed.setColor(`#F00000`)
-					embed.setDescription("```\n" + String(err) + "\n```")
-					interaction.channel.send({ embeds: [embed] });
 				}
-			}
-		})
-	}
-	if (interaction.isCommand()) {
-		commands.forEach(command => {
-			if (command.name == interaction.commandName) {
-				let hohol = interaction
-				hohol.author = interaction.user
-				hohol.isCommand = true
-				if (interaction.guild) {
-					console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ') in guild "' + hohol.guild.name + '" (' + hohol.guild.id + ')');
-				} else {
-					console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ')');
+			})
+		}
+		if (interaction.type == "APPLICATION_COMMAND") {
+			commands.forEach(command => {
+				if (command.name == interaction.commandName) {
+					let hohol = interaction
+					hohol.author = interaction.user
+					hohol.isCommand = true
+					if (interaction.guild) {
+						console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ') in guild "' + hohol.guild.name + '" (' + hohol.guild.id + ')');
+					} else {
+						console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ')');
+					}
+					if (typeof args !== 'undefined') {
+						command.run(client, hohol, args)
+					} else {
+						command.run(client, hohol, "")
+					}
 				}
-				if (typeof args !== 'undefined') {
-					command.run(client, hohol, args)
-				} else {
-					command.run(client, hohol, "")
-				}
-			}
-		})
-		
+			})
+		}
+
+	} catch(err) {
+		console.warn(getTimestamp() + " [ERROR] " + "catched error while executing an interaction: \n" + String(err))
+		let embed = new Discord.MessageEmbed()
+		embed.setTitle(client.user.username + ' - Error')
+		embed.setColor(`#F00000`)
+		embed.setDescription("```\n" + String(err) + "\n```")
+		interaction.channel.send({ embeds: [embed] });
 	}
 });
 

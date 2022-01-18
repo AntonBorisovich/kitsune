@@ -125,14 +125,22 @@ class Mcstat {
 				embed.setDescription("Невозможно установить подключение")
 				embed.setFooter({text: String(error)})
 				message.edit({ embeds: [embed] });
-				//console.log(error);3
+				//console.log(error);
 				return;
-			}
-			if (String(error).startsWith("Error: Timed out")) {
+			} else if (String(error).startsWith("Error: Timed out")) {
 				let embed = new Discord.MessageEmbed()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Превышено время ожидания")
+				embed.setFooter({text: String(error)})
+				message.edit({ embeds: [embed] });
+				//console.log(error);
+				return;
+			} else {
+				let embed = new Discord.MessageEmbed()
+				embed.setTitle(client.user.username + ' - Error')
+				embed.setColor(`#F00000`)
+				embed.setDescription("Неизвестная ошибка")
 				embed.setFooter({text: String(error)})
 				message.edit({ embeds: [embed] });
 				//console.log(error);
