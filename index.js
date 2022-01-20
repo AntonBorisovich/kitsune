@@ -31,27 +31,27 @@ fs.readdir("./values/", async (err, files)=>{
 		console.log(getTimestamp() + ' [INFO] Loaded stable bot config')
 	}
 })
-
 let commands = []
-fs.readdir("./commands/", async (err, files)=>{
-	console.log(getTimestamp() + ' [INFO] Loading commands...')
-	let loaded = 0
-    if (err) throw err;
-    await files.forEach((file)=>{
-		loaded = (loaded + 1)
-        let fileName = file.substring(0,file.length-3)
-        let cmdPrototype = require("./commands/"+fileName)
-        let command = new cmdPrototype(client, config, commands);
-		commands.push(command)
-		console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
-    })
-	console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
-	setTimeout(() => {	
-		console.log(getTimestamp() + ' [INFO] Logging in Discord...')
-		client.login(config.discordtoken);
-	},2500);
-})
-
+setTimeout(() => {	
+	fs.readdir("./commands/", async (err, files)=>{
+		console.log(getTimestamp() + ' [INFO] Loading commands...')
+		let loaded = 0
+		if (err) throw err;
+		await files.forEach((file)=>{
+			loaded = (loaded + 1)
+			let fileName = file.substring(0,file.length-3)
+			let cmdPrototype = require("./commands/"+fileName)
+			let command = new cmdPrototype(client, config, commands);
+			commands.push(command)
+			console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
+		})
+		console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
+		setTimeout(() => {	
+			console.log(getTimestamp() + ' [INFO] Logging in Discord...')
+			client.login(config.discordtoken);
+		},2500);
+	})
+}, 1000);
 
 
 function getTimestamp() {
