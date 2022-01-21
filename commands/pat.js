@@ -12,7 +12,7 @@ class Pat {
 		this.usage = "<юзер>";
 		this.advargs = "<юзер> - упоминание человека, аватарка которого будет поглажена";
         this.desc = "погладить кого-то/пикчу";
-		this.advdesc = "Делает гифку с рукой, которая гладит прикрепленное вами изображение или аватарку пользователя";
+		this.advdesc = "Делает гифку с рукой, которая гладит прикрепленное вами изображение или аватарку пользователя\n\nЛимит размера изображения: 1536x1536";
         this.name = "pat";
     }
 
@@ -36,7 +36,7 @@ class Pat {
 							let embed = new Discord.MessageEmbed()
 							embed.setTitle(client.user.username + ' - Error')
 							embed.setColor(`#F00000`)
-							embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать.")
+							embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
 							msg.channel.send({ embeds: [embed] });
 							return;
 						}
@@ -64,7 +64,7 @@ class Pat {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
-						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать.")
+						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
@@ -85,7 +85,7 @@ class Pat {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
-						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать.")
+						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
 						msg.channel.send({ embeds: [embed] });
 						return;	
 					}
@@ -93,7 +93,7 @@ class Pat {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
-						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать.")
+						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
@@ -101,7 +101,7 @@ class Pat {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
-						embed.setDescription("Изображение слишком большое.")
+						embed.setDescription("Изображение слишком большое")
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
@@ -109,7 +109,7 @@ class Pat {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
-						embed.setDescription("Изображение слишком большое.")
+						embed.setDescription("Изображение слишком большое")
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
