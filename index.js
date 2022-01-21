@@ -41,7 +41,7 @@ setTimeout(() => {
 			loaded = (loaded + 1)
 			let fileName = file.substring(0,file.length-3)
 			let cmdPrototype = require("./commands/"+fileName)
-			let command = new cmdPrototype(client, config, commands);
+			let command = new cmdPrototype(client, config, commands, customvars);
 			commands.push(command)
 			console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
 		})
@@ -51,7 +51,7 @@ setTimeout(() => {
 			client.login(config.discordtoken);
 		},2500);
 	})
-}, 1000);
+}, 1500);
 
 
 function getTimestamp() {
@@ -74,7 +74,7 @@ function getTimestamp() {
 
 client.on("messageCreate", msg => {
 	//some security
-	if (config.maintenance && config.ownerID != msg.author.id || msg.author.bot) return
+	if (customvars.maintenance && config.ownerID != msg.author.id || msg.author.bot) return
 	
 	let args = msg.content.split(" ")
 	let executed = false
@@ -125,7 +125,7 @@ client.on("messageCreate", msg => {
 
 client.on('messageUpdate', (oldMessage, newMessage) => {
 	//some security
-	if (config.maintenance && config.ownerID != newMessage.author.id || newMessage.author.bot) return
+	if (customvars.maintenance && config.ownerID != newMessage.author.id || newMessage.author.bot) return
 	
 	let args = newMessage.content.split(" ")
 	if(args[0].toLowerCase().startsWith(config.prefix)){
@@ -237,7 +237,7 @@ client.on("guildDelete", guild => {
 
 client.once('ready', () => {
 	//client.guilds.cache.size - TODO logging guilds count
-	if (config.maintenance) {
+	if (customvars.maintenance) {
 		client.user.setStatus('idle')
 		client.user.setActivity('Тех. работы | tech. works');
 		console.log(getTimestamp() + " [INFO] " + `${client.user.username} (${config.version}) is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`)

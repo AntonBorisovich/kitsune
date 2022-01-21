@@ -14,7 +14,8 @@ exec("rm /home/pi/senkobot/assets/amogus/temp/*")
 exec("rm /home/pi/senkobot/dumpy*")
 
 class Amogus {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
 		this.test = true; 
         this.client = client;
         this.config = config;

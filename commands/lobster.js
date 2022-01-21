@@ -40,7 +40,8 @@ const demotivatorImage = async (img, title, width, height) => {
 }
 
 class Lobster {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
         this.client = client;
         this.config = config;
         this.commands = commands;

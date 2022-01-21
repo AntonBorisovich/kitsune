@@ -1,6 +1,6 @@
 const Discord = require("discord.js")
 const { createCanvas, loadImage } = require('canvas')
-const bg = '././assets/demotiv/demotivator.png'
+//const bg = '././assets/demotiv/demotivator.png'
 
 const demotivatorImage = async (img, title, subtitle, width, height) => {
   if (width > 850) {
@@ -36,7 +36,8 @@ const demotivatorImage = async (img, title, subtitle, width, height) => {
 }
 
 class Dem {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
         this.client = client;
         this.config = config;
         this.commands = commands;

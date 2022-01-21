@@ -2,7 +2,8 @@ const Discord = require("discord.js")
 const search = require("g-i-s")
 
 class Bread {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
         this.client = client;
         this.config = config;
         this.commands = commands;

@@ -3,7 +3,8 @@ const neko_client = require('nekos.life');
 const neko = new neko_client();
 
 class nekos {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
 		this.client = client;
 		this.config = config;
 		this.commands = commands;

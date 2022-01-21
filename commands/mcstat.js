@@ -2,7 +2,8 @@ const Discord = require("discord.js")
 const minecraft = require('minecraft-server-util');
 
 class Mcstat {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
         this.client = client;
         this.config = config;
         this.commands = commands;

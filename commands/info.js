@@ -4,8 +4,8 @@ const os = require('os');
 let launch_time = Date.now();
 
 class Info {
-    constructor(client, config, commands){
-		
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
 		this.test = "skip"; 
         this.client = client;
         this.config = config;

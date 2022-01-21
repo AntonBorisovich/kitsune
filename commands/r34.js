@@ -3,7 +3,8 @@ const https = require("https");
 const xml2js = require("xml2js");
 
 class r34 {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
 		this.vpn = true; 
 		this.test = true; 
         this.client = client;

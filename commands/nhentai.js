@@ -4,7 +4,8 @@ const { NHentai, NHSort } = require('nhentai.js-api');
 const api = new NHentai();
 
 class Nhentai {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
 		this.test = true; 
 		this.vpn = true; 
         this.client = client;

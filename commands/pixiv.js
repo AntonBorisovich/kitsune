@@ -7,7 +7,8 @@ const pixiv = new PixivApi();
 //Antt0989
 
 class Pixiv {
-    constructor(client, config, commands){
+    constructor(client, config, commands, customvars){
+		this.customvars = customvars;
         this.client = client;
         this.config = config;
         this.commands = commands;
