@@ -78,7 +78,7 @@ class Pat {
 			async function work(client, msg, args, imgurl) {
 				if (imgurl) {
 					msg.channel.sendTyping()		
-					const image = await pet(imgurl.replace(/webp/g, "png"),{resolution: 160, delay: 25})
+					const image = await pet(imgurl.replace(/webp/g, "png"),{resolution: 160, delay: 24})
 					msg.channel.send({files: [{attachment: image, name: 'pat.gif'}]})
 				} else {
 					if (!msg.attachments.first().contentType) {
@@ -97,8 +97,24 @@ class Pat {
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
+					if (msg.attachments.first().height > 1536) {
+						let embed = new Discord.MessageEmbed()
+						embed.setTitle(client.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Изображение слишком большое.")
+						msg.channel.send({ embeds: [embed] });
+						return;
+					}
+					if (msg.attachments.first().width > 1536) {
+						let embed = new Discord.MessageEmbed()
+						embed.setTitle(client.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Изображение слишком большое.")
+						msg.channel.send({ embeds: [embed] });
+						return;
+					}
 					msg.channel.sendTyping()
-					const image = await pet(msg.attachments.first().attachment,{resolution: 160, delay: 25})
+					const image = await pet(msg.attachments.first().attachment,{resolution: 160, delay: 24})
 					msg.channel.send({files: [{attachment: image, name: 'pat.gif'}]})
 				}
 			}
