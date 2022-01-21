@@ -12,7 +12,7 @@ class Pat {
 		this.usage = "<юзер>";
 		this.advargs = "<юзер> - упоминание человека, аватарка которого будет поглажена";
         this.desc = "погладить кого-то/пикчу";
-		this.advdesc = "Делает гифку с рукой, которая гладит прикрепленное вами изображение или аватарку пользователя\n\nЛимит размера изображения: 1536x1536";
+		this.advdesc = "Делает гифку с рукой, которая гладит прикрепленное вами изображение или аватарку пользователя";
         this.name = "pat";
     }
 
@@ -97,7 +97,7 @@ class Pat {
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
-					if (msg.attachments.first().height > 1536) {
+					if (msg.attachments.first().height > 15000) {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
@@ -105,7 +105,7 @@ class Pat {
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
-					if (msg.attachments.first().width > 1536) {
+					if (msg.attachments.first().width > 15000) {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
