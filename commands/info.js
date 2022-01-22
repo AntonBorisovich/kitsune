@@ -31,11 +31,11 @@ class Info {
 		embed.setThumbnail('https://i.imgur.com/Maz0oZ1.png')
 		embed.setColor(`#F36B00`)
 		embed.setDescription(client.user.username + ' - бот для дискорда с NSFW и Fun функциями\nСоздатель: <@' + this.config.ownerID + '>')
-		if (this.customvars.updateversion) {
-			embed.setFooter({ text: 'Версия: ' + this.customvars.version + '\nДоступно обновление "' + this.customvars.updateversion + '", которое будет установлено после перезапуска бота'});
-		} else {
+		//if (this.customvars.updateversion) {
+			//embed.setFooter({ text: 'Версия: ' + this.customvars.version + '\nДоступно обновление "' + this.customvars.updateversion + '", которое будет установлено после перезапуска бота'});
+		//} else {
 			embed.setFooter({ text: 'Версия: ' + this.customvars.version });
-		}
+		//}
 		
 		// const buttonlink = new Discord.MessageButton()
 			// .setLabel('Политика конфиденциальности')

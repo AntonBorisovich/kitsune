@@ -16,6 +16,8 @@ console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' 
 
 async function checkupdate() {
 	console.log(getTimestamp() + ' [INFO] Looking for updates...')
+	//const gitfetch = await git().fetch()
+	//console.log(gitfetch)
 	const gitlog = await git().log()
 	let found = false
 	for await (const commit of gitlog.all) {
