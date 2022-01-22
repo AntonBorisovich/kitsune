@@ -90,6 +90,13 @@ class reboot {
 				msg.channel.send({ embeds: [embed] });
 				return
 			}
+		} else {
+			let embed = new Discord.MessageEmbed()
+			embed.setTitle(client.user.username + ' - reboot')
+			embed.setColor(`#F36B00`)
+			embed.setDescription(":arrows_counterclockwise: Перезапуск...")
+			msg.channel.send({ embeds: [embed] });
+			work(client)
 		}
 		function work(client) {
 			client.user.setActivity('Пока!');
