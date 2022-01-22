@@ -30,12 +30,16 @@ class Info {
 		embed.setTitle(client.user.username + ' - About')
 		embed.setThumbnail('https://i.imgur.com/Maz0oZ1.png')
 		embed.setColor(`#F36B00`)
-		embed.setDescription('SenkoBot - бот для дискорда с NSFW и Fun функциями\nСоздатель: <@' + this.config.ownerID + '>')
-		embed.setFooter({ text: 'Версия: ' + this.config.version });
+		embed.setDescription(client.user.username + ' - бот для дискорда с NSFW и Fun функциями\nСоздатель: <@' + this.config.ownerID + '>')
+		if (this.customvars.updateversion) {
+			embed.setFooter({ text: 'Версия: ' + this.customvars.version + '\nДоступно обновление "' + this.customvars.updateversion + '", которое будет установлено после перезапуска бота'});
+		} else {
+			embed.setFooter({ text: 'Версия: ' + this.customvars.version });
+		}
 		
 		// const buttonlink = new Discord.MessageButton()
 			// .setLabel('Политика конфиденциальности')
-			// .setURL("zombo.com")
+			// .setURL("https://docs.google.com/document/d/e/2PACX-1vQK2d9hAjIXB5Ck9zdTbLALsradpgM6sHxc_J2btYr_vvNVStKgZLHb4ZOdyC-5kn8A1lqzBMszyNbQ/pub")
 			// .setStyle('LINK')
 		// const buttons = new Discord.MessageActionRow()
 			// .addComponents(buttonlink)
@@ -116,7 +120,7 @@ class Info {
 		
 		embed.addField('---== Bot additional info ==---', 
 		'```\n' +
-		'Version: ' + this.config.version + '\n' +
+		'Version: ' + this.customvars.version + '\n' +
 		'Loaded commands: ' + this.commands.length + '\n' +
 		'prefix: ' + this.config.prefix + '\n' +
 		'CPU architecture: ' + os.arch() + '\n' +

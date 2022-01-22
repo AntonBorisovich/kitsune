@@ -6,17 +6,47 @@ Client = Discord.Client;
 Intents = Discord.Intents;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]});
 const fs = require("fs");
-
-console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
+const git = require('simple-git');
 
 let config
 let customvars = {}
+let commands = []
+
+console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
+
+async function checkupdate() {
+	console.log(getTimestamp() + ' [INFO] Looking for updates...')
+	const gitlog = await git().log()
+	let found = false
+	for await (const commit of gitlog.all) {
+		if (found) break;
+		if (commit.refs != '') {
+			let tag
+			if (commit.refs.startsWith('tag')) {
+				tag = commit.refs.substring((commit.refs.indexOf(":") + 2), commit.refs.length)
+				found = tag
+			} else {
+				tag = commit.refs.substring(commit.refs.indexOf("tag"), commit.refs.length)
+				tag = tag.substring(0, tag.indexOf(","))
+				tag = tag.substring((tag.indexOf(":") + 2), tag.length)
+				found = tag
+			}
+		}
+	}
+	if (found != customvars.version) {
+		console.log(getTimestamp() + ' [INFO] The update is available (' + customvars.version + ' => ' + found + ')')
+		customvars.updateversion = found
+	} else {
+		console.log(getTimestamp() + ' [INFO] Application is up-to-date (' + customvars.version + ')')
+	}
+	init()
+}
 fs.readdir("./values/", async (err, files)=>{
 	let loaded = 0
 	let nowloading = ""
-    if (err) throw err;
+	if (err) throw err;
 	console.log(getTimestamp() + ' [INFO] Loading vars...')
-    await files.forEach((file)=>{
+	await files.forEach((file)=>{
 		try {
 			loaded = (loaded + 1)
 			let fileName = file.substring(0,file.length-5)
@@ -28,7 +58,7 @@ fs.readdir("./values/", async (err, files)=>{
 			console.error(" (" + loaded + "/" + files.length + ") Error while loading var " + nowloading)
 			console.error(err)
 		}
-    })
+	})
 	console.log(getTimestamp() + " [INFO] Loaded " + loaded + " vars")
 	if (!customvars.discordtoken) {
 		console.error(getTimestamp() + ' [ERROR] Discord token not found! Can not log in discord. Please create values/discordtoken.json and write in "{"discordtoken": "your_token_here_with_quotes"}"')
@@ -41,36 +71,38 @@ fs.readdir("./values/", async (err, files)=>{
 		config = require('./config.json');
 		console.log(getTimestamp() + ' [INFO] Loaded stable bot config')
 	}
+	checkupdate()
 })
-let commands = []
-setTimeout(() => {	
-	fs.readdir("./commands/", async (err, files)=>{
-		console.log(getTimestamp() + ' [INFO] Loading commands...')
-		let loaded = 0
-		let nowloading
-		if (err) throw err;
-		await files.forEach((file)=>{
-			try {
-				loaded = (loaded + 1)
-				let fileName = file.substring(0,file.length-3)
-				nowloading = fileName
-				let cmdPrototype = require("./commands/"+fileName)
-				let command = new cmdPrototype(client, config, commands, customvars);
-				commands.push(command)
-				console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
-			} catch(err) {
-				console.error(" (" + loaded + "/" + files.length + ") Error while loading command " + nowloading)
-				console.error(err)
-			}
+async function init() {
+	
+	setTimeout(() => {	
+		fs.readdir("./commands/", async (err, files)=>{
+			console.log(getTimestamp() + ' [INFO] Loading commands...')
+			let loaded = 0
+			let nowloading
+			if (err) throw err;
+			await files.forEach((file)=>{
+				try {
+					loaded = (loaded + 1)
+					let fileName = file.substring(0,file.length-3)
+					nowloading = fileName
+					let cmdPrototype = require("./commands/"+fileName)
+					let command = new cmdPrototype(client, config, commands, customvars);
+					commands.push(command)
+					console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
+				} catch(err) {
+					console.error(" (" + loaded + "/" + files.length + ") Error while loading command " + nowloading)
+					console.error(err)
+				}
+			})
+			console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
+			setTimeout(() => {	
+				console.log(getTimestamp() + ' [INFO] Logging in Discord...')
+				client.login(customvars.discordtoken);
+			},2500);
 		})
-		console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
-		setTimeout(() => {	
-			console.log(getTimestamp() + ' [INFO] Logging in Discord...')
-			client.login(customvars.discordtoken);
-		},2500);
-	})
-}, 1500);
-
+	}, 1500);
+}
 
 function getTimestamp() {
 	var date = new Date();
@@ -259,11 +291,11 @@ client.once('ready', () => {
 	if (customvars.maintenance) {
 		client.user.setStatus('idle')
 		client.user.setActivity('Тех. работы | tech. works');
-		console.log(getTimestamp() + " [INFO] " + `${client.user.username} (${config.version}) is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`)
+		console.log(getTimestamp() + " [INFO] " + `${client.user.username} is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`)
 	} else {
 		client.user.setStatus('online')
 		client.user.setActivity(config.prefix + 'help');
-		console.log(getTimestamp() + " [INFO] " + `${client.user.username} (${config.version}) is ready to work!`)
+		console.log(getTimestamp() + " [INFO] " + `${client.user.username} is ready to work!`)
 	}
 });
 

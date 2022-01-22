@@ -1,3 +1,5 @@
 node_modules/
-values/
+values/discordtoken.json
+values/maintenance.json
+values/unstable.json
 promo/
