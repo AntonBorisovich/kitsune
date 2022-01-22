@@ -28,7 +28,7 @@ class Help {
 				msg.author.send({ embeds: [embed] });
 				
 				embed = new Discord.MessageEmbed()
-				embed.setTitle(client.user.username + ' - ' + command.name)
+				embed.setTitle(client.user.username + ' - Full command list')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Полный список команд отправлен тебе в лс")
 				msg.channel.send({ embeds: [embed] });

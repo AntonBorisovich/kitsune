@@ -13,16 +13,27 @@ let config
 let customvars = {}
 fs.readdir("./values/", async (err, files)=>{
 	let loaded = 0
+	let nowloading = ""
     if (err) throw err;
 	console.log(getTimestamp() + ' [INFO] Loading vars...')
     await files.forEach((file)=>{
-		loaded = (loaded + 1)
-		let fileName = file.substring(0,file.length-5)
-        let variable = require("./values/" + file)
-		customvars[fileName] = variable[fileName]
-		console.log(" (" + loaded + "/" + files.length + ") Loaded ver " + fileName + " = " + variable[fileName] + " (" + loaded + "/" + files.length + ")")
+		try {
+			loaded = (loaded + 1)
+			let fileName = file.substring(0,file.length-5)
+			nowloading = fileName
+			let variable = require("./values/" + file)
+			customvars[fileName] = variable[fileName]
+			console.log(" (" + loaded + "/" + files.length + ") Loaded var " + fileName)
+		} catch(err) {
+			console.error(" (" + loaded + "/" + files.length + ") Error while loading var " + nowloading)
+			console.error(err)
+		}
     })
 	console.log(getTimestamp() + " [INFO] Loaded " + loaded + " vars")
+	if (!customvars.discordtoken) {
+		console.error(getTimestamp() + ' [ERROR] Discord token not found! Can not log in discord. Please create values/discordtoken.json and write in "{"discordtoken": "your_token_here_with_quotes"}"')
+		process.exit(1)
+	}
 	if (customvars.unstable || !customvars.stable) {
 		config = require('./testbotconfig.json');
 		console.log(getTimestamp() + ' [INFO] Loaded unstable bot config')
@@ -36,19 +47,26 @@ setTimeout(() => {
 	fs.readdir("./commands/", async (err, files)=>{
 		console.log(getTimestamp() + ' [INFO] Loading commands...')
 		let loaded = 0
+		let nowloading
 		if (err) throw err;
 		await files.forEach((file)=>{
-			loaded = (loaded + 1)
-			let fileName = file.substring(0,file.length-3)
-			let cmdPrototype = require("./commands/"+fileName)
-			let command = new cmdPrototype(client, config, commands, customvars);
-			commands.push(command)
-			console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
+			try {
+				loaded = (loaded + 1)
+				let fileName = file.substring(0,file.length-3)
+				nowloading = fileName
+				let cmdPrototype = require("./commands/"+fileName)
+				let command = new cmdPrototype(client, config, commands, customvars);
+				commands.push(command)
+				console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
+			} catch(err) {
+				console.error(" (" + loaded + "/" + files.length + ") Error while loading command " + nowloading)
+				console.error(err)
+			}
 		})
 		console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
 		setTimeout(() => {	
 			console.log(getTimestamp() + ' [INFO] Logging in Discord...')
-			client.login(config.discordtoken);
+			client.login(customvars.discordtoken);
 		},2500);
 	})
 }, 1500);
@@ -173,6 +191,7 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 
 client.on("interactionCreate", interaction => {
 	try {
+		if (customvars.maintenance && config.ownerID != interaction.user.id || interaction.user.bot) return
 		let executed = false
 		if (interaction.type == "MESSAGE_COMPONENT") {
 			executed = true
