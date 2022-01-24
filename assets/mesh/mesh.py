@@ -16,8 +16,8 @@ def display_answers(link):
 	answers = mesh.get_answers(link)
 	
 	for task_number, task in enumerate(answers):
-		print("ХУЙГОВНО**Вопрос %d:** %s".encode('utf-8').decode('ANSI') % (task_number + 1, task [0].replace('И', 'и').encode('utf-8').decode('ANSI')))
-		print("HOMOSEC %s".encode('utf-8').decode('ANSI') % task [1].replace('И', 'и').encode('utf-8').decode('ANSI'))
+		print("ХУЙГОВНО**Вопрос %d:** %s" % (task_number + 1, task [0]))
+		print("HOMOSEC %s" % task [1])
 
 
 def main ():
