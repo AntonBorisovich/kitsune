@@ -73,7 +73,7 @@ fs.readdir("./values/", async (err, files)=>{
 		config = require('./config.json');
 		console.log(getTimestamp() + ' [INFO] Loaded stable bot config')
 	}
-	checkupdate()
+	init()
 })
 async function init() {
 	
