@@ -4,7 +4,7 @@ Powered by Discord.js
 Простой модульный бот на js.
 
 Перед запуском:
-- Установите последний [node.js](https://nodejs.org/)
+- Установите последний [node.js](https://nodejs.org/) (v16.9.0 и выше) 
 - Установите [python 3](https://www.python.org/downloads/) (python используется пока только для работы команды mesh и не обязателен для запуска)
 - Установить все модули прописав `npm i` в директории с package.json
 - Далее введите токен вашего бота в values/discordtoken.json, который вы можете найти на [Портале Разработчиков Discord](https://discord.com/developers/)

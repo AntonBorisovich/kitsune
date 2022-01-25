@@ -51,9 +51,7 @@ fs.readdir("./values/", async (err, files)=>{
 	await files.forEach((file)=>{
 		try {
 			loaded = (loaded + 1)
-			if (!file.endsWith(".json")) {
-				console.error(" (" + loaded + "/" + files.length + ") Skipped " + file + " (wrong name)")
-			}
+			if (!file.endsWith(".json")) return;
 			const fileName = file.substring(0,file.length-5)
 			nowloading = fileName
 			const variable = require("./values/" + file)
