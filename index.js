@@ -14,7 +14,7 @@ let commands = []
 
 console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
 
-async function checkupdate() {
+async function checkupdate() { //TODO
 	console.log(getTimestamp() + ' [INFO] Looking for updates...')
 	//const gitfetch = await git().fetch()
 	//console.log(gitfetch)
@@ -51,9 +51,12 @@ fs.readdir("./values/", async (err, files)=>{
 	await files.forEach((file)=>{
 		try {
 			loaded = (loaded + 1)
-			let fileName = file.substring(0,file.length-5)
+			if (!file.endsWith(".json")) {
+				console.error(" (" + loaded + "/" + files.length + ") Skipped " + file + " (wrong name)")
+			}
+			const fileName = file.substring(0,file.length-5)
 			nowloading = fileName
-			let variable = require("./values/" + file)
+			const variable = require("./values/" + file)
 			customvars[fileName] = variable[fileName]
 			console.log(" (" + loaded + "/" + files.length + ") Loaded var " + fileName)
 		} catch(err) {
