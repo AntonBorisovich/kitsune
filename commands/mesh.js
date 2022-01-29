@@ -10,7 +10,7 @@ class Mesh {
 		this.perms = [""];
 		this.category = "Fun";
 		this.args = "<ссылка>";
-		this.advargs = "Ссылка на тест. Важно, что бы она была как домашняя работа, а не тест найденый в Библиотеке МЭШ.";
+		this.advargs = "<ссылка> - Ссылка на тест. Важно, что бы она была как домашняя работа, а не тест найденый в Библиотеке МЭШ.";
 		this.usage = "<ссылка>";
         this.desc = "ищет ответы на тесты МЭШ";
         this.advdesc = "Ответы к тестам МЭШ";
@@ -38,8 +38,8 @@ class Mesh {
 						let embed = new Discord.MessageEmbed()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
-						embed.setDescription("Неверная сслыка")
-						embed.setFooter({text: String(code)})
+						embed.setDescription("Неправильная ссылка")
+						//embed.setFooter({text: String(code)})
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
