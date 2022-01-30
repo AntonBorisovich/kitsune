@@ -6,7 +6,6 @@ Client = Discord.Client;
 Intents = Discord.Intents;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]});
 const fs = require("fs");
-const git = require('simple-git');
 
 let config
 let customvars = {}
@@ -14,33 +13,10 @@ let commands = []
 
 console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
 
-async function checkupdate() { //TODO
+async function checkupdate() { //TODO 
 	console.log(getTimestamp() + ' [INFO] Looking for updates...')
-	//const gitfetch = await git().fetch()
-	//console.log(gitfetch)
-	const gitlog = await git().log()
-	let found = false
-	for await (const commit of gitlog.all) {
-		if (found) break;
-		if (commit.refs != '') {
-			let tag
-			if (commit.refs.startsWith('tag')) {
-				tag = commit.refs.substring((commit.refs.indexOf(":") + 2), commit.refs.length)
-				found = tag
-			} else {
-				tag = commit.refs.substring(commit.refs.indexOf("tag"), commit.refs.length)
-				tag = tag.substring(0, tag.indexOf(","))
-				tag = tag.substring((tag.indexOf(":") + 2), tag.length)
-				found = tag
-			}
-		}
-	}
-	if (found != customvars.version) {
-		console.log(getTimestamp() + ' [INFO] The update is available (' + customvars.version + ' => ' + found + ')')
-		customvars.updateversion = found
-	} else {
-		console.log(getTimestamp() + ' [INFO] Application is up-to-date (' + customvars.version + ')')
-	}
+	//dosomething()
+	console.log(getTimestamp() + ' [INFO] Current version: ' + customvars.version)
 	init()
 }
 fs.readdir("./values/", async (err, files)=>{
@@ -74,7 +50,7 @@ fs.readdir("./values/", async (err, files)=>{
 		config = require('./config.json');
 		console.log(getTimestamp() + ' [INFO] Loaded stable bot config')
 	}
-	init()
+	init() //checkupdate()
 })
 async function init() {
 	

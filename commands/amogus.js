@@ -1,4 +1,6 @@
 
+// TODO лимит подушных операций. До тех пор команда заблокирована
+
 // WARNING! THIS SCRIPT HAS SPECIFIC PATHS. CHANGING THE PLATFORM OR CHANGING THE LOCATION OF FILES CAN HAVE A BAD EFFECT ON WORKABILITY
 // ВНИМАНИЕ! СКРИПТ ИМЕЕТ КОНКРЕТНЫЕ ПУТИ. ИЗМЕНЕНИЕ ПЛАТФОРМЫ ИЛИ СМЕНА МЕСТОПОЛОЖЕНИЯ ФАЙЛОВ МОЖЕТ ПЛОХО СКАЗАТЬСЯ НА РАБОТОСПОСОБНОСТИ
 
@@ -25,7 +27,7 @@ class Amogus {
 		this.category = "Fun";
 		this.advargs = "-h <число> - кол во строк (по умолчанию 5, максимум 10)";
 		this.usage = "";
-        this.desc = "сделать гифку с тверкающим амогусом";
+        this.desc = "сделать гифку с тверкающим амогусом hide";
         this.advdesc = "Делает гифку с тверкающими амогусами из вашей фотокарточки\n\n";
         this.name = "amogus";
     }
