@@ -13,10 +13,10 @@ class r34 {
 		this.perms = [""];
 		this.category = "img_NSFW";
 		this.args = "<тег>";
-		this.advargs = "<тег>\n\nМожно запросить несколько тегов, указав их через пробел. Пример: `s!r34 cum`, `s!r34 kujou_karen futanari`.\n\nБез аргументов будет выдана рандомная пикча";
+		this.advargs = "<тег>\n\nМожно запросить несколько тегов указав их через пробел. Пример: `s!r34 cum`, `s!r34 kujou_karen futanari`\n[Полный гайд по тегам](https://rule34.xxx/index.php?page=help&topic=cheatsheet)\n\nБез аргументов будет выдана рандомная пикча";
 		this.usage = "<тег>";
         this.desc = "кидает пикчи с rule34.xxx";
-        this.advdesc = "Ищет NSFW фотокарточки с сайта rule34.xxx";
+        this.advdesc = "Ищет NSFW фотокарточки на сайте rule34.xxx";
         this.name = "r34";
     }
 	async testrun(msg, method) {
