@@ -5,8 +5,7 @@ Powered by Discord.js
 
 Перед запуском:
 - Установите последний [node.js](https://nodejs.org/) (v16.9.0 и выше) 
-- Установите какую-то поеботу для waifu2x-node
-- Установите [python 3](https://www.python.org/downloads/) (python используется пока только для работы команды mesh и не обязателен для запуска)
+- Установите [python 3](https://www.python.org/downloads/)
 - Установить все модули прописав `npm i` в директории с package.json
 - Далее введите токен вашего бота в values/discordtoken.json, который вы можете найти на [Портале Разработчиков Discord](https://discord.com/developers/)
 - Откройте start.bat на Windows или пропишите `node index` на других системах в директории с index.js для запуска.
