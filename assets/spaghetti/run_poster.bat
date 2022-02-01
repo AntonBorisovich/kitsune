@@ -1,1 +1,0 @@
-C:\Users\Rowan\AppData\Local\Programs\Python\Python36\python.exe "C:\Users\Rowan\Desktop\spaghentai-box-X\poster.py"
