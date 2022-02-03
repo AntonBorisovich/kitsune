@@ -1,11 +1,12 @@
 # SenkoBot for Discord
 Powered by Discord.js
 
-Простой модульный бот на js.
+Senko Bot - простой модульный бот на js
 
 Перед запуском:
 - Установите последний [node.js](https://nodejs.org/) (v16.9.0 и выше) 
 - Установите [python 3](https://www.python.org/downloads/)
+- Установите шрифт [Lobster](https://fonts.google.com/specimen/Lobster)
 - Установить все модули прописав `npm i` в директории с package.json
 - Далее введите токен вашего бота в values/discordtoken.json, который вы можете найти на [Портале Разработчиков Discord](https://discord.com/developers/)
 - Откройте start.bat на Windows или пропишите `node index` на других системах в директории с index.js для запуска.
