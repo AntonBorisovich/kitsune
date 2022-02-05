@@ -1,17 +1,17 @@
 console.log(getTimestamp() + " [INFO] Initialization...")
 
 const os = require('os');
+console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
 const Discord = require('discord.js');
 Client = Discord.Client;
 Intents = Discord.Intents;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]});
 const fs = require("fs");
-
 let config
 let customvars = {}
 let commands = []
 
-console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
+
 
 async function checkupdate() { //TODO 
 	console.log(getTimestamp() + ' [INFO] Looking for updates...')
@@ -19,7 +19,7 @@ async function checkupdate() { //TODO
 	console.log(getTimestamp() + ' [INFO] Current version: ' + customvars.version)
 	init()
 }
-fs.readdir("./values/", async (err, files)=>{
+fs.readdir("./src/values/", async (err, files)=>{
 	let loaded = 0
 	let nowloading = ""
 	if (err) throw err;
@@ -27,10 +27,13 @@ fs.readdir("./values/", async (err, files)=>{
 	await files.forEach((file)=>{
 		try {
 			loaded = (loaded + 1)
-			if (!file.endsWith(".json")) return;
+			if (!file.endsWith(".json")) {
+				console.log(" (" + loaded + "/" + files.length + ") Skipped var " + file + " (not .json)")
+				return;
+			}
 			const fileName = file.substring(0,file.length-5)
 			nowloading = fileName
-			const variable = require("./values/" + file)
+			const variable = require("./src/values/" + file)
 			customvars[fileName] = variable[fileName]
 			console.log(" (" + loaded + "/" + files.length + ") Loaded var " + fileName)
 		} catch(err) {
@@ -44,10 +47,10 @@ fs.readdir("./values/", async (err, files)=>{
 		process.exit(1)
 	}
 	if (customvars.unstable || !customvars.stable) {
-		config = require('./testbotconfig.json');
+		config = require('./src/testbotconfig.json');
 		console.log(getTimestamp() + ' [INFO] Loaded unstable bot config')
 	} else {
-		config = require('./config.json');
+		config = require('./src/config.json');
 		console.log(getTimestamp() + ' [INFO] Loaded stable bot config')
 	}
 	init() //checkupdate()
@@ -55,7 +58,7 @@ fs.readdir("./values/", async (err, files)=>{
 async function init() {
 	
 	setTimeout(() => {	
-		fs.readdir("./commands/", async (err, files)=>{
+		fs.readdir("./src/commands/", async (err, files)=>{
 			console.log(getTimestamp() + ' [INFO] Loading commands...')
 			let loaded = 0
 			let nowloading
@@ -65,7 +68,7 @@ async function init() {
 					loaded = (loaded + 1)
 					let fileName = file.substring(0,file.length-3)
 					nowloading = fileName
-					let cmdPrototype = require("./commands/"+fileName)
+					let cmdPrototype = require("./src/commands/"+fileName)
 					let command = new cmdPrototype(client, config, commands, customvars);
 					commands.push(command)
 					console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")

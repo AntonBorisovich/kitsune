@@ -1,5 +1,5 @@
 const Discord = require("discord.js")
-const {dependencies} = require('../package.json');
+const {dependencies} = require('../../package.json');
 const os = require('os');
 let launch_time = Date.now();
 

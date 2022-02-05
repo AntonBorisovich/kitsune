@@ -82,9 +82,9 @@ class Sfbr {
 							postCount = 100;
 						}
 						if (postCount > 0) {
-							//console.log(result)
+							console.log(result)
 							//console.log(result.posts)
-							var picNum = Math.floor(Math.random() * postCount) + 0;
+							var picNum = (Math.floor((Math.random() - 0.0001) * postCount) + 1);
 							var sfbrPic = result.posts.post[picNum].$.file_url;
 							var sfbrTags = result.posts.post[picNum].$.tags.replace(/ /g, ", ");
 							let embed = new Discord.MessageEmbed()
@@ -110,6 +110,7 @@ class Sfbr {
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Произошла ошибка")
+				embed.setFooter({ text: String(e)})
 				msg.channel.send({ embeds: [embed] });
 				return
 			});
@@ -119,6 +120,7 @@ class Sfbr {
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Произошла ошибка")
+			embed.setFooter({ text: String(e)})
 			msg.channel.send({ embeds: [embed] });
 		}
     }

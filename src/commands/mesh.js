@@ -10,17 +10,17 @@ class Mesh {
 		this.perms = [""];
 		this.category = "Fun";
 		this.args = "<ссылка>";
-		this.advargs = "<ссылка> - Ссылка на тест. Важно, что бы она была как домашняя работа, а не тест найденый в Библиотеке МЭШ.";
 		this.usage = "<ссылка>";
-        this.desc = "ищет ответы на тесты МЭШ";
-        this.advdesc = "Ответы к тестам МЭШ";
+		this.advargs = "<ссылка> - Ссылка на тест. Важно, что бы она была как домашняя работа, а не тест найденый в Библиотеке МЭШ.";
+        this.advdesc = "Ищет ответы на тесты МЭШ (Московская Электронная Школа)";
+        this.desc = "ответы к тестам МЭШ";
         this.name = "mesh";
     }
 
     async run(client, msg, args){
 		if (args[1]) {
 			try {	
-				await PythonShell.run('assets/mesh/mesh.py', {args: [args[1]]}, async function (err,code,signal) {
+				await PythonShell.run('src/assets/mesh/mesh.py', {args: [args[1]]}, async function (err,code,signal) {
 					if (err) {
 						console.error(err)
 						let embed = new Discord.MessageEmbed()
