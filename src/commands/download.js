@@ -6,11 +6,11 @@ const path = require('path');
 //cleaning temp
 
 fs.readdir('./src/assets/download/temp/', (err, files) => {
-  if (err) throw err;
+  if (err) console.warn(err);
   for (const file of files) {
 	if (file != ".gitkeep") {
 		fs.unlink(path.join('./src/assets/download/temp/', file), err => {
-		  if (err) throw err;
+		  if (err) console.warn(err);
 		});
 	}
   }
@@ -74,7 +74,7 @@ class Download {
 			await ytdl(args[1], { filter: "audioandvideo" }).pipe(fs.createWriteStream('./src/assets/download/temp/' + sessionid + '.mp4').on('finish', () => {
 				if (fs.statSync('./src/assets/download/temp/' + sessionid + '.mp4').size > 8388608) { sizeError(audiovideo); return; }
 				msg.channel.send({files: [{attachment: './src/assets/download/temp/' + sessionid + '.mp4', name: fileName + '.mp4'}]});
-				setTimeout(() => {fs.unlink(path.join('./src/assets/download/temp/', sessionid + '.mp4'), err => {if (err) throw err;});}, 10000);
+				setTimeout(() => {fs.unlink(path.join('./src/assets/download/temp/', sessionid + '.mp4'), err => {if (err) console.warn(err);});}, 10000);
 			}));
 			return;
 		} catch(err) {
