@@ -1,6 +1,9 @@
 @ECHO OFF
 title Bot Launcher
 cls
+echo.
+echo It is highly recommended to run the bot via pm2
+echo.
 :boot
 node index.js
 echo.

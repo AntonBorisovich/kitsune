@@ -42,41 +42,54 @@ class Download {
 			return;
 		}
 		try {
-			if (!ytdl.validateURL(args[1])) {
-				let embed = new Discord.MessageEmbed()
-				embed.setTitle(client.user.username + ' - Error')
-				embed.setColor(`#F00000`)
-				embed.setDescription("Неверная ссылка. Укажите ссылку на видео YouTube для скачивания")
-				msg.channel.send({ embeds: [embed] });
-				return;
+			if (ytdl.validateURL(args[1])) {
+				youtubeDownload(msg, args)
+			} else {
+				if (args[1].toLowerCase().startsWith('https://www.tiktok.com/') || args[1].toLowerCase().startsWith('www.tiktok.com/') || args[1].toLowerCase().startsWith('tiktok.com/')) {
+					let embed = new Discord.MessageEmbed()
+					embed.setTitle(client.user.username + ' - Error')
+					embed.setColor(`#F00000`)
+					embed.setDescription("Мы пытались, но нет. Приложите ссылку на видео YouTube")
+					msg.channel.send({ embeds: [embed] });
+					return;
+				} else {
+					let embed = new Discord.MessageEmbed()
+					embed.setTitle(client.user.username + ' - Error')
+					embed.setColor(`#F00000`)
+					embed.setDescription("Неверная ссылка. Укажите ссылку на видео YouTube для скачивания")
+					msg.channel.send({ embeds: [embed] });
+					return;
+				}
 			}
 			async function sizeError(audiovideo) {
 				let downloadLinks = ""
 				await audiovideo.forEach(format => {
 					if (format.qualityLabel) {
-						downloadLinks += "[" + format.qualityLabel + "](" + format.url + ") "
+						downloadLinks += "[" + format.qualityLabel + "](" + format.url + ")\n"
 					}
 				})
 				let embed = new Discord.MessageEmbed()
 				embed.setTitle(client.user.username + ' - download')
 				embed.setColor(`#F36B00`)
-				embed.setDescription("Видео слишком большое и мы не можем его прикрепить через дискорд, но вы можете скачать его самостоятельно\n\n" + downloadLinks)
+				embed.setDescription("Видео слишком большое и мы не можем его прикрепить через дискорд, но вы можете скачать его самостоятельно:\n\n" + downloadLinks)
 				msg.channel.send({ embeds: [embed]});
 				return;
 			}
-			const info = await ytdl.getBasicInfo(args[1])
-			const fullInfo = await ytdl.getInfo(args[1])
-			const audiovideo = ytdl.filterFormats(fullInfo.formats, 'audioandvideo');
-			if (audiovideo[0].approxDurationMs > 1000000) { sizeError(audiovideo); return; }
-			const fileName = info.player_response.videoDetails.title + "." + info.player_response.videoDetails.videoId
-			const sessionid = msg.id
-			msg.channel.sendTyping()
-			await ytdl(args[1], { filter: "audioandvideo" }).pipe(fs.createWriteStream('./src/assets/download/temp/' + sessionid + '.mp4').on('finish', () => {
-				if (fs.statSync('./src/assets/download/temp/' + sessionid + '.mp4').size > 8388608) { sizeError(audiovideo); return; }
-				msg.channel.send({files: [{attachment: './src/assets/download/temp/' + sessionid + '.mp4', name: fileName + '.mp4'}]});
-				setTimeout(() => {fs.unlink(path.join('./src/assets/download/temp/', sessionid + '.mp4'), err => {if (err) console.warn(err);});}, 10000);
-			}));
-			return;
+			async function youtubeDownload(msg, args) {
+				const info = await ytdl.getBasicInfo(args[1])
+				const fullInfo = await ytdl.getInfo(args[1])
+				const audiovideo = ytdl.filterFormats(fullInfo.formats, 'audioandvideo');
+				if (audiovideo[0].approxDurationMs > 1000000) { sizeError(audiovideo); return; }
+				const fileName = info.player_response.videoDetails.title + "." + info.player_response.videoDetails.videoId
+				const sessionid = msg.id
+				msg.channel.sendTyping()
+				await ytdl(args[1], { filter: "audioandvideo" }).pipe(fs.createWriteStream('./src/assets/download/temp/' + sessionid + '.mp4').on('finish', () => {
+					if (fs.statSync('./src/assets/download/temp/' + sessionid + '.mp4').size > 8388608) { sizeError(audiovideo); return; }
+					msg.channel.send({files: [{attachment: './src/assets/download/temp/' + sessionid + '.mp4', name: fileName + '.mp4'}]});
+					setTimeout(() => {fs.unlink(path.join('./src/assets/download/temp/', sessionid + '.mp4'), err => {if (err) console.warn(err);});}, 10000);
+				}));
+				return;
+			}
 		} catch(err) {
 			console.log(err)
 			let embed = new Discord.MessageEmbed()

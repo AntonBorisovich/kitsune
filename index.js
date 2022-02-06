@@ -10,6 +10,7 @@ const fs = require("fs");
 let config
 let customvars = {}
 let commands = []
+let timeoutusers = []
 
 
 
@@ -104,16 +105,28 @@ function getTimestamp() {
 	return result
 }
 
-client.on("messageCreate", msg => {
+client.on("messageCreate", async msg => {
 	//some security
 	if (customvars.maintenance && config.ownerID != msg.author.id || msg.author.bot) return
 	
 	let args = msg.content.split(" ")
 	let executed = false
-	if(args[0].toLowerCase().startsWith(config.prefix)){
+	if (args[0].toLowerCase().startsWith(config.prefix)) {
 		let cmd = args[0].substring(config.prefix.length)
-		commands.forEach(command => {
-			if(command.name == cmd.toLowerCase()){
+		commands.forEach(async command => {
+			if (command.name == cmd.toLowerCase()) {
+				let UserIsTimedOut = false
+				for await (const user of timeoutusers) {
+					if (user == msg.author.id) {
+						UserIsTimedOut = true;
+					}
+				}
+				if (!UserIsTimedOut) {
+					timeoutusers.push(msg.author.id)
+					setTimeout(() => {if (timeoutusers.indexOf(msg.author.id) !== -1) {timeoutusers.splice(timeoutusers.indexOf(msg.author.id), 1);};}, 1100);
+				}
+				if (UserIsTimedOut) return;
+				
 				if (msg.guild) {
 					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms];
 					const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions);
@@ -155,15 +168,27 @@ client.on("messageCreate", msg => {
 	}
 });
 
-client.on('messageUpdate', (oldMessage, newMessage) => {
+client.on('messageUpdate', async (oldMessage, newMessage) => {
 	//some security
 	if (customvars.maintenance && config.ownerID != newMessage.author.id || newMessage.author.bot) return
 	
 	let args = newMessage.content.split(" ")
 	if(args[0].toLowerCase().startsWith(config.prefix)){
 		let cmd = args[0].substring(config.prefix.length)
-		commands.forEach(command => {
-			if(command.name == cmd.toLowerCase()){
+		commands.forEach(async command => {
+			if (command.name == cmd.toLowerCase()) {
+				let UserIsTimedOut = false
+				for await (const user of timeoutusers) {
+					if (user == newMessage.author.id) {
+						UserIsTimedOut = true;
+					}
+				}
+				if (!UserIsTimedOut) {
+					timeoutusers.push(newMessage.author.id)
+					setTimeout(() => {if (timeoutusers.indexOf(newMessage.author.id) !== -1) {timeoutusers.splice(timeoutusers.indexOf(newMessage.author.id), 1);};}, 1100);
+				}
+				if (UserIsTimedOut) return;
+				
 				if (command.desc.endsWith('hide') && config.ownerID != newMessage.author.id) return
 				if (newMessage.guild) {
 					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms];
