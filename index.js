@@ -123,7 +123,7 @@ client.on("messageCreate", async msg => {
 				}
 				if (!UserIsTimedOut) {
 					timeoutusers.push(msg.author.id)
-					setTimeout(() => {if (timeoutusers.indexOf(msg.author.id) !== -1) {timeoutusers.splice(timeoutusers.indexOf(msg.author.id), 1);};}, 1100);
+					setTimeout(() => {if (timeoutusers.indexOf(msg.author.id) !== -1) {timeoutusers.splice(timeoutusers.indexOf(msg.author.id), 1);};}, 3500);
 				}
 				if (UserIsTimedOut) return;
 				
@@ -185,7 +185,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 				}
 				if (!UserIsTimedOut) {
 					timeoutusers.push(newMessage.author.id)
-					setTimeout(() => {if (timeoutusers.indexOf(newMessage.author.id) !== -1) {timeoutusers.splice(timeoutusers.indexOf(newMessage.author.id), 1);};}, 1100);
+					setTimeout(() => {if (timeoutusers.indexOf(newMessage.author.id) !== -1) {timeoutusers.splice(timeoutusers.indexOf(newMessage.author.id), 1);};}, 3500);
 				}
 				if (UserIsTimedOut) return;
 				
