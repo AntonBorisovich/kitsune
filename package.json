@@ -9,9 +9,10 @@
   "author": "AntonBorisovich",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/rest": "^0.2.0-canary.0",
+    "@discordjs/rest": "^0.3.0",
     "axios": "^0.24.0",
     "canvas": "^2.8.0",
+    "discord-api-types": "^0.27.1",
     "discord.js": "^13.5.1",
     "express": "^4.17.2",
     "g-i-s": "^2.1.6",
@@ -21,7 +22,6 @@
     "pet-pet-gif": "^1.0.9",
     "python-shell": "^3.0.1",
     "request": "^2.65.0",
-    "simple-git": "^3.0.3",
     "xml2js": "^0.4.23",
     "ytdl-core": "^4.10.1"
   }

@@ -1,6 +1,5 @@
 node_modules/
 src/values/discordtoken.json
-src/values/maintenance.json
 src/values/unstable.json
 src/assets/mesh/mesh/__pycache__/
 promo/
