@@ -5,6 +5,7 @@ Senko Bot - простой модульный бот на js
 
 Перед запуском:
 - Установите последний [node.js](https://nodejs.org/) (v16.9.0 и выше) 
+- Установите всё нужное для модуля canvas [по инструкции](https://github.com/Automattic/node-canvas/wiki) для вашей ОС
 - Установите [python 3](https://www.python.org/downloads/)
 - Установите шрифт [Lobster](https://fonts.google.com/specimen/Lobster)
 - Установить все модули прописав `npm i` в директории с package.json
