@@ -59,7 +59,7 @@ class reboot {
 				work(client)
 			} else if (args[1].toLowerCase() == '-m') {
 				executable_comm = 'pm2 restart all'
-				fs.writeFile('././values/maintenance.json', '{"maintenance": ' + !this.customvars.maintenance + '}', (err) => {
+				fs.writeFile('../values/maintenance.json', '{"maintenance": ' + !this.customvars.maintenance + '}', (err) => {
 				  if (err) {
 					let embed = new Discord.MessageEmbed()
 					embed.setTitle(client.user.username + ' - Error')
