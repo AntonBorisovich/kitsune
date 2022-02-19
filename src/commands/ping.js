@@ -1,7 +1,8 @@
 const Discord = require("discord.js")
 
 class Ping {
-    constructor(client, config, commands, customvars){
+    constructor(client, config, commands, customvars, funcs){
+		this.funcs = funcs
 		this.customvars = customvars;
         this.client = client;
         this.config = config;
@@ -25,8 +26,10 @@ class Ping {
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Понг! (" + ping + " мс)")
 				msg.channel.send({ embeds: [embed] });	
+				//this.funcs.error(client, msg, args, this, "none error", false)
 			}
 		} catch (err) {
+			console.log(err)
 			let embed = new Discord.MessageEmbed()
 			embed.setTitle(client.user.username + ' - error')
 			embed.setColor(`#F00000`)

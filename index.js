@@ -9,6 +9,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 const fs = require("fs");
 let config
 let customvars = {}
+let funcs = {}
 let commands = []
 let timeoutusers = []
 
@@ -54,8 +55,35 @@ fs.readdir("./src/values/", async (err, files)=>{
 		config = require('./src/config.json');
 		console.log(getTimestamp() + ' [INFO] Loaded stable bot config')
 	}
-	init() //checkupdate()
+	setTimeout(() => {	
+		loadfunc()
+	},1000);
+	
 })
+async function loadfunc() {
+	fs.readdir("./src/functions/", async (err, files)=>{
+		console.log(getTimestamp() + ' [INFO] Loading functions...')
+		let loaded = 0
+		let nowloading
+		if (err) throw err;
+		await files.forEach((file)=>{
+			try {
+				loaded = (loaded + 1)
+				let fileName = file.substring(0,file.length-3)
+				nowloading = fileName
+				let funcPrototype = require("./src/functions/"+fileName)
+				let func = new funcPrototype(client, config, commands, customvars, funcs);
+				funcs[fileName] = func.run
+				console.log(" (" + loaded + "/" + files.length + ") Loaded " + func.name + " function")
+			} catch(err) {
+				console.error(" (" + loaded + "/" + files.length + ") Error while loading function " + nowloading)
+				console.error(err)
+			}
+		})
+		console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
+		init()
+	})
+}	
 async function init() {
 	
 	setTimeout(() => {	
@@ -70,7 +98,7 @@ async function init() {
 					let fileName = file.substring(0,file.length-3)
 					nowloading = fileName
 					let cmdPrototype = require("./src/commands/"+fileName)
-					let command = new cmdPrototype(client, config, commands, customvars);
+					let command = new cmdPrototype(client, config, commands, customvars, funcs);
 					commands.push(command)
 					console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
 				} catch(err) {
@@ -108,7 +136,7 @@ function getTimestamp() {
 client.on("messageCreate", async msg => {
 	//some security
 	if (customvars.maintenance && config.ownerID != msg.author.id || msg.author.bot) return
-	
+	//console.log(msg)
 	let args = msg.content.split(" ")
 	let executed = false
 	if (args[0].toLowerCase().startsWith(config.prefix)) {

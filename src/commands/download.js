@@ -86,7 +86,7 @@ class Download {
 				await ytdl(args[1], { filter: "audioandvideo" }).pipe(fs.createWriteStream('./src/assets/download/temp/' + sessionid + '.mp4').on('finish', () => {
 					if (fs.statSync('./src/assets/download/temp/' + sessionid + '.mp4').size > 8388608) { sizeError(audiovideo); return; }
 					msg.channel.send({files: [{attachment: './src/assets/download/temp/' + sessionid + '.mp4', name: fileName + '.mp4'}]});
-					setTimeout(() => {fs.unlink(path.join('./src/assets/download/temp/', sessionid + '.mp4'), err => {if (err) console.warn(err);});}, 10000);
+					setTimeout(() => {fs.unlink(path.join('./src/assets/download/temp/', sessionid + '.mp4'), err => {if (err) console.warn(err);});}, 15000);
 				}));
 				return;
 			}
