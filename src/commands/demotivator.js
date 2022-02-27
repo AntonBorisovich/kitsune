@@ -45,9 +45,9 @@ class Dem {
 		this.category = "fun";
 		this.args = "<-w> <верхний текст>;<нижний текст>";
 		this.usage = this.args;
-		this.advargs = "<верхний текст> и <нижний текст> - содержарие строк, разделяемые `;`\n<-w> - пропишите этот аргумент для шиииирокой пикчи (шире в полтора раза)";
+		this.advargs = "<верхний текст> и <нижний текст> - содержарие строк, разделяемые `;`\n<-w> - пропишите этот аргумент для искажения избражение. Примеры:\n `-w` - растянет пикчу в полтора раза в ширину\n `-w=0.5` - растянет пикчу в 2 раза в высоту";
         this.desc = "сделать демотиватор";
-		this.advdesc = "Делает демотиватор - изображение, под которым 2 строки текста\n\nВывод изображения ограничен в ширину до 850 пикселей";
+		this.advdesc = "Делает демотиватор - изображение, под которым 2 строки текста";
         this.name = "dem";
     }
 
@@ -132,6 +132,14 @@ class Dem {
 					} else if (args[args.length - 1].toLowerCase() == "-w"){
 						args.splice((args.length - 1), 1)
 						wide_multiplier = 1.5 
+					} else if (args[args.length - 1].toLowerCase().startsWith("-w=")) {
+						wide_multiplier = Number(args[args.length - 1].substring(3).replace(/,/g, "."))
+						args.splice((args.length - 1), 1)
+						if (isNaN(wide_multiplier)) {wide_multiplier = 1}
+					} else if (args[1].toLowerCase().startsWith("-w=")) {
+						wide_multiplier = Number(args[1].substring(3).replace(/,/g, "."))
+						args.splice(1, 1)
+						if (isNaN(wide_multiplier)) {wide_multiplier = 1}
 					}
 				}
 				
