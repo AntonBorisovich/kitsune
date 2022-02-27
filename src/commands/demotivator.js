@@ -135,12 +135,12 @@ class Dem {
 					} else if (args[args.length - 1].toLowerCase().startsWith("-w=")) {
 						wide_multiplier = Number(args[args.length - 1].substring(3).replace(/,/g, "."))
 						args.splice((args.length - 1), 1)
-						if (isNaN(wide_multiplier) || wide_multiplier < 0) {wide_multiplier = 1}
+						if (isNaN(wide_multiplier) || Math.sign(wide_multiplier) < 0) {wide_multiplier = 1}
 						if (wide_multiplier > 10) {wide_multiplier = 10}
 					} else if (args[1].toLowerCase().startsWith("-w=")) {
 						wide_multiplier = Number(args[1].substring(3).replace(/,/g, "."))
 						args.splice(1, 1)
-						if (isNaN(wide_multiplier) || wide_multiplier < 0) {wide_multiplier = 1}
+						if (isNaN(wide_multiplier) || Math.sign(wide_multiplier) < 0) {wide_multiplier = 1}
 						if (wide_multiplier > 10) {wide_multiplier = 10}
 					}
 				}
