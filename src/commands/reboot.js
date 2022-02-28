@@ -39,7 +39,7 @@ class reboot {
 			var result = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + hours + ":" + mins + ":" + seconds
 			return result
 		}
-		let executable_comm = 'reboot'
+		let executable_comm = 'sudo reboot'
 		if (args[1]) {
 			if (args[1].toLowerCase() == '-q') {  
 				executable_comm = 'pm2 restart all'
