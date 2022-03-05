@@ -106,7 +106,6 @@ class Dem {
 			
 			//work
 			async function work(client, msg, args) {
-				
 				if (!msg.attachments.first().contentType) {
 					let embed = new Discord.MessageEmbed()
 					embed.setTitle(client.user.username + ' - Error')
@@ -152,15 +151,16 @@ class Dem {
 				msg.channel.sendTyping()
 				
 				const image = await demotivatorImage(attach, data[0], data[1], (msg.attachments.first().width * wide_multiplier), msg.attachments.first().height)
-				msg.channel.send({files: [image]})
+				await msg.channel.send({files: [image]})
+				return;
 			}
 		} catch(err) {
+			cosnole.log(err)
             let embed = new Discord.MessageEmbed()
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Ошибка:\n```" + err + "\n```")
 			msg.channel.send({ embeds: [embed] });;
-			
 		}
     }
 }

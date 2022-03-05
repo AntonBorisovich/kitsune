@@ -26,7 +26,7 @@ class Ping {
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Понг! (" + ping + " мс)")
 				msg.channel.send({ embeds: [embed] });	
-				//this.funcs.error(client, msg, args, this, "none error", false)
+				//this.funcs.error(client, msg, args, this, "pizda)")
 			}
 		} catch (err) {
 			console.log(err)
