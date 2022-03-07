@@ -5,7 +5,7 @@ const { createCanvas, loadImage } = require('canvas')
 const demotivatorImage = async (img, title, subtitle, width, height) => {
   if (width > 850) {
 	//console.log("before " + width + "x" + height)
-    height = (height / (width / 850))
+    height = Math.floor((height / (width / 850)))
 	width = 850
 	//console.log("after " + width + "x" + height)
   }
@@ -59,7 +59,7 @@ class Dem {
 					if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY" && msg.reference !== null) { // if reply check reply for attach
 						const msgrep = await msg.fetchReference()
 						if (msgrep.attachments.first()) {
-							work(client, msgrep, args);
+							await work(client, msgrep, args);
 							return;
 						} else {
 							let embed = new Discord.MessageEmbed()
@@ -87,7 +87,7 @@ class Dem {
 						})
 								
 						if (found) {
-							work(client, found, args);
+							await work(client, found, args);
 							return;
 						}
 								
@@ -100,7 +100,7 @@ class Dem {
 					}
 				}
 			} else {
-				work(client, msg, args);
+				await work(client, msg, args);
 				return;
 			}
 			
@@ -150,7 +150,7 @@ class Dem {
 				const attach = new Discord.MessageAttachment(msg.attachments.first().attachment)
 				msg.channel.sendTyping()
 				
-				const image = await demotivatorImage(attach, data[0], data[1], (msg.attachments.first().width * wide_multiplier), msg.attachments.first().height)
+				const image = await demotivatorImage(attach, data[0], data[1], Math.floor((msg.attachments.first().width * wide_multiplier)), msg.attachments.first().height)
 				await msg.channel.send({files: [image]})
 				return;
 			}

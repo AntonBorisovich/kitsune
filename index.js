@@ -150,7 +150,7 @@ client.on("messageCreate", async msg => {
 					}
 				}
 				if (!UserIsTimedOut) {
-					timeoutusers.push(msg.author.id)
+					timeoutusers.push(msg.author.id);
 					setTimeout(() => {if (timeoutusers.indexOf(msg.author.id) !== -1) {timeoutusers.splice(timeoutusers.indexOf(msg.author.id), 1);};}, 3500);
 				}
 				if (UserIsTimedOut) return;
