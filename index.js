@@ -137,14 +137,6 @@ function getTimestamp() {
 client.on("messageCreate", async msg => {
 	//some security
 	if (customvars.maintenance && config.ownerID != msg.author.id || msg.author.bot) return
-	if (msg.author.id == 763777893762465823) {
-		let embed = new Discord.MessageEmbed()
-		embed.setTitle(client.user.username + ' - ' + msg.author.username)
-		embed.setColor(`#F00000`)
-		embed.setDescription("ты все занаешь что надо делать\n\nсудьба бана в твоих руках")
-		msg.channel.send({ embeds: [embed] });
-		return
-	}
 	//console.log(msg)
 	let args = msg.content.split(" ")
 	let executed = false
@@ -208,14 +200,6 @@ client.on("messageCreate", async msg => {
 client.on('messageUpdate', async (oldMessage, newMessage) => {
 	//some security
 	if (customvars.maintenance && config.ownerID != newMessage.author.id || newMessage.author.bot) return
-	if (newMessage.author.id == 763777893762465823) {
-		let embed = new Discord.MessageEmbed()
-		embed.setTitle(client.user.username + ' - ' + newMessage.author.username)
-		embed.setColor(`#F00000`)
-		embed.setDescription("ты все занаешь что надо делать\n\nсудьба бана в твоих руках")
-		newMessage.channel.send({ embeds: [embed] });
-		return
-	}
 	let args = newMessage.content.split(" ")
 	if(args[0].toLowerCase().startsWith(config.prefix)){
 		let cmd = args[0].substring(config.prefix.length)
