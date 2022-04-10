@@ -1,12 +1,11 @@
-console.log(getTimestamp() + " [INFO] Starting SenkoBot for Discord...")
-console.log(getTimestamp() + " [INFO] Initialization...")
+console.log(getTimestamp() + " [INFO] Initializing kitsune for Discord...")
 
 const os = require('os');
 console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
+
+// подключение модулей и установка переменных
 const Discord = require('discord.js');
-Client = Discord.Client;
-Intents = Discord.Intents;
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]});
+const kitsune = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]});
 const fs = require("fs");
 let config
 let customvars = {}
@@ -14,19 +13,12 @@ let funcs = {}
 let commands = []
 let timeoutusers = []
 
-
-
-async function checkupdate() { //TODO 
-	console.log(getTimestamp() + ' [INFO] Looking for updates...')
-	//dosomething()
-	console.log(getTimestamp() + ' [INFO] Current version: ' + customvars.version)
-	init()
-}
+// чтений значений из папки src/values
 fs.readdir("./src/values/", async (err, files)=>{
 	let loaded = 0
 	let nowloading = ""
 	if (err) throw err;
-	console.log(getTimestamp() + ' [INFO] Loading vars...')
+	console.log(getTimestamp() + ' [INFO] Setting values...')
 	await files.forEach((file)=>{
 		try {
 			loaded = (loaded + 1)
@@ -48,13 +40,6 @@ fs.readdir("./src/values/", async (err, files)=>{
 	if (!customvars.discordtoken) {
 		console.error(getTimestamp() + ' [ERROR] Discord token not found! Can not log in discord. Please create values/discordtoken.json and write in "{"discordtoken": "your_token_here_with_quotes"}"')
 		process.exit(1)
-	}
-	if (customvars.unstable || !customvars.stable) {
-		config = require('./src/testbotconfig.json');
-		console.log(getTimestamp() + ' [INFO] Loaded unstable bot config')
-	} else {
-		config = require('./src/config.json');
-		console.log(getTimestamp() + ' [INFO] Loaded stable bot config')
 	}
 	setTimeout(() => {	
 		loadfunc()
