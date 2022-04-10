@@ -1,34 +1,34 @@
 const Discord = require("discord.js")
 
 class Help {
-    constructor(client, config, commands, customvars){
-		this.customvars = customvars;
-		this.client = client;
-        this.config = config;
-		this.test = "skip";
+    constructor(kitsune, commands, values){
+		
+		//задать полученые значения для дальнейшего использования в коде команды
+		this.values = values;
+        this.kitsune = kitsune;
         this.commands = commands;
+		
 		this.perms = [""];
-		this.category = "info";
-		this.usage = "<команда>"
-		this.args = ""
-		this.advargs = "<команда> - вывод подробной информации о команде"
-        this.desc = "помощь по командам";
-		this.advdesc = "Помощь по командам";
-        this.name = "help";
+        this.name = "help"; // имя команды
+		this.desc = "помощь по командам"; // описание команды в общем списке команд
+		this.advdesc = "Помощь по командам"; // описание команды в помоще по конкретной команде
+		this.argsdesc = "<команда> - имя команды, о которой вы хотите узнать больше"; // описание аргументов в помоще по конкретной команде
+		this.args = ""; // аргументы в общем списке команд
+		this.advargs = "<команда>"; // аргументы в помоще по конкретной команде
     }
 	
-    async run(client, msg, args){
+    async run(kitsune, msg, args){
 		var Return = false
 		if ( args[1] == "-f" && this.config['ownerID'] == msg.author.id ) {
 				let command = this.commands.map(comm => `**${comm.name} ${comm.args}** - ${comm.desc}\n`).join("");
 				let embed = new Discord.MessageEmbed()
-				embed.setTitle(client.user.username + ' - Commands list')
+				embed.setTitle(kitsune.user.username + ' - Commands list')
 				embed.setColor(`#F36B00`)
 				embed.setDescription(command.toString() + '\nLoaded commands [FIXME]: ' + this.commands.length)
 				msg.author.send({ embeds: [embed] });
 				
 				embed = new Discord.MessageEmbed()
-				embed.setTitle(client.user.username + ' - Full command list')
+				embed.setTitle(kitsune.user.username + ' - Full command list')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Полный список команд отправлен тебе в лс")
 				msg.channel.send({ embeds: [embed] });
@@ -38,12 +38,12 @@ class Help {
 			this.commands.forEach(command => {
 				if ( args[1].toLowerCase() == command.name.toLowerCase() ){
 					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - ' + command.name)
+					embed.setTitle(kitsune.user.username + ' - ' + command.name)
 					embed.setColor(`#F36B00`)
-					embed.setDescription("**" + this.config.prefix + command.name + " " + command.usage +  "**" )
+					embed.setDescription("**" + this.values.prefix + command.name + " " + command.advargs +  "**" )
 					embed.addField("Описание:", command.advdesc);
 					if (command.advargs != "") {
-						embed.addField("Аргументы:", command.advargs);
+						embed.addField("Аргументы:", command.argsdesc);
 					}
 					msg.channel.send({ embeds: [embed] });
 					Return = true
@@ -59,9 +59,9 @@ class Help {
 		let command = pubcommands.map(comm => `**${comm.name} ${comm.args}** - ${comm.desc}\n`).join("");
 		
         let embed = new Discord.MessageEmbed()
-        embed.setTitle(client.user.username + ' - Commands list')
+        embed.setTitle(kitsune.user.username + ' - Commands list')
 		embed.setColor(`#F36B00`)
-		embed.setDescription(command.toString() + '\n' + this.config.prefix + 'help <команда> для большей информации')
+		embed.setDescription(command.toString() + '\n' + this.values.prefix + 'help <команда> для большей информации')
 		if (msg.isCommand == true) {
 			msg.reply({ embeds: [embed] });
 			return

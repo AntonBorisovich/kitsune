@@ -1,104 +1,79 @@
-console.log(getTimestamp() + " [INFO] Initializing kitsune for Discord...")
+console.log(getTimestamp() + " [INFO] Initializing kitsune for Discord...");
 
 const os = require('os');
-console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM')
+console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM');
 
 // подключение модулей и установка переменных
 const Discord = require('discord.js');
 const kitsune = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]});
 const fs = require("fs");
-let config
-let customvars = {}
-let funcs = {}
-let commands = []
-let timeoutusers = []
+let values = {};
+let funcs = {};
+let commands = [];
+let timeoutusers = [];
 
 // чтений значений из папки src/values
 fs.readdir("./src/values/", async (err, files)=>{
-	let loaded = 0
-	let nowloading = ""
+	let loaded = 0;
+	let totalloaded = 0;
+	let nowloading = "";
 	if (err) throw err;
-	console.log(getTimestamp() + ' [INFO] Setting values...')
+	console.log(getTimestamp() + ' [INFO] Reading values...')
 	await files.forEach((file)=>{
 		try {
-			loaded = (loaded + 1)
+			
+			loaded = (loaded + 1);
 			if (!file.endsWith(".json")) {
-				console.log(" (" + loaded + "/" + files.length + ") Skipped var " + file + " (not .json)")
+				console.log(" (" + loaded + "/" + files.length + ") Skipped value " + file + " (not .json)");
 				return;
-			}
-			const fileName = file.substring(0,file.length-5)
-			nowloading = fileName
-			const variable = require("./src/values/" + file)
-			customvars[fileName] = variable[fileName]
-			console.log(" (" + loaded + "/" + files.length + ") Loaded var " + fileName)
+			};
+			totalloaded = (totalloaded + 1)
+			const fileName = file.substring(0,file.length-5);
+			nowloading = fileName;
+			const variable = require("./src/values/" + file);
+			values[fileName] = variable[fileName];
+			console.log(" (" + loaded + "/" + files.length + ") Loaded value " + fileName);
 		} catch(err) {
-			console.error(" (" + loaded + "/" + files.length + ") Error while loading var " + nowloading)
-			console.error(err)
-		}
-	})
-	console.log(getTimestamp() + " [INFO] Loaded " + loaded + " vars")
-	if (!customvars.discordtoken) {
-		console.error(getTimestamp() + ' [ERROR] Discord token not found! Can not log in discord. Please create values/discordtoken.json and write in "{"discordtoken": "your_token_here_with_quotes"}"')
-		process.exit(1)
-	}
-	setTimeout(() => {	
-		loadfunc()
-	},1000);
-	
+			console.error(" (" + loaded + "/" + files.length + ") Error while loading value " + nowloading);
+			console.error(err);
+		};
+	});
+	console.log(getTimestamp() + " [INFO] Loaded " + totalloaded + " values");
+	if (!values.prefix) {
+		console.error(getTimestamp() + ' [ERROR] Prefix not found! Please create values/prefix.json and write in "{"prefix": "your_prefix"}"');
+		process.exit(1);
+	};
+	if (!values.discordtoken) {
+		console.error(getTimestamp() + ' [ERROR] Discord token not found! Can not log in discord. Please create values/discordtoken.json and write in "{"discordtoken": "your_token"}"');
+		process.exit(1);
+	};
+	loadcomm();
 })
-async function loadfunc() {
-	fs.readdir("./src/functions/", async (err, files)=>{
-		console.log(getTimestamp() + ' [INFO] Loading functions...')
-		let loaded = 0
-		let nowloading
+
+async function loadcomm(){
+	fs.readdir("./src/commands/", async (err, files)=>{
+		console.log(getTimestamp() + ' [INFO] Reading commands...');
+		let loaded = 0;
+		let nowloading;
 		if (err) throw err;
 		await files.forEach((file)=>{
 			try {
-				loaded = (loaded + 1)
-				let fileName = file.substring(0,file.length-3)
-				nowloading = fileName
-				let funcPrototype = require("./src/functions/"+fileName)
-				let func = new funcPrototype(client, config, commands, customvars, funcs);
-				funcs[fileName] = func.run
-				console.log(" (" + loaded + "/" + files.length + ") Loaded " + func.name + " function")
+				loaded = (loaded + 1);
+				let fileName = file.substring(0,file.length-3);
+				nowloading = fileName;
+				let cmdPrototype = require("./src/commands/"+fileName);
+				let command = new cmdPrototype(kitsune, commands, values);
+				commands.push(command);
+				console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command");
 			} catch(err) {
-				console.error(" (" + loaded + "/" + files.length + ") Error while loading function " + nowloading)
-				console.error(err)
+				console.error(" (" + loaded + "/" + files.length + ") Error while loading command " + nowloading);
+				console.error(err);
 			}
 		})
-		console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
-		init()
+		console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands");
+		console.log(getTimestamp() + ' [INFO] Logging in Discord...');
+		kitsune.login(values.discordtoken);
 	})
-}	
-async function init() {
-	
-	setTimeout(() => {	
-		fs.readdir("./src/commands/", async (err, files)=>{
-			console.log(getTimestamp() + ' [INFO] Loading commands...')
-			let loaded = 0
-			let nowloading
-			if (err) throw err;
-			await files.forEach((file)=>{
-				try {
-					loaded = (loaded + 1)
-					let fileName = file.substring(0,file.length-3)
-					nowloading = fileName
-					let cmdPrototype = require("./src/commands/"+fileName)
-					let command = new cmdPrototype(client, config, commands, customvars, funcs);
-					commands.push(command)
-					console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command")
-				} catch(err) {
-					console.error(" (" + loaded + "/" + files.length + ") Error while loading command " + nowloading)
-					console.error(err)
-				}
-			})
-			console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
-			setTimeout(() => {	
-				console.log(getTimestamp() + ' [INFO] Logging in Discord...')
-				client.login(customvars.discordtoken);
-			},2500);
-		})
-	}, 1500);
 }
 
 function getTimestamp() {
@@ -119,14 +94,14 @@ function getTimestamp() {
 	return result
 }
 
-client.on("messageCreate", async msg => {
+kitsune.on("messageCreate", async msg => {
 	//some security
-	if (customvars.maintenance && config.ownerID != msg.author.id || msg.author.bot) return
+	if (values.maintenance && config.ownerID != msg.author.id || msg.author.bot) return
 	//console.log(msg)
 	let args = msg.content.split(" ")
 	let executed = false
-	if (args[0].toLowerCase().startsWith(config.prefix)) {
-		let cmd = args[0].substring(config.prefix.length)
+	if (args[0].toLowerCase().startsWith(values.prefix)) {
+		let cmd = args[0].substring(values.prefix.length)
 		commands.forEach(async command => {
 			if (command.name == cmd.toLowerCase()) {
 				let UserIsTimedOut = false
@@ -148,12 +123,12 @@ client.on("messageCreate", async msg => {
 						console.warn(getTimestamp() + " [ERROR] required permissions not found: " + missing.join(', ') + " in channel #" + msg.channel.name + " (" + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
 						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) {
 							let embed = new Discord.MessageEmbed()
-							embed.setTitle(client.user.username + ' - Error')
+							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
-							embed.setDescription("Команда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + client.user.username)
+							embed.setDescription("Команда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + kitsune.user.username)
 							msg.channel.send({ embeds: [embed] });
 						} else if (!missing.includes("SEND_MESSAGES") && missing.includes("EMBED_LINKS")) {
-							msg.channel.send({ content: "**" + client.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + client.user.username });
+							msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + kitsune.user.username });
 						}
 						return;
 					}
@@ -168,11 +143,11 @@ client.on("messageCreate", async msg => {
 						console.log(getTimestamp() + " [INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
 					}
 					msg.isCommand = false
-					command.run(client, msg, args)
+					command.run(kitsune, msg, args)
 				} catch (error) {
 					console.warn(getTimestamp() + " [ERROR] " + "catched error while executing an command: \n" + String(error))
 					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Error')
+					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("```\n" + String(error) + "\n```")
 					msg.channel.send({ embeds: [embed] });
@@ -182,12 +157,12 @@ client.on("messageCreate", async msg => {
 	}
 });
 
-client.on('messageUpdate', async (oldMessage, newMessage) => {
+kitsune.on('messageUpdate', async (oldMessage, newMessage) => {
 	//some security
-	if (customvars.maintenance && config.ownerID != newMessage.author.id || newMessage.author.bot) return
+	if (values.maintenance && config.ownerID != newMessage.author.id || newMessage.author.bot) return
 	let args = newMessage.content.split(" ")
-	if(args[0].toLowerCase().startsWith(config.prefix)){
-		let cmd = args[0].substring(config.prefix.length)
+	if(args[0].toLowerCase().startsWith(values.prefix)){
+		let cmd = args[0].substring(values.prefix.length)
 		commands.forEach(async command => {
 			if (command.name == cmd.toLowerCase()) {
 				let UserIsTimedOut = false
@@ -210,12 +185,12 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 						console.log(getTimestamp() + " [ERROR] required permissions not found: " + missing.join(', ') + " in channel #" + newMessage.channel.name + " (" + newMessage.channel.id + ') in guild "' + newMessage.guild.name + '" (' + newMessage.guild.id + ')');
 						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) {
 							let embed = new Discord.MessageEmbed()
-							embed.setTitle(client.user.username + ' - Error')
+							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
-							embed.setDescription("Команда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + client.user.username)
+							embed.setDescription("Команда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + kitsune.user.username)
 							newMessage.channel.send({ embeds: [embed] });
 						} else if (!missing.includes("SEND_MESSAGES") && missing.includes("EMBED_LINKS")) {
-							newMessage.channel.send({ content: "**" + client.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + client.user.username });
+							newMessage.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + kitsune.user.username });
 						}
 						return;
 					}
@@ -227,11 +202,11 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 						console.log(getTimestamp() + " [INFO] " + newMessage.author.tag + ' (' + newMessage.author.id + ') executed command ' + command.name + ' by editing message in channel #' + newMessage.channel.name + ' (' + newMessage.channel.id + ')');
 					}
 					newMessage.isCommand = false
-					command.run(client, newMessage, args)
+					command.run(kitsune, newMessage, args)
 				} catch (error) {
 					console.warn(getTimestamp() + " [ERROR] " + "catched error while executing an command: \n" + String(error))
 					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Error')
+					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("```\n" + String(error) + "\n```")
 					newMessage.channel.send({ embeds: [embed] });
@@ -241,9 +216,9 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 	}
 })				
 
-client.on("interactionCreate", interaction => {
+kitsune.on("interactionCreate", interaction => {
 	try {
-		if (customvars.maintenance && config.ownerID != interaction.user.id || interaction.user.bot) return
+		if (values.maintenance && config.ownerID != interaction.user.id || interaction.user.bot) return
 		let executed = false
 		if (interaction.type == "MESSAGE_COMPONENT") {
 			executed = true
@@ -256,11 +231,11 @@ client.on("interactionCreate", interaction => {
 							console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ')');
 						}
 						interaction.isCommand = false
-						command.buttonreply(client, interaction)
+						command.buttonreply(kitsune, interaction)
 					} catch(err) {
 						console.warn(getTimestamp() + " [ERROR] catched error while executing an interaction: \n" + String(err))
 						let embed = new Discord.MessageEmbed()
-						embed.setTitle(client.user.username + ' - Error')
+						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("```\n" + String(err) + "\n```")
 						interaction.channel.send({ embeds: [embed] });
@@ -280,9 +255,9 @@ client.on("interactionCreate", interaction => {
 						console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ')');
 					}
 					if (typeof args !== 'undefined') {
-						command.run(client, hohol, args)
+						command.run(kitsune, hohol, args)
 					} else {
-						command.run(client, hohol, "")
+						command.run(kitsune, hohol, "")
 					}
 				}
 			})
@@ -291,31 +266,31 @@ client.on("interactionCreate", interaction => {
 	} catch(err) {
 		console.warn(getTimestamp() + " [ERROR] " + "catched error while executing an interaction: \n" + String(err))
 		let embed = new Discord.MessageEmbed()
-		embed.setTitle(client.user.username + ' - Error')
+		embed.setTitle(kitsune.user.username + ' - Error')
 		embed.setColor(`#F00000`)
 		embed.setDescription("```\n" + String(err) + "\n```")
 		interaction.channel.send({ embeds: [embed] });
 	}
 });
 
-client.on("guildCreate", guild => {
-	console.log(getTimestamp() + " [INFO] " + client.user.username + ' was joined to guild "' + guild.name + '" (' + guild.id + ')');
+kitsune.on("guildCreate", guild => {
+	console.log(getTimestamp() + " [INFO] " + kitsune.user.username + ' was joined to guild "' + guild.name + '" (' + guild.id + ')');
 })
 
-client.on("guildDelete", guild => {
-	console.log(getTimestamp() + " [INFO] " + client.user.username + ' was kicked from guild "' + guild.name + '" (' + guild.id + ')');
+kitsune.on("guildDelete", guild => {
+	console.log(getTimestamp() + " [INFO] " + kitsune.user.username + ' was kicked from guild "' + guild.name + '" (' + guild.id + ')');
 })
 
-client.once('ready', () => {
-	//client.guilds.cache.size - TODO logging guilds count
-	if (customvars.maintenance) {
-		client.user.setStatus('idle')
-		client.user.setActivity('Тех. работы | tech. works');
-		console.log(getTimestamp() + " [INFO] " + `${client.user.username} is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`)
+kitsune.once('ready', () => {
+	//kitsune.guilds.cache.size - TODO logging guilds count
+	if (values.maintenance) {
+		kitsune.user.setStatus('idle')
+		kitsune.user.setActivity('Тех. работы | tech. works');
+		console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`)
 	} else {
-		client.user.setStatus('online')
-		client.user.setActivity(config.prefix + 'help');
-		console.log(getTimestamp() + " [INFO] " + `${client.user.username} is ready to work!`)
+		kitsune.user.setStatus('online')
+		kitsune.user.setActivity(values.prefix + 'help');
+		console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} is ready to work!`)
 	}
 });
 

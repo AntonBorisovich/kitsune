@@ -1,11 +1,10 @@
 const Discord = require("discord.js")
 
 class Ping {
-    constructor(client, config, commands, customvars, funcs){
+    constructor(client, commands, customvars, funcs){
 		this.funcs = funcs
 		this.customvars = customvars;
         this.client = client;
-        this.config = config;
         this.commands = commands;
 		this.perms = [""];
 		this.category = "Utils";

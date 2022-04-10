@@ -1,28 +1,22 @@
 {
-  "name": "senkobot",
-  "version": "beta",
-  "description": "Simple discord.js based discord bot",
+  "name": "kitsune",
+  "version": "1.0.0",
+  "description": "modular discord bot",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AntonBorisovich/kitsune.git"
+  },
   "author": "AntonBorisovich",
-  "license": "ISC",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/AntonBorisovich/kitsune/issues"
+  },
+  "homepage": "https://github.com/AntonBorisovich/kitsune#readme",
   "dependencies": {
-    "@discordjs/rest": "^0.3.0",
-    "axios": "^0.24.0",
-    "canvas": "^2.8.0",
-    "discord-api-types": "^0.27.1",
-    "discord.js": "^13.5.1",
-    "express": "^4.17.2",
-    "g-i-s": "^2.1.6",
-    "minecraft-server-util": "^5.2.8",
-    "nekos.life": "^2.0.7",
-    "nhentai.js-api": "^3.0.3",
-    "pet-pet-gif": "^1.0.9",
-    "python-shell": "^3.0.1",
-    "request": "^2.65.0",
-    "xml2js": "^0.4.23",
-    "ytdl-core": "^4.10.1"
+    "discord.js": "^13.6.0"
   }
 }

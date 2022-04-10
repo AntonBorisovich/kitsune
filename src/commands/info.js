@@ -4,37 +4,30 @@ const os = require('os');
 let launch_time = Date.now();
 
 class Info {
-    constructor(client, config, commands, customvars){
-		this.customvars = customvars;
-		this.test = "skip"; 
-        this.client = client;
-        this.config = config;
+    constructor(kitsune, commands, values){
+		
+		//задать полученые значения для дальнейшего использования в коде команды
+		this.values = values;
+        this.kitsune = kitsune;
         this.commands = commands;
+		
 		this.perms = [""];
-		this.category = "info";
-		this.args = ""
-		this.usage = ""
-		this.advargs = ""
-        this.desc = "информация о боте";
-		this.advdesc = "Информация о боте";
-        this.name = "info";
+        this.name = "info"; // имя команды
+		this.desc = "информация"; // описание команды в общем списке команд
+		this.advdesc = "Информация о боте"; // описание команды в помоще по конкретной команде
+		this.args = ""; // аргументы в общем списке команд
+		this.advargs = ""; // аргументы в помоще по конкретной команде
     }
 
-    run(client, msg, args){
-		if (this.config['ownerID'] == msg.author.id && args[1] == '-f') {
-			this.advinfo(client, msg, args)
-			return
-		}
-
+    run(kitsune, msg, args){
 		let embed = new Discord.MessageEmbed()
-		embed.setTitle(client.user.username + ' - About')
-		embed.setThumbnail('https://i.imgur.com/Maz0oZ1.png')
+		embed.setTitle(kitsune.user.username + ' - ' + this.name)
 		embed.setColor(`#F36B00`)
-		embed.setDescription(client.user.username + ' - бот для дискорда с NSFW и Fun функциями\nСоздатель: <@' + this.config.ownerID + '>')
+		embed.setDescription(kitsune.user.username + ' - полуфабрикат, который вроде не работает\nРазработчик: <@' + this.values.developers[0] + '>')
 		//if (this.customvars.updateversion) {
 			//embed.setFooter({ text: 'Версия: ' + this.customvars.version + '\nДоступно обновление "' + this.customvars.updateversion + '", которое будет установлено после перезапуска бота'});
 		//} else {
-			embed.setFooter({ text: 'Версия: ' + this.customvars.version });
+			embed.setFooter({ text: 'Версия: ' + this.values.version });
 		//}
 		
 		// const buttonlink = new Discord.MessageButton()
@@ -49,7 +42,7 @@ class Info {
 	// -f (full info)
 	
 	// some functions
-	isowner(client, msg, args){
+	isowner(kitsune, msg, args){
 		if ( this.config.ownerID == msg.author.id ) {
 			return 'true' 
 		} else {
