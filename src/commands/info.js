@@ -1,4 +1,4 @@
-const Discord = require("discord.js")
+const Discord = require("discord.js");
 const {dependencies} = require('../../package.json');
 const os = require('os');
 let launch_time = Date.now();
@@ -11,11 +11,13 @@ class Info {
         this.kitsune = kitsune;
         this.commands = commands;
 		
+		this.root = false; // запуск только разработчикам
 		this.perms = [""];
         this.name = "info"; // имя команды
 		this.desc = "информация"; // описание команды в общем списке команд
 		this.advdesc = "Информация о боте"; // описание команды в помоще по конкретной команде
 		this.args = ""; // аргументы в общем списке команд
+		this.argsdesc = ""; // описание аргументов в помоще по конкретной команде
 		this.advargs = ""; // аргументы в помоще по конкретной команде
     }
 
@@ -24,12 +26,7 @@ class Info {
 		embed.setTitle(kitsune.user.username + ' - ' + this.name)
 		embed.setColor(`#F36B00`)
 		embed.setDescription(kitsune.user.username + ' - полуфабрикат, который вроде не работает\nРазработчик: <@' + this.values.developers[0] + '>')
-		//if (this.customvars.updateversion) {
-			//embed.setFooter({ text: 'Версия: ' + this.customvars.version + '\nДоступно обновление "' + this.customvars.updateversion + '", которое будет установлено после перезапуска бота'});
-		//} else {
-			embed.setFooter({ text: 'Версия: ' + this.values.version });
-		//}
-		
+		embed.setFooter({ text: 'Версия: ' + this.values.version });
 		// const buttonlink = new Discord.MessageButton()
 			// .setLabel('Политика конфиденциальности')
 			// .setURL("https://docs.google.com/document/d/e/2PACX-1vQK2d9hAjIXB5Ck9zdTbLALsradpgM6sHxc_J2btYr_vvNVStKgZLHb4ZOdyC-5kn8A1lqzBMszyNbQ/pub")
@@ -39,7 +36,7 @@ class Info {
 		msg.channel.send({embeds: [embed]}) //, components: [buttons]
 	}
 			
-	// -f (full info)
+	// debug output
 	
 	// some functions
 	isowner(kitsune, msg, args){

@@ -1,4 +1,4 @@
-const Discord = require("discord.js")
+const Discord = require("discord.js");
 
 class Help {
     constructor(kitsune, commands, values){
@@ -8,12 +8,13 @@ class Help {
         this.kitsune = kitsune;
         this.commands = commands;
 		
+		this.root = false; // запуск только разработчикам
 		this.perms = [""];
         this.name = "help"; // имя команды
 		this.desc = "помощь по командам"; // описание команды в общем списке команд
 		this.advdesc = "Помощь по командам"; // описание команды в помоще по конкретной команде
-		this.argsdesc = "<команда> - имя команды, о которой вы хотите узнать больше"; // описание аргументов в помоще по конкретной команде
 		this.args = ""; // аргументы в общем списке команд
+		this.argsdesc = "<команда> - имя команды, о которой вы хотите узнать больше"; // описание аргументов в помоще по конкретной команде
 		this.advargs = "<команда>"; // аргументы в помоще по конкретной команде
     }
 	
