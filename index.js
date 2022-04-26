@@ -1,112 +1,114 @@
-console.log(getTimestamp() + " [INFO] Initializing kitsune for Discord...");
+console.log(getTimestamp() + " [INFO] Starting kitsune for Discord...");
 
-const os = require('os');
+const os = require('os'); // подключение библиотеки os
 console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM');
 
-// подключение модулей и установка переменных
-const Discord = require('discord.js');
-const kitsune = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]});
-const fs = require("fs");
-let values = {};
-let funcs = {};
-let commands = [];
-let timeoutusers = [];
-let init1_complete = 0;
-init_step1();
+const Discord = require('discord.js'); // подключение библиотеки discord.js
+const kitsune = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]}); // создание пользователя с правами
+const fs = require("fs"); // подключение библиотеки файловой системы (fs)
 
-// чтений значений из папки src/values и функций из папки src/functions
-async function init_step1(){
-	await fs.readdir("./src/values/", async (err, files)=>{
-		console.log(getTimestamp() + ' [INFO] Initializing values...');
-		let loaded = 0;
-		let totalloaded = 0;
-		let nowloading = "";
+const launch_time = Date.now(); // время запуска
+
+// переменные модулей
+let values = {};   // значения
+let funcs = {};    // функции
+let commands = []; // команды
+
+//установка значений для инициализации
+let errors = []; // список ошибок, произошедших во время инициализации
+
+
+console.log(getTimestamp() + ' [INFO] (1/3) Loading values...');
+init_step1(); // петрович, врубай насос
+
+
+async function init_step1(){ // значения
+	return await fs.readdir("./src/values/", (err, files)=>{ // загрузить файлы из папки
 		if (err) throw err;
-		await files.forEach((file)=>{
+		for ( const file of files ) { // перебрать все файлы
 			try {
-				loaded = (loaded + 1);
-				if (!file.endsWith(".json")) {
-					console.log(" (" + loaded + "/" + files.length + ") Skipped value " + file + " (not .json)");
-					return;
+				if (file.endsWith(".json")) { // если .json то работать
+					const fileName = file.substring(0,file.length-5); // красивое имя файла для лога
+					const variable = require("./src/values/" + file); // чтение значения из файла
+					values[fileName] = variable[fileName]; // запись значения в глобальный список
 				};
-				totalloaded = (totalloaded + 1);
-				const fileName = file.substring(0,file.length-5);
-				nowloading = fileName;
-				const variable = require("./src/values/" + file);
-				values[fileName] = variable[fileName];
-				console.log(" (" + loaded + "/" + files.length + ") Loaded value " + fileName);
-			} catch(err) {
-				console.error(" (" + loaded + "/" + files.length + ") Error while loading value " + nowloading);
+			} catch(err) { // при ошибке лог
 				console.error(err);
+				errors.push(err.name);
 			};
-		});
-		console.log(getTimestamp() + " [INFO] Loaded " + totalloaded + " values");
-		if (!values.prefix) {
-			console.error(getTimestamp() + ' [ERROR] Prefix not found! Please create values/prefix.json and write in "{"prefix": "your_prefix"}"');
-			process.exit(1);
 		};
-		if (!values.discordtoken) {
-			console.error(getTimestamp() + ' [ERROR] Discord token not found! Can not log in discord. Please create values/discordtoken.json and write in "{"discordtoken": "your_token"}"');
-			process.exit(1);
+		if (!values.prefix) { // если нет префикска
+			errors.push('noprefix');
 		};
-		init1_complete = init1_complete + 1;
-		init_step2(); // переходим к дальнейшей инициализации
-	});
-	await fs.readdir("./src/functions/", async (err, files)=>{
-		console.log(getTimestamp() + ' [INFO] Initializing functions...');
-		let loaded = 0;
-		let nowloading;
-		if (err) throw err;
-		await files.forEach((file)=>{
-			try {
-				loaded = (loaded + 1);
-				let fileName = file.substring(0,file.length-3);
-				nowloading = fileName;
-				let funky = require("./src/commands/"+fileName);
-				let func = new funky(kitsune, values);
-				funcs.push(func);
-				console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " function");
-			} catch(err) {
-				console.error(" (" + loaded + "/" + files.length + ") Error while loading function " + nowloading);
-				console.error(err);
-			};
-		});
-		console.log(getTimestamp() + " [INFO] Loaded " + totalloaded + " functions");
-		if (!funcs.error) {
-			console.error(getTimestamp() + ' [ERROR] Error logging function not found!');
-			process.exit(1);
+		if (!values.discordtoken) { // если нет токена
+			errors.push('notoken');
 		};
-		init1_complete = init1_complete + 1;
-		init_step2(); // переходим к дальнейшей инициализации
+		console.log(getTimestamp() + ' [INFO] (2/3) Loading functions...');
+		init_step2();
 	});
 };
 
-// чтение команд из папки src/commands
-async function init_step2(){
-	if (init1_complete != 2) return;
-	fs.readdir("./src/commands/", async (err, files)=>{
-		console.log(getTimestamp() + ' [INFO] Initializing commands...');
-		let loaded = 0;
-		let nowloading;
+async function init_step2(){ // функции
+	await fs.readdir("./src/functions/", (err, files) => { // загрузить файлы из папки
 		if (err) throw err;
-		await files.forEach((file)=>{
+		for ( const file of files ) {// перебрать все файлы
 			try {
-				loaded = (loaded + 1);
-				let fileName = file.substring(0,file.length-3);
-				nowloading = fileName;
-				let cmdPrototype = require("./src/commands/"+fileName);
-				let command = new cmdPrototype(kitsune, commands, values);
-				commands.push(command);
-				console.log(" (" + loaded + "/" + files.length + ") Loaded " + command.name + " command");
-			} catch(err) {
-				console.error(" (" + loaded + "/" + files.length + ") Error while loading command " + nowloading);
+				if (file.endsWith(".js")) { // если .js то работать
+					let fileName = file.substring(0,file.length-3); // красивое имя
+					let funky = require("./src/functions/"+fileName); // читаем файл
+					let func = new funky(); // вытаскиваем из файла функцию
+					funcs[func.name] = func.run; // запись функции в глобальный список
+				};
+			} catch(err) { // при ошибке лог
 				console.error(err);
+				errors.push(err.name);
 			};
-		});
-		console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands");
-		console.log(getTimestamp() + ' [INFO] Logging in Discord...');
-		kitsune.login(values.discordtoken);
+		};
+		if (!funcs.error) { // если нет функции логирования ошибок
+			errors.push('noerrorlog');
+		};
+		if (!funcs.log) { // если нет функции общего логирования
+			errors.push('nolog');
+		};
+		console.log(getTimestamp() + ' [INFO] (3/3) Loading commands...');
+		init_step3();
 	});
+};
+	
+async function init_step3() { // команды
+	await fs.readdir("./src/commands/", (err, files) => {
+		if (err) throw err;
+		for ( const file of files ) { 
+			try {
+				if (file.endsWith(".js")) { // если .js то работать
+					let fileName = file.substring(0,file.length-3);
+					let cmdPrototype = require("./src/commands/"+fileName); // читаем файл
+					let command = new cmdPrototype(kitsune, commands, values); // вытаскиваем из файла функцию
+					commands.push(command); // запись функции в глобальный список
+				};
+			} catch(err) {
+				console.error(err);
+				errors.push(err.name);
+			};
+		};
+		init_step4();
+	});
+};
+
+async function init_step4() { // анализ ошибок
+	if (errors.length > 0) { // если есть ошибки то начать лог
+		console.log(getTimestamp() + ' [ERROR] Errors detected: ' + errors.join(', ')); // посылаем инфу в консоль
+		if (funcs.log && values.discordtoken) { // если есть чем и куда логировать
+			kitsune.login(values.discordtoken); // логин в дискорд (далее чек ошибок в once.ready)
+		} else { // если нечем логировать
+			console.log(getTimestamp() + ' [ERROR] Failed to report an error');
+			process.exit(1); // выходим из js
+		};
+	} else {
+		console.log(getTimestamp() + ' [INFO] Done. ' + ((Date.now() - launch_time) / 1000 ) + 's');
+		console.log(getTimestamp() + ' [INFO] Logging in Discord...' );
+		kitsune.login(values.discordtoken);
+	};
 };
 
 // функция логирования времени
@@ -128,41 +130,44 @@ function getTimestamp() {
 	return result;
 };
 
-// обработка получения нового сообщения
+// обработка нового сообщения
 kitsune.on("messageCreate", async msg => {
-	if (values.maintenance && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в режиме обслуживания
-	let args = msg.content.split(" ");
+	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
+	// TODO пропуск тестеров
+	let args = msg.content.split(" "); // форматируем аргументы
 	if (args[0].toLowerCase().startsWith(values.prefix)) { // если сообщение начинается с префикса то работать
 		let cmd = args[0].substring(values.prefix.length) // получаем имя вызываемой команды из сообщения
-		commands.forEach(async command => { // перебираем список команд в боте
-			if (command.name == cmd.toLowerCase()) { // если команда в сообщении совпала с командой из списка бота то работать		
-				if (msg.guild) { // если вызвано на сервере то проверить права
-					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms];
-					const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions);
-					if (!missing[0] == "") {
+		commands.forEach(command => { // перебираем список команд в боте
+			if (command.name == cmd.toLowerCase()) { // если команда в сообщении совпала с командой из списка бота то работать	
+				let running_comm = ''
+				if (msg.guild) { // если вызвано на сервере то проверить права TODO переделать проверку прав
+					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms]; // задаём права, которые надо проверить
+					const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions); // проверяем права в канале
+					if (!missing[0] == "") { // если права нету
 						console.warn(getTimestamp() + " [ERROR] required permissions not found: " + missing.join(', ') + " in channel #" + msg.channel.name + " (" + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
 						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) {
-							let embed = new Discord.MessageEmbed()
-							embed.setTitle(kitsune.user.username + ' - Error');
-							embed.setColor(`#F00000`);
-							embed.setDescription("Команда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + kitsune.user.username);
-							msg.channel.send({ embeds: [embed] });
+							//let embed = new Discord.MessageEmbed()
+							//embed.setTitle(kitsune.user.username + ' - Error');
+							//embed.setColor(`#F00000`);
+							//embed.setDescription("Команда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + kitsune.user.username);
+							//msg.channel.send({ embeds: [embed] });
+							funcs.error(kitsune, values, msg, args, command.name, 'нет прав');
 						} else if (!missing.includes("SEND_MESSAGES") && missing.includes("EMBED_LINKS")) {
 							msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + kitsune.user.username });
 						};
 						return;
 					};
 				};
-				
 				try {
 					if (msg.guild) { // если на сервере то логировать название сервера
 						console.log(getTimestamp() + " [INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
 					} else { // иначе логировать без сервера
 						console.log(getTimestamp() + " [INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
 					}
-					async command.run(kitsune, msg, args); // запуск команды
+					funcs.log(kitsune, 'info', 'information', values)
+					command.run(kitsune, msg, args); // запуск команды
 				} catch (error) { // если ошибка то логировать ошибку
-					funcs.error(error);
+					funcs.error(kitsune, values, msg, args, command.name, error);
 				};
 			};
 		});
@@ -173,6 +178,7 @@ kitsune.on("messageCreate", async msg => {
 kitsune.on('messageUpdate', async (oldMsg, msg) => {
 	if (values.maintenance && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в режиме обслуживания
 	let args = msg.content.split(" ");
+	let running_comm = ''
 	if (args[0].toLowerCase().startsWith(values.prefix)) { // если сообщение начинается с префикса то работать
 		let cmd = args[0].substring(values.prefix.length); // получаем имя вызываемой команды из сообщения
 		commands.forEach(async command => { // перебираем список команд в боте
@@ -201,9 +207,10 @@ kitsune.on('messageUpdate', async (oldMsg, msg) => {
 					} else { // иначе логировать без сервера
 						console.log(getTimestamp() + " [INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by editing message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
 					}
-					async command.run(kitsune, msg, args); // запуск команды
+					running_comm = command.name; // запоминаем какую команду мы запускаем (для лога ошибок)
+					command.run(kitsune, msg, args); // запуск команды
 				} catch (error) { // если ошибка то логировать ошибку
-					funcs.error(error);
+					funcs.error(kitsune, values, msg, args, running_comm, error);
 				};
 			};
 		});
@@ -211,42 +218,7 @@ kitsune.on('messageUpdate', async (oldMsg, msg) => {
 });
 
 // обработка интерактивного элемента (кнопки, слэш-команды)
-kitsune.on("interactionCreate", interaction => {
-	if (values.maintenance && values.developers[0] != interaction.user.id || interaction.user.bot) return; // игнор бота и игнор всех в режиме обслуживания
-	try {
-		if (interaction.type == "MESSAGE_COMPONENT") { // обработка кнопки
-			commands.forEach(command => { // перебираем список команд в боте
-				if(interaction.customId.toLowerCase().startsWith(command.name)){ // если id содержит имя команды то работать
-					try {
-						if (interaction.guild) { // если выполнено на сервере то логировать имя сервере
-							console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ') in guild "' + interaction.guild.name + '" (' + interaction.guild.id + ')');
-						} else { // иначе логировать без имени сервера
-							console.log(getTimestamp() + " [INFO] " + interaction.user.tag + ' (' + interaction.user.id + ') executed interaction ' + interaction.componentType + ' with custom id "' + interaction.customId + '" in message (' + interaction.message.id + ') in channel #' + interaction.channel.name + ' (' + interaction.channel.id + ')');
-						};
-						command.buttonreply(kitsune, interaction); // работать
-					} catch(error) { // если шашипка то логировать её
-						funcs.error(error);
-					};
-				};
-			});
-		};
-		if (interaction.type == "APPLICATION_COMMAND") { // обработка слэш-команды
-			commands.forEach(command => { // перебираем список команд в боте
-				if (command.name == interaction.commandName) { // если команда в сообщении является командой в списке бота то работать
-					let args // ДОДЕЛАТЬ
-					if (interaction.guild) { // если сервер то логировать сервер
-						console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ') in guild "' + hohol.guild.name + '" (' + hohol.guild.id + ')');
-					} else { // если нет то нет
-						console.log(getTimestamp() + " [INFO] " + hohol.author.tag + ' (' + hohol.author.id + ') executed slash command ' + command.name + ' by editing message in channel #' + hohol.channel.name + ' (' + hohol.channel.id + ')');
-					}
-					async command.run(kitsune, hohol, args); // работать
-				};
-			});
-		};
-	} catch(error) { // если ошибка то ошибаться
-		funcs.error(error);
-	};
-});
+//redo
 
 // логирование приглашений бота на сервер
 //kitsune.on("guildCreate", guild => {
@@ -259,15 +231,23 @@ kitsune.on("interactionCreate", interaction => {
 
 // готов к работе
 kitsune.once('ready', () => {
-	//kitsune.guilds.cache.size - TODO logging guilds count
-	if (values.maintenance) { // если режим обслуживания
-		kitsune.user.setStatus('idle'); // статус нет на месте
-		kitsune.user.setActivity('Тех. работы | tech. works'); // статус тех работ
-		console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} is ready to work in maintenance mode! In this mode, bot will reply only to users who have same id as in config (ownerID).`);
+	delete values.discordtoken // чистим токен из памяти когда залогинились
+	
+	if (errors.length > 0) { // если есть ошибки то логировать
+		kitsune.user.setStatus('invisible'); // статус невидимки
+		funcs.log(kitsune, 'syserror', 'Errors occurred during the loading:\n`' + errors.join(', ') + '`\nCheck the console for more information', values) // отсылаем отчёт
+		console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} sent a report to the developers. Logging out...`);
+		kitsune.destroy(); // выходим из дискорда
+		process.exit(1); // выходим из js
+	}
+	
+	if (values.debug) { // если дебаг
+		kitsune.user.setStatus('idle'); // статус не беспокоить
+		kitsune.user.setActivity('debug'); // играет в дебаг
+		funcs.log(kitsune, 'warning', 'Debugging logging is enabled', values)
 	} else { // если всё нормально
 		kitsune.user.setStatus('online') // статус в сети
 		kitsune.user.setActivity(values.prefix + 'help'); // играет в <prefix>help
-		console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} is ready to work!`);
 	};
+	console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} is ready to work!`);
 });
-

@@ -36,22 +36,23 @@ const demotivatorImage = async (img, title, subtitle, width, height) => {
 }
 
 class Dem {
-    constructor(client, config, commands, customvars){
-		this.customvars = customvars;
-        this.client = client;
-        this.config = config;
+    constructor(kitsune, config, commands, customvars){
+		//задать полученые значения для дальнейшего использования в коде команды
+		this.values = values;
+        this.kitsune = kitsune;
         this.commands = commands;
+		
+		this.root = false; // запуск только разработчикам
 		this.perms = ["ATTACH_FILES"];
-		this.category = "fun";
-		this.args = "<-w> <верхний текст>;<нижний текст>";
-		this.usage = this.args;
-		this.advargs = "<верхний текст> и <нижний текст> - содержарие строк, разделяемые `;`\n<-w> - пропишите этот аргумент для искажения избражения. Примеры:\n <-w> - растянет пикчу в полтора раза в ширину\n <-w=0.5> - растянет пикчу в полраза в высоту";
-        this.desc = "сделать демотиватор";
-		this.advdesc = "Делает демотиватор - изображение, под которым 2 строки текста";
-        this.name = "dem";
+        this.name = "dem"; // имя команды
+		this.desc = "сделать демотиватор"; // описание команды в общем списке команд
+		this.advdesc = "Делает демотиватор - изображение, под которым 2 строки текста"; // описание команды в помоще по конкретной команде
+		this.args = "<-w> <верхний текст>;<нижний текст>"; // аргументы в общем списке команд
+		this.argsdesc = "<верхний текст> и <нижний текст> - содержарие строк, разделяемые `;`\n<-w> - пропишите этот аргумент для искажения избражения. Примеры:\n <-w> - растянет пикчу в полтора раза в ширину\n <-w=0.5> - растянет пикчу в полраза в высоту"; // описание аргументов в помоще по конкретной команде
+		this.advargs = "<-w> <верхний текст>;<нижний текст>"; // аргументы в помоще по конкретной команде
     }
 
-    async run(client, msg, args){
+    async run(kitsune, msg, args){
 		try {
 			//checking attachment availability
 			if (!msg.attachments.first()) {
@@ -59,11 +60,11 @@ class Dem {
 					if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY" && msg.reference !== null) { // if reply check reply for attach
 						const msgrep = await msg.fetchReference()
 						if (msgrep.attachments.first()) {
-							await work(client, msgrep, args);
+							await work(kitsune, msgrep, args);
 							return;
 						} else {
 							let embed = new Discord.MessageEmbed()
-							embed.setTitle(client.user.username + ' - Error')
+							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
 							msg.channel.send({ embeds: [embed] });
@@ -87,12 +88,12 @@ class Dem {
 						})
 								
 						if (found) {
-							await work(client, found, args);
+							await work(kitsune, found, args);
 							return;
 						}
 								
 						let embed = new Discord.MessageEmbed()
-						embed.setTitle(client.user.username + ' - Error')
+						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
 						msg.channel.send({ embeds: [embed] });
@@ -100,15 +101,15 @@ class Dem {
 					}
 				}
 			} else {
-				await work(client, msg, args);
+				await work(kitsune, msg, args);
 				return;
 			}
 			
 			//work
-			async function work(client, msg, args) {
+			async function work(kitsune, msg, args) {
 				if (!msg.attachments.first().contentType) {
 					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Error')
+					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
 					msg.channel.send({ embeds: [embed] });
@@ -116,7 +117,7 @@ class Dem {
 				}
 				if (!msg.attachments.first().contentType.startsWith('image')) {
 					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Error')
+					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
 					msg.channel.send({ embeds: [embed] });
@@ -155,12 +156,7 @@ class Dem {
 				return;
 			}
 		} catch(err) {
-			cosnole.log(err)
-            let embed = new Discord.MessageEmbed()
-			embed.setTitle(client.user.username + ' - Error')
-			embed.setColor(`#F00000`)
-			embed.setDescription("Ошибка:\n```" + err + "\n```")
-			msg.channel.send({ embeds: [embed] });;
+			throw(err);
 		}
     }
 }
