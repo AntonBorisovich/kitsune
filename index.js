@@ -1,4 +1,4 @@
-console.log(getTimestamp() + " [INFO] Starting kitsune for Discord...");
+console.log(getTimestamp() + " [INFO] Starting kitsune for Discord..."); // успешный компил
 
 const os = require('os'); // подключение библиотеки os
 console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM');
@@ -9,15 +9,14 @@ const fs = require("fs"); // подключение библиотеки фай�
 
 const launch_time = Date.now(); // время запуска
 
-// переменные модулей
+// склад модулей
 let values = {};   // значения
 let funcs = {};    // функции
 let commands = []; // команды
 
-//установка значений для инициализации
 let errors = []; // список ошибок, произошедших во время инициализации
 
-
+// Начало инициализации
 console.log(getTimestamp() + ' [INFO] (1/3) Loading values...');
 init_step1(); // петрович, врубай насос
 
@@ -218,21 +217,12 @@ kitsune.on('messageUpdate', async (oldMsg, msg) => {
 });
 
 // обработка интерактивного элемента (кнопки, слэш-команды)
-//redo
-
-// логирование приглашений бота на сервер
-//kitsune.on("guildCreate", guild => {
-//	console.log(getTimestamp() + " [INFO] " + kitsune.user.username + ' was joined to guild "' + guild.name + '" (' + guild.id + ')');
-//})
-// логирование киков бота с сервера
-//kitsune.on("guildDelete", guild => {
-//	console.log(getTimestamp() + " [INFO] " + kitsune.user.username + ' was kicked from guild "' + guild.name + '" (' + guild.id + ')');
-//})
+// TODO
 
 // готов к работе
 kitsune.once('ready', () => {
 	delete values.discordtoken // чистим токен из памяти когда залогинились
-	
+	console.log(getTimestamp() + " [INFO] Logged in");
 	if (errors.length > 0) { // если есть ошибки то логировать
 		kitsune.user.setStatus('invisible'); // статус невидимки
 		funcs.log(kitsune, 'syserror', 'Errors occurred during the loading:\n`' + errors.join(', ') + '`\nCheck the console for more information', values) // отсылаем отчёт
@@ -240,7 +230,6 @@ kitsune.once('ready', () => {
 		kitsune.destroy(); // выходим из дискорда
 		process.exit(1); // выходим из js
 	}
-	
 	if (values.debug) { // если дебаг
 		kitsune.user.setStatus('idle'); // статус не беспокоить
 		kitsune.user.setActivity('debug'); // играет в дебаг
@@ -249,5 +238,7 @@ kitsune.once('ready', () => {
 		kitsune.user.setStatus('online') // статус в сети
 		kitsune.user.setActivity(values.prefix + 'help'); // играет в <prefix>help
 	};
+	console.log(getTimestamp() + " [INFO] " + `Serving ${kitsune.guilds.cache.size} guilds`);
+	console.log(getTimestamp() + " [INFO] " + `Boot: ${((Date.now() - launch_time) / 1000 )}s`); // бл а как перевести "Запустился за n секунд"?
 	console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} is ready to work!`);
 });

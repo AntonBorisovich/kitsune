@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const {dependencies} = require('../../package.json');
 const os = require('os');
-let launch_time = Date.now();
+const launch_time = Date.now();
 
 class Info {
     constructor(kitsune, commands, values){
