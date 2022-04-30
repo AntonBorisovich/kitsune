@@ -1,4 +1,4 @@
-# Kitsune
+# Kitsune dev
 ###### Powered by Discord.js
 
 #### Описание:
