@@ -36,13 +36,13 @@ const demotivatorImage = async (img, title, subtitle, width, height) => {
 }
 
 class Dem {
-    constructor(kitsune, config, commands, customvars){
+    constructor(kitsune, config, commands, values){
 		//задать полученые значения для дальнейшего использования в коде команды
 		this.values = values;
         this.kitsune = kitsune;
         this.commands = commands;
 		
-		this.root = false; // запуск только разработчикам
+		//this.twofa = false; // запуск только разработчикам
 		this.perms = ["ATTACH_FILES"];
         this.name = "dem"; // имя команды
 		this.desc = "сделать демотиватор"; // описание команды в общем списке команд
@@ -114,7 +114,7 @@ class Dem {
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
 					msg.channel.send({ embeds: [embed] });
 					return;	
-				}
+				};
 				if (!msg.attachments.first().contentType.startsWith('image')) {
 					let embed = new Discord.MessageEmbed()
 					embed.setTitle(kitsune.user.username + ' - Error')
@@ -122,7 +122,7 @@ class Dem {
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
 					msg.channel.send({ embeds: [embed] });
 					return;
-				}
+				};
 				
 				let wide_multiplier = 1
 				if (args[1]) {
