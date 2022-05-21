@@ -3,19 +3,20 @@ const {PythonShell} = require('python-shell')
 
 class Mesh {
     constructor(client, config, commands, customvars){
-		this.customvars = customvars;
-        this.client = client;
-        this.config = config;
+		//задать полученые значения для дальнейшего использования в коде команды
+		this.values = values;
+        this.kitsune = kitsune;
         this.commands = commands;
+		
+		this.root = false; // запуск только разработчикам
 		this.perms = [""];
-		this.category = "Fun";
-		this.args = "<ссылка>";
-		this.usage = "<ссылка>";
-		this.advargs = "<ссылка> - Ссылка на тест. Важно, что бы она была как домашняя работа, а не тест найденый в Библиотеке МЭШ.";
-        this.advdesc = "Ищет ответы на тесты МЭШ (Московская Электронная Школа)";
-        this.desc = "ответы к тестам МЭШ";
-        this.name = "mesh";
-    }
+        this.name = "mesh"; // имя команды
+		this.desc = "ответы к тестам МЭШ"; // описание команды в общем списке команд
+		this.advdesc = "Ищет ответы на тесты МЭШ (Московская Электронная Школа)"; // описание команды в помоще по конкретной команде
+		this.args = "<ссылка>"; // аргументы в общем списке команд
+		this.argsdesc = "<ссылка> - Ссылка на тест. Важно, что бы она была как домашняя работа, а не тест найденый в Библиотеке МЭШ."; // описание аргументов в помоще по конкретной команде
+		this.advargs = "<ссылка>"; // аргументы в помоще по конкретной команде
+    };
 
     async run(client, msg, args){
 		if (args[1]) {
