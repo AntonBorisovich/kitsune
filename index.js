@@ -117,7 +117,7 @@ async function init_step4() { // проверка ошибок
 	};
 	
 	// всё ок. логируем о хорошем и входим в дискорд
-	console.log(getTimestamp() + ' [INFO] Componentы loaded successfully. ' + ((Date.now() - launch_time) / 1000 ) + 's');
+	console.log(getTimestamp() + ' [INFO] Components loaded successfully. ' + ((Date.now() - launch_time) / 1000 ) + 's');
 	console.log(getTimestamp() + ' [INFO] Logging in Discord...' );
 	kitsune.login(values.discordtoken); 
 };

@@ -33,7 +33,7 @@ class Info {
 			// .setStyle('LINK')
 		// const buttons = new Discord.MessageActionRow()
 			// .addComponents(buttonlink)
-		throw('error');
+		//throw('error');
 		msg.channel.send({embeds: [embed]}) //, components: [buttons]
 	}
 			

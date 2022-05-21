@@ -2,7 +2,7 @@ const Discord = require("discord.js")
 const {PythonShell} = require('python-shell')
 
 class Mesh {
-    constructor(client, config, commands, customvars){
+    constructor(kitsune, commands, values){
 		//задать полученые значения для дальнейшего использования в коде команды
 		this.values = values;
         this.kitsune = kitsune;
@@ -18,14 +18,14 @@ class Mesh {
 		this.advargs = "<ссылка>"; // аргументы в помоще по конкретной команде
     };
 
-    async run(client, msg, args){
+    async run(kitsune, msg, args){
 		if (args[1]) {
 			try {	
 				await PythonShell.run('src/assets/mesh/mesh.py', {args: [args[1]]}, async function (err,code,signal) {
 					if (err) {
 						console.error(err)
 						let embed = new Discord.MessageEmbed()
-						embed.setTitle(client.user.username + ' - Error')
+						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Произошла ошибка")
 						embed.setFooter({text: String(err)})
@@ -37,7 +37,7 @@ class Mesh {
 					if (String(code) == "wrong_link") {
 						console.error(code)
 						let embed = new Discord.MessageEmbed()
-						embed.setTitle(client.user.username + ' - Error')
+						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Неправильная ссылка")
 						//embed.setFooter({text: String(code)})
@@ -45,7 +45,7 @@ class Mesh {
 						return;
 					}
 					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - МЭШ')
+					embed.setTitle(kitsune.user.username + ' - МЭШ')
 					embed.setColor(`#F36B00`)
 					let output
 					await code.forEach(input => {
@@ -66,7 +66,7 @@ class Mesh {
 				})
 			} catch (err) {
 				let embed = new Discord.MessageEmbed()
-				embed.setTitle(client.user.username + ' - Error')
+				embed.setTitle(kitsune.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Произошла ошибка")
 				embed.setFooter({text: String(err)})
@@ -74,7 +74,7 @@ class Mesh {
 			}
 		} else {
 			let embed = new Discord.MessageEmbed()
-			embed.setTitle(client.user.username + ' - Error')
+			embed.setTitle(kitsune.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Не указана ссылка на тест")
 			msg.channel.send({ embeds: [embed] });
