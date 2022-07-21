@@ -25,7 +25,7 @@ class Info {
 		let embed = new Discord.MessageEmbed()
 		embed.setTitle(kitsune.user.username + ' - ' + this.name)
 		embed.setColor(`#F36B00`)
-		embed.setDescription(kitsune.user.username + ' - полуфабрикат, который вроде вкусный, но только когда приготовлен\nРазработчик: <@' + this.values.developers[0] + '>')
+		embed.setDescription(kitsune.user.username + ' - бот для Discord для генерации мемов и собственных нужд автора\nРазработчик: <@' + this.values.developers[0] + '>')
 		embed.setFooter({ text: 'Версия: ' + this.values.version });
 		// const buttonlink = new Discord.MessageButton()
 			// .setLabel('Политика конфиденциальности')

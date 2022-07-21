@@ -129,10 +129,9 @@ class Lobster {
 				}
 				
 				args.shift();
-				let data = args.join(' ').split(';');
-				data.push("");
-				const attach = new Discord.MessageAttachment(msg.attachments.first().attachment)
-				msg.channel.sendTyping()
+				let data = args.join(' ');
+				const attach = new Discord.MessageAttachment(msg.attachments.first().attachment);
+				msg.channel.sendTyping();
 				
 				const image = await demotivatorImage(attach, data[0], msg.attachments.first().width, msg.attachments.first().height)
 				msg.channel.send({files: [image]})

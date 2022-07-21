@@ -14,7 +14,7 @@ let values = {};   // значения
 let funcs = {};    // функции
 let commands = []; // команды
 
-let errors = []; // список ошибок, произошедших во время инициализации
+let errors = [];   // список ошибок, произошедших во время инициализации
 
 // Начало инициализации
 console.log(getTimestamp() + ' [INFO] (1/3) Loading values...');
@@ -117,7 +117,7 @@ async function init_step4() { // проверка ошибок
 	};
 	
 	// всё ок. логируем о хорошем и входим в дискорд
-	console.log(getTimestamp() + ' [INFO] Components loaded successfully. ' + ((Date.now() - launch_time) / 1000 ) + 's');
+	console.log(getTimestamp() + ' [INFO] Initialization completed successful. ' + ((Date.now() - launch_time) / 1000 ) + 's');
 	console.log(getTimestamp() + ' [INFO] Logging in Discord...' );
 	kitsune.login(values.discordtoken); 
 };
@@ -199,11 +199,11 @@ kitsune.once('ready', () => {
 	if (errors.length > 0) { // если есть ошибки то логировать
 		kitsune.user.setStatus('invisible'); // статус невидимки
 		funcs.log(kitsune, 'syserror', 'Errors occurred during the loading:\n`' + errors.join(', ') + '`\nCheck the console for more information', values); // отсылаем отчёт
+		console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} sent a report to the developers. Logging out...`);
 		setTimeout(() => { // ожидаем пока сообщение точно отправится
-			console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} sent a report to the developers. Logging out...`);
 			kitsune.destroy(); // выходим из дискорда
 			process.exit(1); // выходим из js
-		}, 2000);
+		}, 3000);
 	} else { // если нет ошибок то запуск
 		// установка статуса
 		if (values.debug) { // если дебаг
