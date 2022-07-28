@@ -1,13 +1,13 @@
 console.log(getTimestamp() + " [INFO] Starting kitsune for Discord...");
 
-const os = require('os'); // подключение библиотеки os
+const os = require('os'); // подключение библиотеки получение данных о системе (os)
 console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM');
 
-const Discord = require('discord.js'); // подключение библиотеки discord.js
+const Discord = require('discord.js'); // подключение библиотеки Discord API (discord.js)
 const kitsune = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]}); // создание пользователя с правами
 const fs = require("fs"); // подключение библиотеки файловой системы (fs)
 
-const launch_time = Date.now(); // время запуска
+const launch_time = Date.now(); // запоминаем время запуска
 
 // склад модулей
 let values = {};   // значения
@@ -46,7 +46,7 @@ async function init_step1(){ // загрузка значений
 			console.log(getTimestamp() + ' [INFO] Debug logger enabled');
 		};
 		console.log(getTimestamp() + ' [INFO] (2/3) Loading functions...');
-		init_step2();
+		init_step2(); // следующий этап
 	});
 };
 
@@ -73,7 +73,7 @@ async function init_step2(){ // загрузка функций
 			errors.push('noLogFunc');
 		};
 		console.log(getTimestamp() + ' [INFO] (3/3) Loading commands...');
-		init_step3();
+		init_step3(); // следующий этап
 	});
 };
 	
@@ -98,7 +98,7 @@ async function init_step3() { // загрузка команд
 			if (command.name == 'help') HelpExists = true;
 		};
 		if (!HelpExists) {errors.push('noHelpComm')};
-		init_step4();
+		init_step4(); // следующий этап
 	});
 };
 
@@ -119,14 +119,14 @@ async function init_step4() { // проверка ошибок
 	// всё ок. логируем о хорошем и входим в дискорд
 	console.log(getTimestamp() + ' [INFO] Initialization completed successful. ' + ((Date.now() - launch_time) / 1000 ) + 's');
 	console.log(getTimestamp() + ' [INFO] Logging in Discord...' );
-	kitsune.login(values.discordtoken); 
+	kitsune.login(values.discordtoken); // логинимся
 };
 
 // функция логирования времени
 function getTimestamp() {
 	var date = new Date(); // задаём текущую поеботу
 
-	// преобразуем всю поеботу в нормальный вид
+	// преобразуем всю поеботу в нормальный вид (что бы было не 2.3.2022, а 02.03.2022)
 	var hours = date.getHours();
 	if (hours < 10) {
 		hours = "0" + hours;
@@ -146,7 +146,6 @@ function getTimestamp() {
 // обработка нового сообщения
 kitsune.on("messageCreate", async msg => {
 	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
-	// TODO пропуск тестеров
 	
 	let args = msg.content.split(" "); // форматируем аргументы
 	if (args[0].toLowerCase().startsWith(values.prefix)) { // если сообщение начинается с префикса то работать
@@ -155,25 +154,22 @@ kitsune.on("messageCreate", async msg => {
 			if (command.name == cmd.toLowerCase()) { // если команда в сообщении совпала с командой из списка бота то работать	
 				let running_comm = ''
 				if (msg.guild) { // если вызвано на сервере то проверить права
+				
 					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms]; // задаём права, которые надо проверить
 					const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions); // проверяем права в канале
+					
 					if (!missing[0] == "") { // если какое либо право не найдено то паника
 						funcs.error(kitsune, values, msg, args, command.name, "Required permissions not found: " + missing.join(', '));
-						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) {
-							funcs.error(kitsune, values, msg, args, command.name, '');
-						} else if (!missing.includes("SEND_MESSAGES") && missing.includes("EMBED_LINKS")) {
-							msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + kitsune.user.username });
+						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) { // если нет прав на эмбеды и отправку сообщений
+							// TODO логирование в лс
+						} else if (!missing.includes("SEND_MESSAGES") && missing.includes("EMBED_LINKS")) { // если нет прав на эмбеды но можно отправить сообщение
+							msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n`\n" + missing.join(', ') + "\n`\nПопросите владельца сервера предоставить это право " + kitsune.user.username }); // embed-free ошибка
 						};
 						return;
 					};
 				};
 				try {
-					if (msg.guild) { // если на сервере то логировать название сервера
-						console.log(getTimestamp() + " [INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
-					} else { // иначе логировать без сервера
-						console.log(getTimestamp() + " [INFO] " + msg.author.tag + ' (' + msg.author.id + ') executed command ' + command.name + ' by sending message in channel #' + msg.channel.name + ' (' + msg.channel.id + ')');
-					}
-					//funcs.log(kitsune, 'info', 'information', values)
+					console.log(getTimestamp() + " [INFO] executed command " + command.name); // логирование о проходе всех проверок и начале запуске команды
 					command.run(kitsune, msg, args); // запуск команды
 				} catch (error) { // если ошибка то логировать ошибку
 					funcs.error(kitsune, values, msg, args, command.name, error);
@@ -193,9 +189,8 @@ kitsune.on("messageCreate", async msg => {
 
 // залогинились. теперь логируем об этом, задаём статусы и т.д.
 kitsune.once('ready', () => {
+	console.log(getTimestamp() + " [INFO] Logged in"); // уведомляем об успешном входе
 	delete values.discordtoken; // чистим токен из памяти когда залогинились
-	console.log(getTimestamp() + " [INFO] Logged in");
-	
 	if (errors.length > 0) { // если есть ошибки то логировать
 		kitsune.user.setStatus('invisible'); // статус невидимки
 		funcs.log(kitsune, 'syserror', 'Errors occurred during the loading:\n`' + errors.join(', ') + '`\nCheck the console for more information', values); // отсылаем отчёт
@@ -213,8 +208,7 @@ kitsune.once('ready', () => {
 			kitsune.user.setStatus('online'); // статус в сети
 			kitsune.user.setActivity(values.prefix + 'help'); // играет в <prefix>help
 		};
-		console.log(getTimestamp() + " [INFO] " + `Serving ${kitsune.guilds.cache.size} guilds`);
 		console.log(getTimestamp() + " [INFO] " + `Total launch time: ${((Date.now() - launch_time) / 1000 )}s`);
 		console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} (ver: ${values.version}) is ready to work!`);
-	}
+	};
 });

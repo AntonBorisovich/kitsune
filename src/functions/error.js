@@ -16,12 +16,17 @@ class Error {
 			let hour = Math.floor(min / 60)
 			let day = Math.floor(hour / 24)
 			return day + ' дней ' + (hour - (24 * day)) + ' часов ' + (min - (60 * hour)) + ' минут ' + (sec - (60 * min)) + ' секунд';
-		}
-		const ping = Math.round(kitsune.ws.ping)
+		};
+		
+		const ping = Math.round(kitsune.ws.ping); // Замеряем пинг
+		
+		// Смотрим и запоминаем вложения к сообщению
 		let attachments = ""
 		msg.attachments.forEach(attach => {
 			attachments += "[" + attach.id + "_" + attach.contentType + "](" + attach.url + ")  "
-		})
+		});
+		
+		// Формируем лог для разработчиков (full)
 		let embed = new Discord.MessageEmbed()
 		embed.setTitle(kitsune.user.username + ' - Error')
 		embed.setColor(`#F00000`)
@@ -42,15 +47,15 @@ class Error {
 		const botowner = await kitsune.users.fetch(values.developers[0]);
 		botowner.send({ embeds: [embed] });
 		
-		
+		// Формируем лог для пользователей (public)
 		let pubembed = new Discord.MessageEmbed();
 		pubembed.setTitle(kitsune.user.username + ' - Error');
 		pubembed.setColor(`#F00000`);
 		pubembed.setDescription("Произошла ошибка: `" + error.name + '`');
 		pubembed.setFooter({ text: 'Отчёт об ошибке был отпрален разработчикам (' + msg.id + ')'})
 		msg.channel.send({ embeds: [pubembed] });
-    }
-}
+    };
+};
 
 module.exports = Error
 

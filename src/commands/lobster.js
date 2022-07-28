@@ -46,10 +46,9 @@ class Lobster {
         this.config = config;
         this.commands = commands;
 		this.perms = ["ATTACH_FILES"];
-		this.category = "fun";
 		this.args = "<текст>";
-		this.usage = this.args;
 		this.advargs = "<текст> - содержарие строки";
+		this.argsdesc = this.advargs; // описание аргументов в помоще по конкретной команде
         this.desc = "сделать мем с лобстером как в вк";
 		this.advdesc = 'Пикча с текстом, написанным шрифтом "Lobster", что и дает название мема\n\nВывод изображения ограничен в ширину до 850 пикселей';
         this.name = "lobster";
@@ -112,40 +111,40 @@ class Lobster {
 			async function work(client, msg, args) {
 				
 				if (!msg.attachments.first().contentType) {
-					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Error')
-					embed.setColor(`#F00000`)
-					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
+					let embed = new Discord.MessageEmbed();
+					embed.setTitle(client.user.username + ' - Error');
+					embed.setColor(`#F00000`);
+					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
 					msg.channel.send({ embeds: [embed] });
 					return;	
-				}
+				};
 				if (!msg.attachments.first().contentType.startsWith('image')) {
-					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Error')
-					embed.setColor(`#F00000`)
-					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
+					let embed = new Discord.MessageEmbed();
+					embed.setTitle(client.user.username + ' - Error');
+					embed.setColor(`#F00000`);
+					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
 					msg.channel.send({ embeds: [embed] });
 					return;
-				}
+				};
 				
 				args.shift();
-				let data = args.join(' ');
+				args.push('');
+				const data = args.join(' ');
 				const attach = new Discord.MessageAttachment(msg.attachments.first().attachment);
 				msg.channel.sendTyping();
 				
-				const image = await demotivatorImage(attach, data[0], msg.attachments.first().width, msg.attachments.first().height)
-				msg.channel.send({files: [image]})
-			}
+				const image = await demotivatorImage(attach, data, msg.attachments.first().width, msg.attachments.first().height);
+				msg.channel.send({files: [image]});
+			};
 		} catch(err) {
-            let embed = new Discord.MessageEmbed()
-			embed.setTitle(client.user.username + ' - Error')
-			embed.setColor(`#F00000`)
-			embed.setDescription("Ошибка:\n```" + err + "\n```")
-			msg.channel.send({ embeds: [embed] });;
-			
-		}
-    }
-}
+            let embed = new Discord.MessageEmbed();
+			embed.setTitle(client.user.username + ' - Error');
+			embed.setColor(`#F00000`);
+			embed.setDescription("Ошибка:\n```" + err + "\n```");
+			msg.channel.send({ embeds: [embed] });
+		};
+    };
+};
 
-module.exports = Lobster
+module.exports = Lobster;
 

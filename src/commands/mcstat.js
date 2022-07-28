@@ -10,11 +10,12 @@ class Mcstat {
 		this.perms = [""];
 		this.category = "Utils";
 		this.args = "<ip>";
-		this.advargs = "<ip> - ip сервера. например: \n" +
-					   "54.95.45.16 (порт по умолчанию - 25565)\n" +
-					   "81.5.66.205:3001 (собственный порт через `:`)\n" +
-					   "mc.hypixel.net (ссылка на сервер)";
+		this.argsdesc = "<ip> - ip сервера. например: \n" +
+					   "127.0.0.1 (ip с портом по умолчанию - 25565)\n" +
+					   "127.0.0.1:13370 (ip с собственным портом через `:`)\n" +
+					   "example.com (URL ссылка на сервер)";
 		this.usage = "<ip>";
+		this.advargs = "<ip>"; // описание аргументов в помоще по конкретной команде
         this.desc = "статус minecraft сервера";
         this.advdesc = "Статус сервера Minecraft Java Edition версии 1.7.2 и выше";
         this.name = "mcstat";
