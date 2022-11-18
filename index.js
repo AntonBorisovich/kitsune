@@ -147,6 +147,20 @@ function getTimestamp() {
 
 // обработка нового сообщения
 kitsune.on("messageCreate", async msg => {
+	
+	if (msg.channelId == 750403949202243695) { // новости ъеъ
+		msg.react('<:neeet:1039589647032012930>'); // ?
+	};
+	if (msg.channelId == 836313957383536762) { // dev-log ъеъ
+		var date = new Date(); // задаём текущую поеботу
+		msg.react('🤮'); // озон одобряет
+		msg.channel.threads.create({ // пишем отзыв об обновлении
+			name: 'бл (' + date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + ')',
+			startMessage: msg,
+			reason: 'вадим любит коки (' + (date.getMonth() + 1) + "." + date.getDate() + ')'
+		}).then(threadChannel => threadChannel.send('кринжатина. лучше бы не писал ничего <:bravo:1039589650773315584>'));
+	};
+	
 	console.log('created')
 	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
 	
