@@ -97,78 +97,8 @@ class Info {
 		}
 		
 		let embed = new Discord.MessageEmbed();
-		embed.setTitle(client.user.username + ' - Advanced info')
+		embed.setTitle(client.user.username + ' - Debug info')
 		embed.setColor(`#F36B00`)
-		embed.setDescription('```\n' + client.user.username + '\n' + date + '.' + month + '.' + now.getFullYear() + '  ' + hour + ':' + secon + '  UTC+' + hrsdif + '\n' +
-							 '\nПоздравляем, бот работает!\n\n```')
-		embed.addField('---== Bot info ==---', 
-		'```\n' +
-		'name: ' + client.user.username + '\n' +
-		'tag: ' + client.user.tag + '\n' +
-		'id: ' + client.user.id + '\n' +
-		'ping: ' + Math.round(client.ws.ping) + ' ms' +
-		'\n```')
-		
-		embed.addField('---== Bot additional info ==---', 
-		'```\n' +
-		'Version: ' + this.customvars.version + '\n' +
-		'Loaded commands: ' + this.commands.length + '\n' +
-		'prefix: ' + this.config.prefix + '\n' +
-		'CPU architecture: ' + os.arch() + '\n' +
-		'OS Platform: ' + os.platform() + '\n' +
-		'OS Type: ' + os.type() + '\n' +
-		'OS Release: ' + os.release() + '\n' +
-		'OS uptime: ' + this.sec2time( os.uptime() ) + '\n' +
-		'Bot uptime: ' + this.bot_uptime() + '\n' +
-		'RAM: ' + Math.floor( ( os.totalmem() - os.freemem() ) / 1048576 ) + '/' + Math.floor( os.totalmem() / 1048576 ) + 'MB' +
-		'\n```')
-		
-		let guilds = client.guilds.cache.map(guild => `${guild.name} (${guild.id})\n`).join("");
-		embed.addField('---== Bot guilds ==---',
-		'```\n' + 
-		guilds.toString() + '\n' +
-		'total guilds quantity: ' + client.guilds.cache.size + 
-		'\n```')
-		
-		embed.addField('---== Client info ==---', 
-		'```\n' +
-		'name: ' + msg.author.username + '\n' +
-		'tag: ' + msg.author.tag + '\n' +
-		'id: ' + msg.author.id + '\n' +
-		'ping: ' + (Date.now() - msg.createdTimestamp) + ' ms\n' +
-		'bot owner: ' + this.isowner(client,msg,args) + '\n' +
-		//'joined on server at: ' + msg.guild.joinedAt + ' (FIXME)' + 
-		'\n```')
-		
-		//let hasperms = [""]
-		//let allperms = ["SEND_MESSAGES", "ADMINISTRATOR"]
-		
-		//allperms.forEach(perm => {
-		//	eval('if (msg.guild.me.permissions.has(Discord.Permissions.FLAGS.' + perm + ')) {' +
-		//		'hasperms.push[' + perm + ']' +
-		//	'}'
-		//	)
-		//	
-		//})
-		//console.log(hasperms)
-		embed.addField('---== Permissions ==---', '```\nTODO (info.js)\n```')
-		//console.log(msg.guild.me)
-		if (msg.guild) {
-			embed.addField('---== Server info ==---', 
-			'```\n' +
-			'name: ' + msg.guild.name + '\n' +
-			'id: ' + msg.guild.id + '\n' +
-			'users: ' + msg.guild.memberCount + '/' + msg.guild.maximumMembers + '\n' +
-			'boosts: ' + msg.guild.premiumSubscriptionCount + '\n' +
-			'boost level: ' + msg.guild.premiumTier + '\n' +
-			'verification level: ' + msg.guild.verificationLevel + '\n' +
-			'verified: ' + msg.guild.verified  +
-			'\n```')
-		}
-		
-		embed.addField('---== Libraries/APIs used ==---',
-		'```\nNode.js | ' + process.version.replace(/v/g, "") + '\n' + JSON.stringify(dependencies).replace(/\,/g, "\n").replace(/[ \{, \}, \", \^, , ]/g, "" ).replace(/\:/g, " - ") + '\n```')
-		msg.author.send({embeds: [embed]})
 		
 		embed = new Discord.MessageEmbed()
 		embed.setTitle(client.user.username + ' - Advanced info')

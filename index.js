@@ -16,6 +16,8 @@ let commands = []; // команды
 
 let errors = [];   // список ошибок, произошедших во время инициализации
 
+let timeoutid = []; // список id пользователей, которые находятся в 5 секундном тайм-ауте
+
 // Начало инициализации
 console.log(getTimestamp() + ' [INFO] (1/3) Loading values...');
 init_step1(); // петрович, врубай насос
@@ -145,7 +147,16 @@ function getTimestamp() {
 
 // обработка нового сообщения
 kitsune.on("messageCreate", async msg => {
+	console.log('created')
 	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
+	
+	if (timeoutid.indexOf(msg.author.id) != -1) return; // проверяем в тайм-ауте ли пользователь
+	
+	timeoutid.push(msg.author.id); // добавляем пользователя в тайм-аут
+	setTimeout(() => { // через 5 секунд снимаем пользователя с тайм-аута
+		const index = timeoutid.indexOf(msg.author.id); // чекаем есть ли id в тайм-ауте
+		if (index !== -1) { timeoutid.splice(index, 1) }; // удаляем из тайм-аута
+	}, 2000);
 	
 	let args = msg.content.split(" "); // форматируем аргументы
 	if (args[0].toLowerCase().startsWith(values.prefix)) { // если сообщение начинается с префикса то работать
@@ -180,8 +191,49 @@ kitsune.on("messageCreate", async msg => {
 });
 
 // обработка получения изменённого сообщения
-// TODO (обработка сообщения, таймаут-антиспам)
-//kitsune.on('messageUpdate', async (oldMsg, msg) => { });
+kitsune.on('messageUpdate', async (oldMsg, msg) => {
+	console.log('updated')
+	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
+	
+	if (timeoutid.indexOf(msg.author.id) != -1) return; // проверяем в тайм-ауте ли пользователь
+	
+	timeoutid.push(msg.author.id); // добавляем пользователя в тайм-аут
+	setTimeout(() => { // через 5 секунд снимаем пользователя с тайм-аута
+		const index = timeoutid.indexOf(msg.author.id); // чекаем есть ли id в тайм-ауте
+		if (index !== -1) { timeoutid.splice(index, 1) }; // удаляем из тайм-аута
+	}, 2000);
+	
+	let args = msg.content.split(" "); // форматируем аргументы
+	if (args[0].toLowerCase().startsWith(values.prefix)) { // если сообщение начинается с префикса то работать
+		let cmd = args[0].substring(values.prefix.length) // получаем имя вызываемой команды из сообщения
+		commands.forEach(command => { // перебираем список команд в боте
+			if (command.name == cmd.toLowerCase()) { // если команда в сообщении совпала с командой из списка бота то работать	
+				let running_comm = ''
+				if (msg.guild) { // если вызвано на сервере то проверить права
+				
+					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms]; // задаём права, которые надо проверить
+					const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions); // проверяем права в канале
+					
+					if (!missing[0] == "") { // если какое либо право не найдено то паника
+						funcs.error(kitsune, values, msg, args, command.name, "Required permissions not found: " + missing.join(', '));
+						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) { // если нет прав на эмбеды и отправку сообщений
+							// TODO логирование в лс
+						} else if (!missing.includes("SEND_MESSAGES") && missing.includes("EMBED_LINKS")) { // если нет прав на эмбеды но можно отправить сообщение
+							msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n`\n" + missing.join(', ') + "\n`\nПопросите владельца сервера предоставить это право " + kitsune.user.username }); // embed-free ошибка
+						};
+						return;
+					};
+				};
+				try {
+					console.log(getTimestamp() + " [INFO] executed command " + command.name); // логирование о проходе всех проверок и начале запуске команды
+					command.run(kitsune, msg, args); // запуск команды
+				} catch (error) { // если ошибка то логировать ошибку
+					funcs.error(kitsune, values, msg, args, command.name, error);
+				};
+			};
+		});
+	};
+});
 
 // обработка интерактивного элемента (кнопки, слэш-команды)
 // TODO
