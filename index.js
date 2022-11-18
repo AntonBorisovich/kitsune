@@ -151,7 +151,7 @@ kitsune.on("messageCreate", async msg => {
 	if (msg.channelId == 750403949202243695) { // новости ъеъ
 		msg.react('<:neeet:1039589647032012930>'); // ?
 	};
-	if (msg.channelId == 836313957383536762) { // dev-log ъеъ
+	if (msg.channelId == 838430531188162640) { // dev-log ъеъ
 		var date = new Date(); // задаём текущую поеботу
 		msg.react('🤮'); // озон одобряет
 		msg.channel.threads.create({ // пишем отзыв об обновлении
@@ -160,8 +160,7 @@ kitsune.on("messageCreate", async msg => {
 			reason: 'вадим любит коки (' + (date.getMonth() + 1) + "." + date.getDate() + ')'
 		}).then(threadChannel => threadChannel.send('кринжатина. лучше бы не писал ничего <:bravo:1039589650773315584>'));
 	};
-	
-	console.log('created')
+
 	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
 	
 	if (timeoutid.indexOf(msg.author.id) != -1) return; // проверяем в тайм-ауте ли пользователь
@@ -206,7 +205,6 @@ kitsune.on("messageCreate", async msg => {
 
 // обработка получения изменённого сообщения
 kitsune.on('messageUpdate', async (oldMsg, msg) => {
-	console.log('updated')
 	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
 	
 	if (timeoutid.indexOf(msg.author.id) != -1) return; // проверяем в тайм-ауте ли пользователь
