@@ -77,6 +77,24 @@ class React {
 							return;
 						};
 					};
+					if (args[1].startsWith('<:')) { // если это имя сложного эмодзи
+						//console.log(': input: ' + args[1])
+						const emojiname = args[1].substr(2,(args[1].substr(2, (args[1].length - 1)).indexOf(':'))); // форматируем имя
+						//console.log(': emoji name: ' + emojiname);
+						const bean = msg.guild.emojis.cache.find(emoji => emoji.name === emojiname); // получаем его из дискорда по имени
+						if (bean.name == emojiname) { // проверяем нашлось ли правильно
+							msg.react(bean); // ставим какаху 
+							reactsend = true;
+						} else {
+							//console.log(err)
+							let embed = new Discord.MessageEmbed()
+							embed.setTitle(kitsune.user.username + ' - error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Не удалось найти этот эмодзи.")
+							msg.channel.send({ embeds: [embed] });
+							return;
+						};
+					};
 					if (!reactsend) { // попробуем последний раз ченить найти
 						const bean = msg.guild.emojis.cache.find(emoji => emoji.name === args[1]); // ищем максимально тупо
 						if (bean.name == args[1]) { // УРА! НАШЛОСЬ!
