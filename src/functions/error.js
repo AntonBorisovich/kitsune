@@ -29,12 +29,13 @@ class Error {
 		
 		// Формируем лог для разработчиков (full)
 		let embed = new Discord.EmbedBuilder()
-		embed.setTitle(kitsune.user.username + ' - Error')
+		embed.setTitle(kitsune.user.username + ' - Error (' + msg.id + ')')
 		embed.setColor(`#F00000`)
 		embed.setDescription('При выполнении команды "' + commname + '" произошла ошибка. Ниже вы можете увидеть отчёт.')
 		embed.addFields([
 			{name: '---== Ошибка ==---', value: '```\n' + String(error) + '\n```' },
 			{name: '---== Сообщение пользователя ==---', value:
+				'ID сообщения: ' + msg.id + '\n' +
 				'Пользователь: ' + msg.author.username + '#' + msg.author.discriminator + ' (' + msg.author.id + ')\n' +
 				'Сервер: ' + msg.guild.name + ' (' + msg.guild.id + ')\n' +
 				'Содержание: `' + msg.content + '`\n' +
@@ -61,15 +62,30 @@ class Error {
 		if (!shorterr) {shorterr = error.name};
 		
 		if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.SendMessages])) { // если мы вообще имеем право на отправку сообщения
-			if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.EmbedLinks])) { // если можем отправить embed то отправить эмбедом
-				let pubembed = new Discord.EmbedBuilder();
-				pubembed.setTitle(kitsune.user.username + ' - Error');
-				pubembed.setColor(`#F00000`);
-				pubembed.setDescription("Произошла ошибка: `" + shorterr + '`');
-				pubembed.setFooter({ text: 'Отчёт об ошибке был отправлен разработчикам (' + msg.id + ')'})
-				msg.channel.send({ embeds: [pubembed] });
-			} else { // если не можем отправить embed то отправить текстом
-				msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nПроизошла ошибка: `" + shorterr + '`\n\nОтчёт об ошибке был отправлен разработчикам (' + msg.id + ')'}); // embed-free ошибка
+			if (msg.channel.type === Discord.ChannelType.GuildForum || msg.channel.type === Discord.ChannelType.GuildPublicThread || msg.channel.type === Discord.ChannelType.GuildPrivateThread) { // если это ветка или форум
+				if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.SendMessagesInThreads])) { // то проверим есть ли у нас прова на отправку в ветку или форум
+					if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.EmbedLinks])) { // если можем отправить embed то отправить эмбедом
+						let pubembed = new Discord.EmbedBuilder();
+						pubembed.setTitle(kitsune.user.username + ' - Error');
+						pubembed.setColor(`#F00000`);
+						pubembed.setDescription("Произошла ошибка: `" + shorterr + '`');
+						pubembed.setFooter({ text: 'Отчёт об ошибке был отправлен разработчикам (' + msg.id + ')'})
+						msg.channel.send({ embeds: [pubembed] });
+					} else { // если не можем отправить embed то отправить текстом
+						msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nПроизошла ошибка: `" + shorterr + '`\n\nОтчёт об ошибке был отправлен разработчикам (' + msg.id + ')'}); // embed-free ошибка
+					};
+				};
+			} else { // если это не ветка или форум то ничего и не проверять
+				if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.EmbedLinks])) { // если можем отправить embed то отправить эмбедом
+					let pubembed = new Discord.EmbedBuilder();
+					pubembed.setTitle(kitsune.user.username + ' - Error');
+					pubembed.setColor(`#F00000`);
+					pubembed.setDescription("Произошла ошибка: `" + shorterr + '`');
+					pubembed.setFooter({ text: 'Отчёт об ошибке был отправлен разработчикам (' + msg.id + ')'})
+					msg.channel.send({ embeds: [pubembed] });
+				} else { // если не можем отправить embed то отправить текстом
+					msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nПроизошла ошибка: `" + shorterr + '`\n\nОтчёт об ошибке был отправлен разработчикам (' + msg.id + ')'}); // embed-free ошибка
+				};
 			};
 		};
     };

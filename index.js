@@ -179,7 +179,13 @@ kitsune.on("messageCreate", async msg => {
 			if (command.name == cmd.toLowerCase()) { // если команда в сообщении совпала с командой из списка бота то работать	
 				let running_comm = ''
 				if (msg.guild) { // если вызвано на сервере то проверить права
-					const permissions = ['SendMessages', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+					let permissions = [];
+					if (msg.channel.type === Discord.ChannelType.GuildForum || msg.channel.type === Discord.ChannelType.GuildPublicThread || msg.channel.type === Discord.ChannelType.GuildPrivateThread) {
+						permissions = ['SendMessages', 'SendMessagesInThreads', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+					} else {
+						permissions = ['SendMessages', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+					}
+					
 					let missing = []
 					permissions.forEach(perm => { // чекаем каждый пермишн
 							if (perm) { // если строка случайно не пустая
