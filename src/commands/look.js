@@ -59,7 +59,7 @@ class Look {
         this.commands = commands;
 		
 		//this.twofa = false; // запуск только разработчикам
-		this.perms = ["ATTACH_FILES"];
+		this.perms = ["AttachFiles"];
         this.name = "look"; // имя команды
 		this.desc = "2 чела показывают на пикчу"; // описание команды в общем списке команд
 		this.advdesc = "Делает мем, где 2 нарисованых чела показывают на картинку\nПодробнее: [knowyourmeme.com](https://knowyourmeme.com/memes/two-soyjaks-pointing)"; // описание команды в помоще по конкретной команде
@@ -73,13 +73,13 @@ class Look {
 			//checking attachment availability
 			if (!msg.attachments.first()) {
 				if (msg.guild) { // if guild
-					if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY" && msg.reference !== null) { // if reply check reply for attach
+					if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.ReadMessageHistory]) && msg.type == "19" && msg.reference !== null) { // if reply check reply for attach
 						const msgrep = await msg.fetchReference();
 						if (msgrep.attachments.first()) {
 							await work(kitsune, msgrep, args);
 							return;
 						} else {
-							let embed = new Discord.MessageEmbed();
+							let embed = new Discord.EmbedBuilder();
 							embed.setTitle(kitsune.user.username + ' - Error');
 							embed.setColor(`#F00000`);
 							embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
@@ -108,7 +108,7 @@ class Look {
 							return;
 						};
 								
-						let embed = new Discord.MessageEmbed();
+						let embed = new Discord.EmbedBuilder();
 						embed.setTitle(kitsune.user.username + ' - Error');
 						embed.setColor(`#F00000`);
 						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
@@ -124,7 +124,7 @@ class Look {
 			//work
 			async function work(kitsune, msg, args) {
 				if (!msg.attachments.first().contentType) {
-					let embed = new Discord.MessageEmbed();
+					let embed = new Discord.EmbedBuilder();
 					embed.setTitle(kitsune.user.username + ' - Error');
 					embed.setColor(`#F00000`);
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
@@ -132,7 +132,7 @@ class Look {
 					return;	
 				};
 				if (!msg.attachments.first().contentType.startsWith('image')) {
-					let embed = new Discord.MessageEmbed();
+					let embed = new Discord.EmbedBuilder();
 					embed.setTitle(kitsune.user.username + ' - Error');
 					embed.setColor(`#F00000`);
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
@@ -161,11 +161,11 @@ class Look {
 					};
 				};
 				
-				const attach = new Discord.MessageAttachment(msg.attachments.first().attachment)
+				const attach = new Discord.AttachmentBuilder(msg.attachments.first().attachment)
 				msg.channel.sendTyping()
 				const image = await LookAtThisImage(attach, Math.floor((msg.attachments.first().width * wide_multiplier)), msg.attachments.first().height);
 				const imageName = msg.attachments.first().name;
-				const finalImage = new Discord.MessageAttachment(image, 'look_at_' + imageName.substring(0,imageName.length-4) + '.png');
+				const finalImage = new Discord.AttachmentBuilder(image, { name: 'look_at_' + imageName.substring(0,imageName.length-4) + '.png' });
 				await msg.channel.send({files: [finalImage]})
 				return;
 			};

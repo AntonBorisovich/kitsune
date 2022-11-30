@@ -24,7 +24,7 @@ class Mesh {
 				await PythonShell.run('src/assets/mesh/mesh.py', {args: [args[1]]}, async function (err,code,signal) {
 					if (err) {
 						console.error(err)
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Произошла ошибка")
@@ -36,7 +36,7 @@ class Mesh {
 					code = String(code).split('ХУЙ')
 					if (String(code) == "wrong_link") {
 						console.error(code)
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Неправильная ссылка")
@@ -44,7 +44,7 @@ class Mesh {
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(kitsune.user.username + ' - МЭШ')
 					embed.setColor(`#F36B00`)
 					let output
@@ -65,7 +65,7 @@ class Mesh {
 					msg.channel.send({ embeds: [embed] });
 				})
 			} catch (err) {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Произошла ошибка")
@@ -73,7 +73,7 @@ class Mesh {
 				msg.channel.send({ embeds: [embed] });
 			}
 		} else {
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(kitsune.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Не указана ссылка на тест")

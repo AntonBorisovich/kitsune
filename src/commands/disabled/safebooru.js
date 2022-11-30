@@ -70,7 +70,7 @@ class Sfbr {
 						//console.log(result)
 						//console.log(result.posts)
 						if (!result) {
-							let embed = new Discord.MessageEmbed()
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(client.user.username + ' - safebooru')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Ничего не найдено   ╮(︶▽︶)╭")
@@ -87,7 +87,7 @@ class Sfbr {
 							var picNum = (Math.floor((Math.random() - 0.0001) * postCount) + 1);
 							var sfbrPic = result.posts.post[picNum].$.file_url;
 							var sfbrTags = result.posts.post[picNum].$.tags.replace(/ /g, ", ");
-							let embed = new Discord.MessageEmbed()
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(client.user.username + ' - safebooru')
 							embed.setColor(`#F36B00`)
 							embed.setImage(sfbrPic)
@@ -95,7 +95,7 @@ class Sfbr {
 							msg.channel.send({ embeds: [embed] });
 							return
 						} else {
-							let embed = new Discord.MessageEmbed()
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(client.user.username + ' - safebooru')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Ничего не найдено   ╮(︶▽︶)╭")
@@ -106,7 +106,7 @@ class Sfbr {
 				});
 			}).on("error", function(e) {
 				console.log(e);
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Произошла ошибка")
@@ -116,7 +116,7 @@ class Sfbr {
 			});
 		} catch (e) {
 			console.log(e);
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Произошла ошибка")

@@ -43,7 +43,7 @@ class reboot {
 		if (args[1]) {
 			if (args[1].toLowerCase() == '-q') {  
 				executable_comm = 'pm2 restart all'
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - reboot')
 				embed.setColor(`#F36B00`)
 				embed.setDescription(":arrows_counterclockwise: Перезапуск...")
@@ -51,7 +51,7 @@ class reboot {
 				work(client)
 			} else if (args[1].toLowerCase() == '-s') {
 				executable_comm = 'pm2 stop all'
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - reboot')
 				embed.setColor(`#F36B00`)
 				embed.setDescription(":mobile_phone_off: Выключение...")
@@ -61,7 +61,7 @@ class reboot {
 				executable_comm = 'pm2 restart all'
 				fs.writeFile('../values/maintenance.json', '{"maintenance": ' + !this.customvars.maintenance + '}', (err) => {
 				  if (err) {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("```\n" + err + "\n```")
@@ -72,7 +72,7 @@ class reboot {
 				  }
 				})
 				console.log(getTimestamp() + ' [INFO] Changed value. maintenance = ' + !this.customvars.maintenance)
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - reboot')
 				embed.setColor(`#F36B00`)
 				if (this.customvars.maintenance) {
@@ -83,7 +83,7 @@ class reboot {
 				msg.channel.send({ embeds: [embed] });
 				work(client)
 			} else {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Неправильные аргументы")
@@ -91,7 +91,7 @@ class reboot {
 				return
 			}
 		} else {
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - reboot')
 			embed.setColor(`#F36B00`)
 			embed.setDescription(":arrows_counterclockwise: Перезапуск...")

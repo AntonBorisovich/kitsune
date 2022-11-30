@@ -24,7 +24,7 @@ class Mcstat {
     async run(client, msg, args){
 		
 		if (!args[1]){
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Ты не указал ip")
@@ -44,7 +44,7 @@ class Mcstat {
 			mcip = mcip[0]
 		}
 		
-		let embed = new Discord.MessageEmbed()
+		let embed = new Discord.EmbedBuilder()
 		embed.setTitle(client.user.username + ' - Minecraft Status')
 		embed.setColor(`#F36B00`)
 		embed.setDescription("Подключение к серверу...")
@@ -59,40 +59,13 @@ class Mcstat {
 					})
 				}
 			}
-			if (msg.guild) {
-				const permissions = ['ATTACH_FILES'];
-				const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions);
-							
-				if (!missing[0] == "") {
-					let embed = new Discord.MessageEmbed()
-					embed.setTitle(client.user.username + ' - Minecraft Status')
-					embed.setColor(`#F36B00`)
-					if (response.players.sample) {
-						if (response.players.sample.length >= 1) {
-							embed.setDescription('**' + mcip + '**:' + Number(mcport) + '\n' + 
-										'Версия: ' + response.version.name + '\n' +
-										'Онлайн: ' + response.players.online + '/' + response.players.max + "\n" +
-										'Игроки:\n```\n' + players + '\n```\n' +
-										'Motd:```\n' + response.motd.clean + '```\n')
-						} else {
-							embed.setDescription('**' + mcip + '**:' + Number(mcport) + '\n' + 
-										'Версия: ' + response.version.name + '\n' +
-										'Онлайн: ' + response.players.online + '/' + response.players.max +
-										'```\n' + response.motd.clean + '```')
-						}
-					} else {
-						embed.setDescription('**' + mcip + '**:' + Number(mcport) + '\n' + 
-									'Версия: ' + response.version.name + '\n' +
-									'Онлайн: ' + response.players.online + '/' + response.players.max +
-									'```\n' + response.motd.clean + '```')
-					}
-					message.edit({ embeds: [embed] });
-				} else {
+			if (msg.guild) {						
+				if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.AttachFiles])) {
 					const b64image = response.favicon
 					const data = b64image.split(',')[1]; 
 					const buf = new Buffer.from(data, 'base64');
-					const file = new Discord.MessageAttachment(buf, 'icon.png');
-					let embed = new Discord.MessageEmbed()
+					const file = new Discord.AttachmentBuilder(buf, {name: 'icon.png'});
+					let embed = new Discord.EmbedBuilder()
 					embed.setThumbnail('attachment://icon.png')
 					embed.setTitle(client.user.username + ' - Minecraft Status')
 					embed.setColor(`#F36B00`)
@@ -115,13 +88,37 @@ class Mcstat {
 									'Онлайн: ' + response.players.online + '/' + response.players.max +
 									'```\n' + response.motd.clean + '```')
 					}
-					message.edit({ embeds: [embed], files: [file]});		
+					message.edit({ embeds: [embed], files: [file]});	
+				} else {
+					let embed = new Discord.EmbedBuilder()
+					embed.setTitle(client.user.username + ' - Minecraft Status')
+					embed.setColor(`#F36B00`)
+					if (response.players.sample) {
+						if (response.players.sample.length >= 1) {
+							embed.setDescription('**' + mcip + '**:' + Number(mcport) + '\n' + 
+										'Версия: ' + response.version.name + '\n' +
+										'Онлайн: ' + response.players.online + '/' + response.players.max + "\n" +
+										'Игроки:\n```\n' + players + '\n```\n' +
+										'Motd:```\n' + response.motd.clean + '```\n')
+						} else {
+							embed.setDescription('**' + mcip + '**:' + Number(mcport) + '\n' + 
+										'Версия: ' + response.version.name + '\n' +
+										'Онлайн: ' + response.players.online + '/' + response.players.max +
+										'```\n' + response.motd.clean + '```')
+						}
+					} else {
+						embed.setDescription('**' + mcip + '**:' + Number(mcport) + '\n' + 
+									'Версия: ' + response.version.name + '\n' +
+									'Онлайн: ' + response.players.online + '/' + response.players.max +
+									'```\n' + response.motd.clean + '```')
+					}
+					message.edit({ embeds: [embed] });
 				}
 			}	
 		})
 		.catch((error) => {
 			if (String(error).startsWith("undefined") || String(error).startsWith("Error: connect ECONNREFUSED")) {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Невозможно установить подключение")
@@ -130,7 +127,7 @@ class Mcstat {
 				//console.log(error);
 				return;
 			} else if (String(error).startsWith("Error: Timed out")) {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Превышено время ожидания")
@@ -139,7 +136,7 @@ class Mcstat {
 				//console.log(error);
 				return;
 			} else {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Неизвестная ошибка")

@@ -6,7 +6,7 @@ class React {
         this.kitsune = kitsune;
         this.commands = commands;
 		
-		this.perms = ["ADD_REACTIONS"];
+		this.perms = ["AddReactions"];
 
 		this.name = "react"; // имя команды
 		this.desc = "реакция на сообщение";
@@ -20,7 +20,7 @@ class React {
 		try {
 			let msgrep = false
 			if (!args[1]){ // если эмодзи не указан
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("А что ставить то? Укажи эмодзи.")
@@ -29,7 +29,7 @@ class React {
 			};
 			
 			// ищем референс
-			if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY" && msg.reference !== null) { // если есть ответ (reply) то проверить права
+			if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.ReadMessageHistory]) && msg.type == "19" && msg.reference) { // если есть ответ (reply) то проверить права
 				msgrep = await msg.fetchReference(); // попробовать достать исходное сообщение
 				if (msgrep) { // если удалось, то работать с ним
 					await work(kitsune, msgrep, msg, args);
@@ -44,9 +44,8 @@ class React {
 					return
 				} 
 			};
-			
 			if (!msgrep) {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Не удалось поставить реакцию. Возможно, у бота нету прав на это сообщение или сообщения не существует.")
@@ -69,7 +68,7 @@ class React {
 							reactsend = true;
 						} else {
 							//console.log(err)
-							let embed = new Discord.MessageEmbed()
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(kitsune.user.username + ' - error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Не удалось найти этот эмодзи.")
@@ -86,8 +85,8 @@ class React {
 							msg.react(bean); // ставим какаху 
 							reactsend = true;
 						} else {
-							//console.log(err)
-							let embed = new Discord.MessageEmbed()
+							console.log(err)
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(kitsune.user.username + ' - error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Не удалось найти этот эмодзи.")
@@ -101,7 +100,7 @@ class React {
 							msg.react(bean); // ставим какаху 
 							reactsend = true;
 						} else { // неа, ниче не нашлось
-							let embed = new Discord.MessageEmbed()
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(kitsune.user.username + ' - error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Не удалось найти этот эмодзи.")
@@ -113,8 +112,8 @@ class React {
 						origmsg.react('✅');
 					};
 				} catch(err) {
-					//console.log(err)
-					let embed = new Discord.MessageEmbed()
+					console.log(err)
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(kitsune.user.username + ' - error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Не удалось поставить реакцию. Возможно, вы не указали реакцию или указали её не правильно.")
@@ -124,7 +123,7 @@ class React {
 			
 		} catch(err) {
 			console.log(err)
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(kitsune.user.username + ' - error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Не удалось поставить реакцию. Возможно, у бота нету прав на это сообщение или сообщения не существует.")

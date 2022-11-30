@@ -20,7 +20,7 @@ class Ping {
 		try {
 			const ping = Math.round(client.ws.ping)
 			if (ping) {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Ping')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Понг! (" + ping + " мс)")
@@ -29,7 +29,7 @@ class Ping {
 			}
 		} catch (err) {
 			console.log(err)
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Не удалось вычислить задержку")

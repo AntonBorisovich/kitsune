@@ -31,7 +31,7 @@ class Time {
 			let outputzone = args[1].split(":")
 			if (!args[2]) { // current time in <data> timezone
 				if (!isInt(outputzone[0])) { 
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Неверные данные")
@@ -39,7 +39,7 @@ class Time {
 					return
 				}
 				if (outputzone[0] > 12) {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Нет такого часового пояса")
@@ -50,7 +50,7 @@ class Time {
 					outputzone.push("0")
 				}
 				if (!isInt(outputzone[1])) {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Неверные данные")
@@ -58,7 +58,7 @@ class Time {
 					return
 				}
 				if (outputzone[1] >= 60) {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Нет такого часового пояса")
@@ -66,7 +66,7 @@ class Time {
 					return
 				}
 				if (outputzone[1] >= 60) {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Нет такого часового пояса")
@@ -141,7 +141,7 @@ class Time {
 				hours = "0" + hours
 			}
 
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - time')
 			embed.setColor(`#F36B00`)
 			embed.setDescription("Текущее время (" + timezone + "): " + date.getUTCFullYear() + " " + weekdays[date.getUTCDay()] + " " + months[date.getUTCMonth()] + " " + date.getUTCDate() + " " + hours + ":" + mins + ":" + seconds)

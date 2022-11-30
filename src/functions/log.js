@@ -67,11 +67,11 @@ workfunc = async function(kitsune, type, log, values) { // задание пер
 					
 			console.log(textColor + getTimestamp() + ' [' + typeString + '] ' + log + resetColor);
 					
-			let embed = new Discord.MessageEmbed();
+			let embed = new Discord.EmbedBuilder();
 			embed.setTitle(kitsune.user.username + ' - Log');
 			embed.setColor(embedColor);
 			embed.setDescription(getTimestamp());
-			embed.addField(typeString, '```\n' + String(log) + '\n```');
+			embed.addFields([{name: typeString, value: '```\n' + String(log) + '\n```'}]);
 			embed.setTimestamp();
 			const botowner = await kitsune.users.fetch(values.developers[0]);
 			botowner.send({ embeds: [embed] });
@@ -101,11 +101,11 @@ workfunc = async function(kitsune, type, log, values) { // задание пер
 			};
 			
 			console.log(textColor + getTimestamp() + ' [' + typeString + '] ' + log + resetColor);
-			let embed = new Discord.MessageEmbed();
+			let embed = new Discord.EmbedBuilder();
 			embed.setTitle(kitsune.user.username + ' - Log');
 			embed.setColor(embedColor);
 			embed.setDescription(getTimestamp());
-			embed.addField(typeString, '```\n' + String(log) + '\n```');
+			embed.addFields([{name: typeString, value: '```\n' + String(log) + '\n```'}]);
 			embed.setTimestamp();
 			const botowner = await kitsune.users.fetch(values.developers[0]);
 			botowner.send({ embeds: [embed] });

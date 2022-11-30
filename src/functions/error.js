@@ -18,6 +18,7 @@ class Error {
 			return day + ' дней ' + (hour - (24 * day)) + ' часов ' + (min - (60 * hour)) + ' минут ' + (sec - (60 * min)) + ' секунд';
 		};
 		
+		
 		const ping = Math.round(kitsune.ws.ping); // Замеряем пинг
 		
 		// Смотрим и запоминаем вложения к сообщению
@@ -27,33 +28,50 @@ class Error {
 		});
 		
 		// Формируем лог для разработчиков (full)
-		let embed = new Discord.MessageEmbed()
+		let embed = new Discord.EmbedBuilder()
 		embed.setTitle(kitsune.user.username + ' - Error')
 		embed.setColor(`#F00000`)
 		embed.setDescription('При выполнении команды "' + commname + '" произошла ошибка. Ниже вы можете увидеть отчёт.')
-		embed.addField('---== Ошибка ==---', '```\n' + String(error) + '\n```')
-		embed.addField('---== Сообщение пользователя ==---',
-		'Пользователь: ' + msg.author.username + '#' + msg.author.discriminator + ' (' + msg.author.id + ')\n' +
-		'Сервер: ' + msg.guild.name + ' (' + msg.guild.id + ')\n' +
-		'Содержание: `' + msg.content + '`\n' +
-		'Вложения: ' + attachments)
-		embed.addField('---== Статус бота ==---',
-		'Пинг: ' + ping + ' мс\n' +
-		'Версия бота: ' + values.version + '\n' +
-		'Время работы: ' + uptime() + '\n' +
-		'ОЗУ: ' + Math.floor( ( os.totalmem() - os.freemem() ) / 1048576 ) + '/' + Math.floor( os.totalmem() / 1048576 ) + 'МБ\n' +
-		'Версия Node.js: ' + process.version + '\n')
+		embed.addFields([
+			{name: '---== Ошибка ==---', value: '```\n' + String(error) + '\n```' },
+			{name: '---== Сообщение пользователя ==---', value:
+				'Пользователь: ' + msg.author.username + '#' + msg.author.discriminator + ' (' + msg.author.id + ')\n' +
+				'Сервер: ' + msg.guild.name + ' (' + msg.guild.id + ')\n' +
+				'Содержание: `' + msg.content + '`\n' +
+				'Вложения: ' + attachments
+			},
+			{name: '---== Статус бота ==---', value:
+				'Пинг: ' + ping + ' мс\n' +
+				'Версия бота: ' + values.version + '\n' +
+				'Время работы: ' + uptime() + '\n' +
+				'ОЗУ: ' + Math.floor( ( os.totalmem() - os.freemem() ) / 1048576 ) + '/' + Math.floor( os.totalmem() / 1048576 ) + 'МБ\n' +
+				'Версия Node.js: ' + process.version + '\n'
+			}
+		]);
 		embed.setTimestamp()
 		const botowner = await kitsune.users.fetch(values.developers[0]);
 		botowner.send({ embeds: [embed] });
-		
 		// Формируем лог для пользователей (public)
-		let pubembed = new Discord.MessageEmbed();
-		pubembed.setTitle(kitsune.user.username + ' - Error');
-		pubembed.setColor(`#F00000`);
-		pubembed.setDescription("Произошла ошибка: `" + error.name + '`');
-		pubembed.setFooter({ text: 'Отчёт об ошибке был отпрален разработчикам (' + msg.id + ')'})
-		msg.channel.send({ embeds: [pubembed] });
+		let shorterr = false;
+		if (!error.name) {
+			if (String(error).startsWith('Required permissions not found')) { shorterr = error };
+		} else {
+			shorterr = "unknown error";
+		};
+		if (!shorterr) {shorterr = error.name};
+		
+		if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.SendMessages])) { // если мы вообще имеем право на отправку сообщения
+			if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.EmbedLinks])) { // если можем отправить embed то отправить эмбедом
+				let pubembed = new Discord.EmbedBuilder();
+				pubembed.setTitle(kitsune.user.username + ' - Error');
+				pubembed.setColor(`#F00000`);
+				pubembed.setDescription("Произошла ошибка: `" + shorterr + '`');
+				pubembed.setFooter({ text: 'Отчёт об ошибке был отправлен разработчикам (' + msg.id + ')'})
+				msg.channel.send({ embeds: [pubembed] });
+			} else { // если не можем отправить embed то отправить текстом
+				msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nПроизошла ошибка: `" + shorterr + '`\n\nОтчёт об ошибке был отправлен разработчикам (' + msg.id + ')'}); // embed-free ошибка
+			};
+		};
     };
 };
 

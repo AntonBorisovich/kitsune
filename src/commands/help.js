@@ -22,13 +22,13 @@ class Help {
 		var Return = false
 		if ( args[1] == "-f" && this.config['ownerID'] == msg.author.id ) {
 				let command = this.commands.map(comm => `**${comm.name} ${comm.args}** - ${comm.desc}\n`).join("");
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Commands list')
 				embed.setColor(`#F36B00`)
 				embed.setDescription(command.toString() + '\nLoaded commands [FIXME]: ' + this.commands.length)
 				msg.author.send({ embeds: [embed] });
 				
-				embed = new Discord.MessageEmbed()
+				embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Full command list')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Полный список команд отправлен тебе в лс")
@@ -38,13 +38,13 @@ class Help {
 		if (args[1]) {
 			this.commands.forEach(command => {
 				if ( args[1].toLowerCase() == command.name.toLowerCase() ){
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(kitsune.user.username + ' - ' + command.name)
 					embed.setColor(`#F36B00`)
 					embed.setDescription("**" + this.values.prefix + command.name + " " + command.advargs +  "**" )
-					embed.addField("Описание:", command.advdesc);
+					embed.addFields([{ name: "Описание:", value: command.advdesc}]);
 					if (command.advargs != "") {
-						embed.addField("Аргументы:", command.argsdesc);
+						embed.addFields([{ name:"Аргументы:", value: command.argsdesc}]);
 					}
 					msg.channel.send({ embeds: [embed] });
 					Return = true
@@ -59,7 +59,7 @@ class Help {
 		await allcommands.forEach(command => { if ( command.desc.toLowerCase().endsWith('hide') ) { pubcommands.splice(pubcommands.indexOf(command), 1) } })
 		let command = pubcommands.map(comm => `**${comm.name} ${comm.args}** - ${comm.desc}\n`).join("");
 		
-        let embed = new Discord.MessageEmbed()
+        let embed = new Discord.EmbedBuilder()
         embed.setTitle(kitsune.user.username + ' - Commands list')
 		embed.setColor(`#F36B00`)
 		embed.setDescription(command.toString() + '\n' + this.values.prefix + 'help <команда> для большей информации')

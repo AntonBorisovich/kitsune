@@ -66,7 +66,7 @@ class nekos {
 		// ["why", "catText", "OwOify", "8Ball", "fact", "spoiler.forEach(tag => {
 			// if (tag == args[1]) {
 				// try {
-					// let embed = new Discord.MessageEmbed()
+					// let embed = new Discord.EmbedBuilder()
 					// embed.setTitle(client.user.username + ' - nekos.life')
 					// embed.setColor(`#F00000`)
 					// embed.setDescription(tag)
@@ -83,7 +83,7 @@ class nekos {
 			if (tag.toLowerCase() == args[1].toLowerCase()) {
 				executed = true
 				eval('neko.sfw.' + tag + '().then(picture => {\n'  +
-				'let embed = new Discord.MessageEmbed()\n' +
+				'let embed = new Discord.EmbedBuilder()\n' +
 				'embed.setTitle(client.user.username + " - nekos.life")\n' +
 				'embed.setColor(`#F36B00`)\n' +
 				'embed.setDescription(tag)\n' +
@@ -99,7 +99,7 @@ class nekos {
 				if (msg.channel.nsfw) {
 					if (tag == "wallpaper") {
 						neko.sfw.wallpaper().then(picture => {
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + " - nekos.life")
 						embed.setColor(`#F36B00`)
 						embed.setDescription(tag)
@@ -108,7 +108,7 @@ class nekos {
 						})
 					} else {
 						eval('neko.nsfw.' + tag + '().then(picture => {\n'  +
-						'let embed = new Discord.MessageEmbed()\n' +
+						'let embed = new Discord.EmbedBuilder()\n' +
 						'embed.setTitle(client.user.username + " - nekos.life")\n' +
 						'embed.setColor(`#F36B00`)\n' +
 						'embed.setDescription(tag)\n' +
@@ -118,7 +118,7 @@ class nekos {
 						
 					}
 				} else {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Этот тег можно использовать только в NSFW каналах!")
@@ -128,13 +128,13 @@ class nekos {
 		})
 		if (!executed) {
 			if (!args[1] || args[1] == "") {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Ты не указал тег\n\nCписок тегов ты можешь посмотреть в " + this.config.prefix + "help " + this.name)
 				msg.channel.send({ embeds: [embed] });
 			} else {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Тег не найден\n\nCписок тегов ты можешь посмотреть в " + this.config.prefix + "help " + this.name)

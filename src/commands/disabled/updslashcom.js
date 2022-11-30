@@ -33,7 +33,7 @@ class Updateslashcom {
 				globalcomm = true
 			}
 		})
-		let embed = new Discord.MessageEmbed()
+		let embed = new Discord.EmbedBuilder()
 		embed.setTitle(client.user.username + ' - Slash Command Update')
 		embed.setColor(`#F36B00`)
 		if (globalcomm) {
@@ -56,7 +56,7 @@ class Updateslashcom {
 						if (args[2].toLowerCase() == "-d") {
 							commands.fetch().then(comms => comms.map(comm => { if (comm.name == command.name) {
 								commands.delete(comm.permissions.commandId)
-								embed = new Discord.MessageEmbed()
+								embed = new Discord.EmbedBuilder()
 								embed.setTitle(client.user.username + ' - Slash Command Update')
 								embed.setColor(`#F36B00`)
 								if (!globalcomm) {
@@ -72,7 +72,7 @@ class Updateslashcom {
 								comm.edit({
 									description: command.desc
 								})
-								embed = new Discord.MessageEmbed()
+								embed = new Discord.EmbedBuilder()
 								embed.setTitle(client.user.username + ' - Slash Command Update')
 								embed.setColor(`#F36B00`)
 								if (!globalcomm) {
@@ -89,7 +89,7 @@ class Updateslashcom {
 							name: command.name,
 							description: command.desc
 						})
-						embed = new Discord.MessageEmbed()
+						embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Slash Command Update')
 						embed.setColor(`#F36B00`)
 						if (!globalcomm) {
@@ -105,7 +105,7 @@ class Updateslashcom {
 							description: command.desc
 						})
 					}})).then(() => {
-						embed = new Discord.MessageEmbed()
+						embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Slash Command Update')
 						embed.setColor(`#F36B00`)
 						if (!globalcomm) {
@@ -119,7 +119,7 @@ class Updateslashcom {
 					commands.fetch().then(comms => comms.map(comm => { if (comm.name == command.name) {
 						comm.delete()
 					}})).then(() => {
-						embed = new Discord.MessageEmbed()
+						embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Slash Command Update')
 						embed.setColor(`#F36B00`)
 						if (!globalcomm) {
@@ -134,7 +134,7 @@ class Updateslashcom {
 		} else {
 			let slashcommands = ""
 			await commands.fetch().then(comms => comms.map(comm => {slashcommands += `/${comm.name} (${comm.id})\n`}))
-			embed = new Discord.MessageEmbed()
+			embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - Slash Command Update')
 			embed.setColor(`#F36B00`)
 			let listtext

@@ -22,7 +22,7 @@ class Info {
     }
 
     run(kitsune, msg, args){
-		let embed = new Discord.MessageEmbed()
+		let embed = new Discord.EmbedBuilder()
 		embed.setTitle(kitsune.user.username + ' - ' + this.name)
 		embed.setColor(`#F36B00`)
 		embed.setDescription(kitsune.user.username + ' - бот для Discord для генерации разных мемов.\nРазработчик: <@' + this.values.developers[0] + '>')
@@ -96,11 +96,11 @@ class Info {
 			var secon = now.getSeconds()
 		}
 		
-		let embed = new Discord.MessageEmbed();
+		let embed = new Discord.EmbedBuilder();
 		embed.setTitle(client.user.username + ' - Debug info')
 		embed.setColor(`#F36B00`)
 		
-		embed = new Discord.MessageEmbed()
+		embed = new Discord.EmbedBuilder()
 		embed.setTitle(client.user.username + ' - Advanced info')
 		embed.setColor(`#F36B00`)
 		embed.setDescription('Подробная информация выслана тебе в лс')

@@ -71,7 +71,7 @@ class r34 {
 							//console.log(result)
 							//console.log(result.posts)
 							if (!result) {
-								let embed = new Discord.MessageEmbed()
+								let embed = new Discord.EmbedBuilder()
 								embed.setTitle(client.user.username + ' - rule34')
 								embed.setColor(`#F00000`)
 								embed.setDescription("Ничего не найдено   ╮(︶▽︶)╭")
@@ -90,7 +90,7 @@ class r34 {
 								var r34Tags = result.posts.post[picNum].$.tags.replace(/ /g, ", ");
 								if (r34Pic.startsWith("https://api-cdn-mp4")) {
 									var r34PicPreview = result.posts.post[picNum].$.preview_url;
-									let embed = new Discord.MessageEmbed()
+									let embed = new Discord.EmbedBuilder()
 									embed.setTitle(client.user.username + ' - rule34')
 									embed.setDescription("[**Видео**](" + r34Pic + ")")
 									embed.setColor(`#F36B00`)
@@ -99,7 +99,7 @@ class r34 {
 									msg.channel.send({ embeds: [embed] });
 									return	
 								} else {
-									let embed = new Discord.MessageEmbed()
+									let embed = new Discord.EmbedBuilder()
 									embed.setTitle(client.user.username + ' - rule34')
 									embed.setColor(`#F36B00`)
 									embed.setImage(r34Pic)
@@ -108,7 +108,7 @@ class r34 {
 									return
 								}
 							} else {
-								let embed = new Discord.MessageEmbed()
+								let embed = new Discord.EmbedBuilder()
 								embed.setTitle(client.user.username + ' - rule34')
 								embed.setColor(`#F00000`)
 								embed.setDescription("Ничего не найдено   ╮(︶▽︶)╭")
@@ -121,7 +121,7 @@ class r34 {
 					return
 				});
 			} else {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Эту команду можно использовать только в NSFW каналах!")
@@ -129,7 +129,7 @@ class r34 {
 			}
 		} catch (e) {
 			console.log(e);
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Произошла ошибка")

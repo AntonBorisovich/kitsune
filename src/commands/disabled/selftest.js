@@ -25,7 +25,7 @@ class Selftest {
 			if (!missing[0] == "") {
 				console.log(getTimestamp() + "[ERROR] required permissions not found: " + missing.join(', ') + " in channel #" + msg.channel.name + " (" + msg.channel.id + ') in guild "' + msg.guild.name + '" (' + msg.guild.id + ')');
 				if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Команда `" + command.name + "` не может работать без этих прав:\n```\n" + missing.join(', ') + "\n```\nПопросите владельца сервера предоставить это право " + client.user.username)
@@ -37,14 +37,14 @@ class Selftest {
 			}
 		}
 		let loger = "Discord connection - OK! (" + ping + " ms)\n"
-        let embed = new Discord.MessageEmbed()
+        let embed = new Discord.EmbedBuilder()
 		embed.setTitle(client.user.username + ' - selftest')
 		embed.setColor(`#F36B00`)
 		embed.addField('log', '```\n' + loger + '```\n')
 		const message = await msg.channel.send({ embeds: [embed] });
 		
 		async function edit(logg) {
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - selftest')
 			embed.setColor(`#F36B00`)
 			embed.addField('log', '```\n' + logg + '```\n')

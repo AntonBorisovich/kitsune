@@ -37,7 +37,7 @@ class Reload {
 		}
 		
 		if (!args) {
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Нету аргументов")
@@ -45,7 +45,7 @@ class Reload {
 			return;
 		}
 		
-		let embed = new Discord.MessageEmbed()
+		let embed = new Discord.EmbedBuilder()
 		embed.setTitle(client.user.username + ' - reload')
 		embed.setColor(`#F36B00`)
 		embed.setDescription("Подождите...")
@@ -54,7 +54,7 @@ class Reload {
 		if (args[1].toLowerCase() == "all") {
 			if (args[2]) {
 				if (args[2] == "comms") {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - reload')
 					embed.setColor(`#F36B00`)
 					embed.setDescription("бля доделай это сначало (логирование перезапускаемых команд)")
@@ -83,20 +83,20 @@ class Reload {
 						console.log(getTimestamp() + " [INFO] Loaded " + loaded + " commands" )
 					})
 				} else if (args[2] == "vars") {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - reload')
 					embed.setColor(`#F36B00`)
 					embed.setDescription("бля доделай это сначало (перезагрузка всех значений)")
 					message.edit({ embeds: [embed] });
 				} else {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - reload')
 					embed.setColor(`#F36B00`)
 					embed.setDescription("бля доделай это сначало (перезагрузка конкретной команды)")
 					message.edit({ embeds: [embed] });
 				}
 			} else {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - reload')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Чумба, ты совсем ёбнутый? Сходи к reboot, попей reboot -q")

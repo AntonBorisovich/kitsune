@@ -35,7 +35,7 @@ class Invite {
 			],
 			scopes: ['bot', 'applications.commands'],
 		});
-        let embed = new Discord.MessageEmbed()
+        let embed = new Discord.EmbedBuilder()
 		embed.setTitle(client.user.username + ' - ' + this.name)
 		embed.setDescription('[Пригласить бота на свой сервер](' + invite_link + ')')
 		embed.setColor(`#F36B00`)

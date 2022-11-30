@@ -4,7 +4,7 @@ const os = require('os'); // подключение библиотеки пол�
 console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM');
 
 const Discord = require('discord.js'); // подключение библиотеки Discord API (discord.js)
-const kitsune = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES ], partials: ["CHANNEL"]}); // создание пользователя с правами
+const kitsune = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.DirectMessages, Discord.GatewayIntentBits.GuildMessages, Discord.GatewayIntentBits.MessageContent], partials: [Discord.Partials.Channel]}); // создание пользователя с правами
 const fs = require("fs"); // подключение библиотеки файловой системы (fs)
 
 const launch_time = Date.now(); // запоминаем время запуска
@@ -147,7 +147,7 @@ function getTimestamp() {
 
 // обработка нового сообщения
 kitsune.on("messageCreate", async msg => {
-	try {
+	/* try {
 		if (msg.channelId == 750403949202243695) { // новости ъеъ
 			msg.react('<:neeet:1039589647032012930>'); // ?
 		};
@@ -162,12 +162,10 @@ kitsune.on("messageCreate", async msg => {
 		};
 	} catch(err) {
 		console.log('Failed to place reaction to the message')
-	};
+	}; */
 
 	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
-	
 	if (timeoutid.indexOf(msg.author.id) != -1) return; // проверяем в тайм-ауте ли пользователь
-	
 	timeoutid.push(msg.author.id); // добавляем пользователя в тайм-аут
 	setTimeout(() => { // через 5 секунд снимаем пользователя с тайм-аута
 		const index = timeoutid.indexOf(msg.author.id); // чекаем есть ли id в тайм-ауте
@@ -181,17 +179,15 @@ kitsune.on("messageCreate", async msg => {
 			if (command.name == cmd.toLowerCase()) { // если команда в сообщении совпала с командой из списка бота то работать	
 				let running_comm = ''
 				if (msg.guild) { // если вызвано на сервере то проверить права
-				
-					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms]; // задаём права, которые надо проверить
-					const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions); // проверяем права в канале
-					
+					const permissions = ['SendMessages', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+					let missing = []
+					permissions.forEach(perm => { // чекаем каждый пермишн
+							if (perm) { // если строка случайно не пустая
+								eval("if (!msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags." + perm + "])) { missing.push('" + perm + "') }") // дикий костыль но работает
+							};
+					});
 					if (!missing[0] == "") { // если какое либо право не найдено то паника
 						funcs.error(kitsune, values, msg, args, command.name, "Required permissions not found: " + missing.join(', '));
-						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) { // если нет прав на эмбеды и отправку сообщений
-							// TODO логирование в лс
-						} else if (!missing.includes("SEND_MESSAGES") && missing.includes("EMBED_LINKS")) { // если нет прав на эмбеды но можно отправить сообщение
-							msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n`\n" + missing.join(', ') + "\n`\nПопросите владельца сервера предоставить это право " + kitsune.user.username }); // embed-free ошибка
-						};
 						return;
 					};
 				};
@@ -209,9 +205,7 @@ kitsune.on("messageCreate", async msg => {
 // обработка получения изменённого сообщения
 kitsune.on('messageUpdate', async (oldMsg, msg) => {
 	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
-	
 	if (timeoutid.indexOf(msg.author.id) != -1) return; // проверяем в тайм-ауте ли пользователь
-	
 	timeoutid.push(msg.author.id); // добавляем пользователя в тайм-аут
 	setTimeout(() => { // через 5 секунд снимаем пользователя с тайм-аута
 		const index = timeoutid.indexOf(msg.author.id); // чекаем есть ли id в тайм-ауте
@@ -225,17 +219,15 @@ kitsune.on('messageUpdate', async (oldMsg, msg) => {
 			if (command.name == cmd.toLowerCase()) { // если команда в сообщении совпала с командой из списка бота то работать	
 				let running_comm = ''
 				if (msg.guild) { // если вызвано на сервере то проверить права
-				
-					const permissions = ['SEND_MESSAGES', 'EMBED_LINKS', ...command.perms]; // задаём права, которые надо проверить
-					const missing = msg.channel.permissionsFor(msg.client.user).missing(permissions); // проверяем права в канале
-					
+					const permissions = ['SendMessages', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+					let missing = []
+					permissions.forEach(perm => { // чекаем каждый пермишн
+							if (perm) { // если строка случайно не пустая
+								eval("if (!msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags." + perm + "])) { missing.push('" + perm + "') }") // дикий костыль но работает
+							};
+					});
 					if (!missing[0] == "") { // если какое либо право не найдено то паника
 						funcs.error(kitsune, values, msg, args, command.name, "Required permissions not found: " + missing.join(', '));
-						if (!missing.includes("SEND_MESSAGES") && !missing.includes("EMBED_LINKS")) { // если нет прав на эмбеды и отправку сообщений
-							// TODO логирование в лс
-						} else if (!missing.includes("SEND_MESSAGES") && missing.includes("EMBED_LINKS")) { // если нет прав на эмбеды но можно отправить сообщение
-							msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nКоманда `" + command.name + "` не может работать без этих прав:\n`\n" + missing.join(', ') + "\n`\nПопросите владельца сервера предоставить это право " + kitsune.user.username }); // embed-free ошибка
-						};
 						return;
 					};
 				};

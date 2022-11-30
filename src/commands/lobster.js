@@ -45,7 +45,7 @@ class Lobster {
         this.client = client;
         this.config = config;
         this.commands = commands;
-		this.perms = ["ATTACH_FILES"];
+		this.perms = ["AttachFiles"];
 		this.args = "<текст>";
 		this.advargs = "<текст> - содержарие строки";
 		this.argsdesc = this.advargs; // описание аргументов в помоще по конкретной команде
@@ -59,13 +59,13 @@ class Lobster {
 			//checking attachment availability
 			if (!msg.attachments.first()) {
 				if (msg.guild) { // if guild
-					if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY") { // if reply check reply for attach
+					if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.ReadMessageHistory]) && msg.type == "19") { // if reply check reply for attach
 						const msgrep = await msg.fetchReference()
 						if (msgrep.attachments.first()) {
 							work(client, msgrep, args);
 							return;
 						} else {
-							let embed = new Discord.MessageEmbed()
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(client.user.username + ' - Error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
@@ -94,7 +94,7 @@ class Lobster {
 							return;
 						}
 								
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
@@ -111,7 +111,7 @@ class Lobster {
 			async function work(client, msg, args) {
 				
 				if (!msg.attachments.first().contentType) {
-					let embed = new Discord.MessageEmbed();
+					let embed = new Discord.EmbedBuilder();
 					embed.setTitle(client.user.username + ' - Error');
 					embed.setColor(`#F00000`);
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
@@ -119,7 +119,7 @@ class Lobster {
 					return;	
 				};
 				if (!msg.attachments.first().contentType.startsWith('image')) {
-					let embed = new Discord.MessageEmbed();
+					let embed = new Discord.EmbedBuilder();
 					embed.setTitle(client.user.username + ' - Error');
 					embed.setColor(`#F00000`);
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
@@ -130,14 +130,14 @@ class Lobster {
 				args.shift();
 				args.push('');
 				const data = args.join(' ');
-				const attach = new Discord.MessageAttachment(msg.attachments.first().attachment);
+				const attach = new Discord.AttachmentBuilder(msg.attachments.first().attachment);
 				msg.channel.sendTyping();
 				
 				const image = await demotivatorImage(attach, data, msg.attachments.first().width, msg.attachments.first().height);
 				msg.channel.send({files: [image]});
 			};
 		} catch(err) {
-            let embed = new Discord.MessageEmbed();
+            let embed = new Discord.EmbedBuilder();
 			embed.setTitle(client.user.username + ' - Error');
 			embed.setColor(`#F00000`);
 			embed.setDescription("Ошибка:\n```" + err + "\n```");

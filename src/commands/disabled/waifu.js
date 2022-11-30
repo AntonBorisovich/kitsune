@@ -92,7 +92,7 @@ class waifu {
 							});
 	 
 							res.on("end", function() {
-								let embed = new Discord.MessageEmbed()
+								let embed = new Discord.EmbedBuilder()
 								embed.setTitle(client.user.username + ' - waifu')
 								embed.setColor(`#F36B00`)
 								embed.setDescription(tag)
@@ -104,7 +104,7 @@ class waifu {
 							return
 						});
 					} else {
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Этот тег можно использовать только в NSFW каналах!")
@@ -127,7 +127,7 @@ class waifu {
 						});
 	 
 						res.on("end", function() {
-							let embed = new Discord.MessageEmbed()
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(client.user.username + ' - waifu')
 							embed.setColor(`#F36B00`)
 							embed.setDescription(tag)
@@ -143,13 +143,13 @@ class waifu {
 		})
 		if (!executed) {
 			if (!args[1] || args[1] == "") {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Ты не указал тег\n\nCписок тегов ты можешь посмотреть в " + this.config.prefix + "help " + this.name)
 				msg.channel.send({ embeds: [embed] });;
 			} else {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Тег не найден\n\nCписок тегов ты можешь посмотреть в " + this.config.prefix + "help " + this.name)

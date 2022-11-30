@@ -20,20 +20,20 @@ class coinflip {
 		const random = Math.floor(Math.random() * (1005));
 		if (random > 500) {
 			if (random > 1000) {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - coinflip')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Ребро! :last_quarter_moon:")
 				msg.channel.send({ embeds: [embed] });
 			} else {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - coinflip')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Решка! :new_moon:")
 				msg.channel.send({ embeds: [embed] });
 			}
 		} else {
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - coinflip')
 			embed.setColor(`#F36B00`)
 			embed.setDescription("Орел! :full_moon:")

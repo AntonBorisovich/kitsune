@@ -7,7 +7,7 @@ class Pat {
         this.client = client;
         this.config = config;
         this.commands = commands;
-		this.perms = ["ATTACH_FILES"];
+		this.perms = ["AttachFiles"];
 		this.category = "fun";
 		this.args = "";
 		this.usage = "<юзер>";
@@ -28,13 +28,13 @@ class Pat {
 			}
 			if (!msg.attachments.first()) {
 				if (msg.guild) { // if guild
-					if (msg.channel.permissionsFor(msg.client.user).missing("READ_MESSAGE_HISTORY") && msg.type == "REPLY" && msg.reference !== null) { // if reply check reply for attach
+					if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.ReadMessageHistory]) && msg.type == "19" && msg.reference !== null) { // if reply check reply for attach
 						const msgrep = await msg.fetchReference()
 						if (msgrep.attachments.first()) {
 							work(client, msgrep, args);
 							return;
 						} else {
-							let embed = new Discord.MessageEmbed()
+							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(client.user.username + ' - Error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
@@ -62,7 +62,7 @@ class Pat {
 							return;
 						}
 								
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
@@ -83,7 +83,7 @@ class Pat {
 					msg.channel.send({files: [{attachment: image, name: 'pat.gif'}]})
 				} else {
 					if (!msg.attachments.first().contentType) {
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
@@ -91,7 +91,7 @@ class Pat {
 						return;	
 					}
 					if (!msg.attachments.first().contentType.startsWith('image')) {
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
@@ -99,7 +99,7 @@ class Pat {
 						return;
 					}
 					if (msg.attachments.first().height > 15000) {
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение слишком большое")
@@ -107,7 +107,7 @@ class Pat {
 						return;
 					}
 					if (msg.attachments.first().width > 15000) {
-						let embed = new Discord.MessageEmbed()
+						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение слишком большое")
@@ -120,7 +120,7 @@ class Pat {
 				}
 			}
 		} catch(err) {
-            let embed = new Discord.MessageEmbed()
+            let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Ошибка:\n```" + err + "\n```")

@@ -33,7 +33,7 @@ class Nhentai {
 		if (msg.channel.nsfw) {
 			let message
 			try {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - nhentai')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Загрузка...")
@@ -55,7 +55,7 @@ class Nhentai {
 					tags_m.push("`" + tag.name + "`")
 				})
 				if (loli) {
-					let embed = new Discord.MessageEmbed()
+					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(client.user.username + ' - nhentai')
 					embed.setColor(`#F00000`)
 					embed.setDescription("**" + doujin.cleanTitle + "**\n*#" + doujin.id + "*\n\nТеги: " + tags_m.join(", ") + "\nСтраницы: `" + doujin.pages + '`\n\nК сожалению, найденная додзинси содержит тег ||lolicon|| и мы не можем показать её содержимое в Discord.')
@@ -77,7 +77,7 @@ class Nhentai {
 					message.edit({ embeds: [embed], components: [buttons] });
 					return
 				}
-				embed = new Discord.MessageEmbed()
+				embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + " - nhentai")
 				embed.setColor(`#F36B00`)
 				embed.setDescription("**" + doujin.cleanTitle + "**\n*#" + doujin.id + "*\n\nТеги: " + tags_m.join(", ") + "\nСтраницы: `" + doujin.pages + "`")
@@ -100,14 +100,14 @@ class Nhentai {
 					
 				message.edit({ embeds: [embed], components: [buttons] });
 			} catch(err) {
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Такого id не существует\n" + err)
 				message.edit({ embeds: [embed] });
 			}
 		} else {
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Эту команду можно использовать только в NSFW каналах!")
@@ -119,7 +119,7 @@ class Nhentai {
 		//console.log(interaction)
 		const data = interaction.customId.split('_');
 		if (data[2] != interaction.user.id) {
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Ты не можешь взаимодействовать с чужой мангой")
@@ -138,7 +138,7 @@ class Nhentai {
 				tags_d.forEach(tag => {
 					tags_m.push("`" + tag.name + "`")
 				})
-				let embed = new Discord.MessageEmbed()
+				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + " - nhentai")
 				embed.setColor(`#F36B00`)
 				embed.setDescription("**" + doujin.cleanTitle + "**\n*#" + doujin.id + "*\n\nТеги: " + tags_m.join(", ") + "\nСтраницы: `" + doujin.pages + "`")
@@ -171,7 +171,7 @@ class Nhentai {
 				tags_d.forEach(tag => {
 					tags_m.push("`" + tag.name + "`")
 				})
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + " - nhentai")
 			embed.setColor(`#F36B00`)
 			embed.setDescription("**" + doujin.cleanTitle + "**\n*#" + doujin.id + "*\n\nТеги: " + tags_m.join(", ") + "\nСтраница: `" + curr_page + '/' + doujin.pages + "`")
@@ -213,7 +213,7 @@ class Nhentai {
 				tags_d.forEach(tag => {
 					tags_m.push("`" + tag.name + "`")
 				})
-			let embed = new Discord.MessageEmbed()
+			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + " - nhentai")
 			embed.setColor(`#F36B00`)
 			embed.setDescription("**" + doujin.cleanTitle + "**\n*#" + doujin.id + "*\n\nТеги: " + tags_m.join(", ") + "\nСтраница: `" + curr_page + '/' + doujin.pages + "`")
