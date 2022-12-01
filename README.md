@@ -1,5 +1,5 @@
 # Kitsune dev
-###### Powered by Discord.js
+###### Powered by Discord.js v14
 
 #### Описание:
 Модульный бот для Discord, написанный на Node.js®. Подробнее в разделе wiki
