@@ -16,7 +16,7 @@ let commands = []; // команды
 
 let errors = [];   // список ошибок, произошедших во время инициализации
 
-let timeoutid = []; // список id пользователей, которые находятся в 5 секундном тайм-ауте
+let timeoutid = []; // список id пользователей, которые находятся в 2 секундном тайм-ауте
 
 // Начало инициализации
 console.log(getTimestamp() + ' [INFO] (1/3) Loading values...');
@@ -167,7 +167,7 @@ kitsune.on("messageCreate", async msg => {
 	if (values.debug && values.developers[0] != msg.author.id || msg.author.bot) return; // игнор бота и игнор всех в дебаг режиме
 	if (timeoutid.indexOf(msg.author.id) != -1) return; // проверяем в тайм-ауте ли пользователь
 	timeoutid.push(msg.author.id); // добавляем пользователя в тайм-аут
-	setTimeout(() => { // через 5 секунд снимаем пользователя с тайм-аута
+	setTimeout(() => { // через 2 секунды снимаем пользователя с тайм-аута
 		const index = timeoutid.indexOf(msg.author.id); // чекаем есть ли id в тайм-ауте
 		if (index !== -1) { timeoutid.splice(index, 1) }; // удаляем из тайм-аута
 	}, 2000);
@@ -225,7 +225,13 @@ kitsune.on('messageUpdate', async (oldMsg, msg) => {
 			if (command.name == cmd.toLowerCase()) { // если команда в сообщении совпала с командой из списка бота то работать	
 				let running_comm = ''
 				if (msg.guild) { // если вызвано на сервере то проверить права
-					const permissions = ['SendMessages', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+					let permissions = [];
+					if (msg.channel.type === Discord.ChannelType.GuildForum || msg.channel.type === Discord.ChannelType.GuildPublicThread || msg.channel.type === Discord.ChannelType.GuildPrivateThread) {
+						permissions = ['SendMessages', 'SendMessagesInThreads', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+					} else {
+						permissions = ['SendMessages', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+					}
+					
 					let missing = []
 					permissions.forEach(perm => { // чекаем каждый пермишн
 							if (perm) { // если строка случайно не пустая
