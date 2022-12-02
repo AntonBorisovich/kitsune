@@ -114,7 +114,13 @@ class Socialcredit {
 					work(kitsune, msg, attachu) // работать
 				});
 			}).on('error', (e) => {
-				console.log(`Got error: ${e.message}`);
+				console.log(`Got error while downloading image from discord: ${e.message}`);
+				let embed = new Discord.EmbedBuilder()
+				embed.setTitle(kitsune.user.username + ' - Error')
+				embed.setColor(`#F00000`)
+				embed.setDescription("Не удалось загрузить изображение. Попробуйте ещё раз.")
+				msg.channel.send({ embeds: [embed] });
+				return;
 			});
 		}
 		
@@ -130,22 +136,43 @@ class Socialcredit {
 			
 			request.post(options, (err, res, body) => { // обращаемся к серваку
 				if (err) {
-					let embed = new Discord.EmbedBuilder()
-					embed.setTitle(kitsune.user.username + ' - Error')
-					embed.setColor(`#F00000`)
-					embed.setDescription("Прозошла ошибка! Наверное китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
-					msg.channel.send({ embeds: [embed] });
+					if (body.msg) {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+						embed.setFooter({ text: body.msg })
+						msg.channel.send({ embeds: [embed] });
+						return;
+					} else {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+						msg.channel.send({ embeds: [embed] });
+						return;
+					}
 				}
 				try {
 					let outlink = body.extra
 					outlink = outlink.slice(outlink.indexOf('https'), (outlink.indexOf('jpg') + 3) ) // обрезаем до ссылки
 					msg.channel.send({content: outlink})
 				} catch(err) {
-					let embed = new Discord.EmbedBuilder()
-					embed.setTitle(kitsune.user.username + ' - Error')
-					embed.setColor(`#F00000`)
-					embed.setDescription("Прозошла ошибка! Наверное китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
-					msg.channel.send({ embeds: [embed] });
+					if (body.code == 2114 || body.msg == 'IMG_ILLEGAL') {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Китайцам не нравятся ваши письки на фотке. Давайте без них.\nNSFW картинки нельзя, понятно?")
+						embed.setFooter({ text: body.msg })
+						msg.channel.send({ embeds: [embed] });
+					} else {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+						embed.setFooter({ text: body.msg })
+						msg.channel.send({ embeds: [embed] });
+					}
 				}
 			});
 		}
