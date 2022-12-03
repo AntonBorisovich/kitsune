@@ -2,7 +2,7 @@ const Discord = require("discord.js")
 const request = require("request");
 const https = require("https");
 
-let timeoutidextend = []; // список id пользователей, которые находятся в 15 секундном тайм-ауте
+let timeoutidextend = []; // список id пользователей, которые находятся в 20 секундном тайм-ауте
 
 class Socialcredit {
 	constructor(kitsune, config, commands, values){
@@ -14,8 +14,8 @@ class Socialcredit {
 		//this.twofa = false; // запуск только разработчикам
 		this.perms = ["AttachFiles"];
         this.name = "china"; // имя команды
-		this.desc = "吮吸我的蛋蛋"; // описание команды в общем списке команд
-		this.advdesc = "此命令从站点 \"不同维度我\" 生成图像 https://h5.tu.qq.com/web/ai-2d/cartoon/index"; // описание команды в помоще по конкретной команде
+		this.desc = "аниме-фильтр"; // описание команды в общем списке команд
+		this.advdesc = "Преобразует вашу фотокарточку с помощью нейронных сетей, и в итоге будто кадр из аниме.\nПоддерживаются форматы png и jpeg. Цензуру не проходят нагота и политика, а с 3 декабря нейронка больше не принимает фотки без лиц людей.\nОригинальный сайт: https://h5.tu.qq.com/web/ai-2d/cartoon/index"; // описание команды в помоще по конкретной команде
 		this.args = ""; // аргументы в общем списке команд
 		this.argsdesc = ""; // описание аргументов в помоще по конкретной команде
 		this.advargs = ""; // аргументы в помоще по конкретной команде
@@ -26,15 +26,15 @@ class Socialcredit {
 			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(kitsune.user.username + ' - Cooldown')
 			embed.setColor(`#F00000`)
-			embed.setDescription("Погоди немного, братишка. Чё моросишь?")
+			embed.setDescription("Погоди немного, чаще чем 20 секунд нельзя.")
 			msg.channel.send({ embeds: [embed] });
 			return;
 		}; 
 		timeoutidextend.push(msg.author.id); // добавляем пользователя в тайм-аут
-		setTimeout(() => { // через 15 секунд снимаем пользователя с тайм-аута
+		setTimeout(() => { // через 20 секунд снимаем пользователя с тайм-аута
 			const index = timeoutidextend.indexOf(msg.author.id); // чекаем есть ли id в тайм-ауте
 			if (index !== -1) { timeoutidextend.splice(index, 1) }; // удаляем из тайм-аута
-		}, 15000);
+		}, 20000);
 		
 		if (!msg.attachments.first()) {
 			if (msg.guild) { // if guild
@@ -47,7 +47,7 @@ class Socialcredit {
 						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
-						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
+						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение.")
 						msg.channel.send({ embeds: [embed] });
 						return;
 					}
@@ -76,7 +76,7 @@ class Socialcredit {
 					let embed = new Discord.EmbedBuilder()
 					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
-					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
+					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение.")
 					msg.channel.send({ embeds: [embed] });
 					return;
 				}
@@ -91,7 +91,7 @@ class Socialcredit {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Error')
 				embed.setColor(`#F00000`)
-				embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
+				embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение.")
 				msg.channel.send({ embeds: [embed] });
 				return;	
 			};
@@ -99,7 +99,7 @@ class Socialcredit {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Error')
 				embed.setColor(`#F00000`)
-				embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
+				embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение.")
 				msg.channel.send({ embeds: [embed] });
 				return;
 			};
@@ -141,7 +141,7 @@ class Socialcredit {
 						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
-						embed.setFooter({ text: body.msg })
+						embed.setFooter({ text: body.code + " " + body.msg })
 						msg.channel.send({ embeds: [embed] });
 						return;
 					} else {
@@ -158,20 +158,53 @@ class Socialcredit {
 					outlink = outlink.slice(outlink.indexOf('https'), (outlink.indexOf('jpg') + 3) ) // обрезаем до ссылки
 					msg.channel.send({content: outlink})
 				} catch(err) {
-					if (body.code == 2114 || body.msg == 'IMG_ILLEGAL') {
-						let embed = new Discord.EmbedBuilder()
-						embed.setTitle(kitsune.user.username + ' - Error')
-						embed.setColor(`#F00000`)
-						embed.setDescription("Китайцам не нравятся ваши письки на фотке. Давайте без них.\nNSFW картинки нельзя, понятно?")
-						embed.setFooter({ text: body.msg })
-						msg.channel.send({ embeds: [embed] });
-					} else {
-						let embed = new Discord.EmbedBuilder()
-						embed.setTitle(kitsune.user.username + ' - Error')
-						embed.setColor(`#F00000`)
-						embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
-						embed.setFooter({ text: body.msg })
-						msg.channel.send({ embeds: [embed] });
+					// known codes
+					
+					// code  - description (message from server)
+					// 0     - Work done, no errors ()
+					// 1     - Wrong format, decoding failure (service codec...)
+					// -2100 - Wrong format (PARAM_INVALID)
+					// 1001  - No face in image (b'no face in img')
+					// 2111  - Too often? (VOLUMN_LIMIT)
+					// 2114  - NSFW, politics (IMG_ILLEGAL)
+					
+					if (body.msg && body.code) {
+						if (body.code == 1 || body.code == -2100 || body.msg == 'PARAM_INVALID') {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Фотка не подошла по формату. Иногда помогает сделать скриншот и отправить его вместо оригинала.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.channel.send({ embeds: [embed] });
+						} else if (body.code == 2114 || body.msg == 'IMG_ILLEGAL') {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Запрещённая фотка. По неизвестным причинам содержание этой фотки не прошла проверку китайской цензуры.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.channel.send({ embeds: [embed] });
+						} else if (body.code == 2111 || body.msg == 'VOLUMN_LIMIT') {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Произошла ошибка! Наверное, недавно было слишком много одинаковых запросов.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.channel.send({ embeds: [embed] });
+						} else if (body.code == 1001 || body.msg == "b'no face in img'") {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Лицо не обнаружено. Китайцы хотят больше лиц в свою базу данных, поэтому картинки без человеческого лица больше не обрабатываются.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.channel.send({ embeds: [embed] });
+						} else {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Произошла ошибка! Наверное, китайцы прислали кирпич вместо результата. Попробуйте ещё раз.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.channel.send({ embeds: [embed] });
+						}
 					}
 				}
 			});
