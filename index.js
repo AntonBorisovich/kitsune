@@ -17,7 +17,7 @@ let commands = [];  // команды
 let errors = [];    // список ошибок, произошедших во время инициализации
 
 let timeoutid = []; // список id пользователей, которые находятся в 2 секундном тайм-ауте
-let pings = []      // список последних пингов до серверов Discord (для отлавливания проблем с интернетом)
+values.pings = []      // список последних пингов до серверов Discord (для отлавливания проблем с интернетом)
 
 // Начало инициализации
 console.log(getTimestamp() + ' [INFO] (1/3) Loading values...');
@@ -147,13 +147,12 @@ function getTimestamp() {
 };
 
 function checkInternet(kitsune) { // Проверка интернета каждые 60 секунд. Если пинг будет одним и тем же 8 раз подряд, то будем считать, что соединение оборвано
-	console.log(getTimestamp() + ' [DEBUG] Ping: ' + kitsune.ws.ping)
-	if (pings.length == 8) { pings.shift() }; // если слишком много пингов, то удалить самый старый
-	pings.push(kitsune.ws.ping);
-	console.log(pings)
+	//console.log(getTimestamp() + ' [DEBUG] Ping: ' + kitsune.ws.ping)
+	if (values.pings.length == 8) { values.pings.shift() }; // если слишком много пингов, то удалить самый старый
+	values.pings.push(kitsune.ws.ping);
 	
-	if (pings.filter(item => item === pings[0]).length == 8) { // если в массиве 8 одинаковых пингов
-		console.log(getTimestamp() + ' [ERROR] Latest latencies (' + pings + ') are identical. We might lost connection to discord server!');
+	if (values.pings.filter(item => item === values.pings[0]).length == 8) { // если в массиве 8 одинаковых пингов
+		console.log(getTimestamp() + ' [ERROR] Latest latencies (' + values.pings + ') are identical. We might lost connection to discord server!');
 		console.log(getTimestamp() + ' [INFO] Logging out...');
 		fs.writeFile('./src/values/ping_failure.json', '{"ping_failure": true}', function (err) {
 		  if (err) return console.log(err);
@@ -302,7 +301,7 @@ kitsune.once('ready', () => {
 			delete values.ping_failure
 			funcs.log(kitsune, 'syswarning', 'A connection error occurred last boot, but we successfully reloaded and ready to go!', values); // отсылаем отчёт
 		};
-		pings.push(kitsune.ws.ping) // пишем пинг
+		values.pings.push(kitsune.ws.ping) // пишем пинг
 		setTimeout(() => { // запуск цикла проверки интернета
 			checkInternet(kitsune)
 		}, 5000);

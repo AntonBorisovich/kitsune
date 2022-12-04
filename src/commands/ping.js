@@ -1,11 +1,12 @@
 const Discord = require("discord.js")
 
 class Ping {
-    constructor(client, commands, customvars, funcs){
-		this.funcs = funcs
-		this.customvars = customvars;
-        this.client = client;
+    constructor(kitsune, commands, values){
+		//задать полученые значения для дальнейшего использования в коде команды
+		this.values = values;
+        this.kitsune = kitsune;
         this.commands = commands;
+		
 		this.perms = [""];
 		this.category = "Utils";
 		this.args = "";
@@ -16,21 +17,21 @@ class Ping {
         this.name = "ping";
     }
 
-    run(client, msg, args){
+    run(kitsune, msg, args){
 		try {
-			const ping = Math.round(client.ws.ping)
+			const ping = Math.round(kitsune.ws.ping)
 			if (ping) {
 				let embed = new Discord.EmbedBuilder()
-				embed.setTitle(client.user.username + ' - Ping')
+				embed.setTitle(kitsune.user.username + ' - Ping')
 				embed.setColor(`#F36B00`)
-				embed.setDescription("Понг! (" + ping + " мс)")
+				embed.setDescription("Понг! (" + ping + " мс)\nПоследние пинги: " + this.values.pings.join('мс, ') + "мс")
 				msg.channel.send({ embeds: [embed] });	
-				//this.funcs.error(client, msg, args, this, "pizda)")
+				//this.funcs.error(kitsune, msg, args, this, "pizda)")
 			}
 		} catch (err) {
 			console.log(err)
 			let embed = new Discord.EmbedBuilder()
-			embed.setTitle(client.user.username + ' - error')
+			embed.setTitle(kitsune.user.username + ' - error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Не удалось вычислить задержку")
 			msg.channel.send({ embeds: [embed] });

@@ -5,7 +5,7 @@ const https = require("https");
 let timeoutidextend = []; // список id пользователей, которые находятся в 20 секундном тайм-ауте
 
 class Socialcredit {
-	constructor(kitsune, config, commands, values){
+	constructor(kitsune, commands, values){
 		//задать полученые значения для дальнейшего использования в коде команды
 		this.values = values;
         this.kitsune = kitsune;
