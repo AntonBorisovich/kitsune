@@ -10,13 +10,14 @@ const fs = require("fs"); // подключение библиотеки фай�
 const launch_time = Date.now(); // запоминаем время запуска
 
 // склад модулей
-let values = {};   // значения
-let funcs = {};    // функции
-let commands = []; // команды
+let values = {};    // значения
+let funcs = {};     // функции
+let commands = [];  // команды
 
-let errors = [];   // список ошибок, произошедших во время инициализации
+let errors = [];    // список ошибок, произошедших во время инициализации
 
 let timeoutid = []; // список id пользователей, которые находятся в 2 секундном тайм-ауте
+let pings = []      // список последних пингов до серверов Discord (для отлавливания проблем с интернетом)
 
 // Начало инициализации
 console.log(getTimestamp() + ' [INFO] (1/3) Loading values...');
@@ -145,6 +146,29 @@ function getTimestamp() {
 	return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + hours + ":" + mins + ":" + seconds; // выводим красивую поеботу
 };
 
+function checkInternet(kitsune) { // Проверка интернета каждые 60 секунд. Если пинг будет одним и тем же 8 раз подряд, то будем считать, что соединение оборвано
+	console.log(getTimestamp() + ' [DEBUG] Ping: ' + kitsune.ws.ping)
+	if (pings.length == 8) { pings.shift() }; // если слишком много пингов, то удалить самый старый
+	pings.push(kitsune.ws.ping);
+	console.log(pings)
+	
+	if (pings.filter(item => item === pings[0]).length == 8) { // если в массиве 8 одинаковых пингов
+		console.log(getTimestamp() + ' [ERROR] Latest latencies (' + pings + ') are identical. We might lost connection to discord server!');
+		console.log(getTimestamp() + ' [INFO] Logging out...');
+		fs.writeFile('./src/values/ping_failure.json', '{"ping_failure": true}', function (err) {
+		  if (err) return console.log(err);
+		});
+		kitsune.destroy() // отключаемся
+		setTimeout(() => {
+			process.exit(1); // выходим из js
+		}, 2000);
+	} else {
+		setTimeout(() => { // repeat again in 10 secs
+			checkInternet(kitsune)
+		}, 60000);
+	};
+};
+
 // обработка нового сообщения
 kitsune.on("messageCreate", async msg => {
 	/* try {
@@ -271,6 +295,17 @@ kitsune.once('ready', () => {
 			process.exit(1); // выходим из js
 		}, 3000);
 	} else { // если нет ошибок то запуск
+		if (values.ping_failure) {
+			fs.unlink('./src/values/ping_failure.json', (err) => {
+			  if (err) throw err;
+			});
+			delete values.ping_failure
+			funcs.log(kitsune, 'syswarning', 'A connection error occurred last boot, but we successfully reloaded and ready to go!', values); // отсылаем отчёт
+		};
+		pings.push(kitsune.ws.ping) // пишем пинг
+		setTimeout(() => { // запуск цикла проверки интернета
+			checkInternet(kitsune)
+		}, 5000);
 		// установка статуса
 		if (values.debug) { // если дебаг
 			kitsune.user.setStatus('idle'); // статус не беспокоить
