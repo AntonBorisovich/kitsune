@@ -15,7 +15,7 @@ class Socialcredit {
 		this.perms = ["AttachFiles"];
         this.name = "china"; // имя команды
 		this.desc = "аниме-фильтр"; // описание команды в общем списке команд
-		this.advdesc = "Преобразует вашу фотокарточку с помощью нейронных сетей, и в итоге будто кадр из аниме.\nПоддерживаются форматы png и jpeg. Цензуру не проходят нагота и политика, а с 3 декабря нейронка больше не принимает фотки без лиц людей.\nОригинальный сайт: https://h5.tu.qq.com/web/ai-2d/cartoon/index"; // описание команды в помоще по конкретной команде
+		this.advdesc = "Преобразует вашу фотокарточку с помощью нейронных сетей, и в итоге будто кадр из аниме.\nПоддерживаются форматы png и jpeg. Цензуру не проходят нагота и политика, а с 3 декабря нейронка больше не принимает фотки без лиц людей.\n\n**Прокси для этой команды будет работать до: " + this.values.proxy[1] + "**\n\nОригинальный сайт: https://h5.tu.qq.com/web/ai-2d/cartoon/index"; // описание команды в помоще по конкретной команде
 		this.args = ""; // аргументы в общем списке команд
 		this.argsdesc = ""; // описание аргументов в помоще по конкретной команде
 		this.advargs = ""; // аргументы в помоще по конкретной команде
@@ -41,7 +41,7 @@ class Socialcredit {
 				if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.ReadMessageHistory]) && msg.type == "19" && msg.reference !== null) { // if reply check reply for attach
 					const msgrep = await msg.fetchReference()
 					if (msgrep.attachments.first()) {
-						await downloadimg(kitsune, msgrep, args);
+						await downloadimg(kitsune, msgrep, args, this.values.proxy);
 						return;
 					} else {
 						let embed = new Discord.EmbedBuilder()
@@ -69,7 +69,7 @@ class Socialcredit {
 					})
 							
 					if (found) {
-						await downloadimg(kitsune, found, args);
+						await downloadimg(kitsune, found, args, this.values.proxy);
 						return;
 					}
 							
@@ -82,11 +82,11 @@ class Socialcredit {
 				}
 			}
 		} else {
-			await downloadimg(kitsune, msg, args);
+			await downloadimg(kitsune, msg, args, this.values.proxy);
 			return;
 		}
 		
-		function downloadimg(kitsune, msg, args) {
+		function downloadimg(kitsune, msg, args, proxy) {
 			if (!msg.attachments.first().contentType) {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Error')
@@ -111,7 +111,7 @@ class Socialcredit {
 				resp.on('data', (data) => { attachu += data});
 				resp.on('end', () => { // закончили. всё норм
 					msg.channel.sendTyping()
-					work(kitsune, msg, attachu) // работать
+					work(kitsune, msg, attachu, proxy) // работать
 				});
 			}).on('error', (e) => {
 				console.log(`Got error while downloading image from discord: ${e.message}`);
@@ -124,31 +124,57 @@ class Socialcredit {
 			});
 		}
 		
-		function work(kitsune, msg, img) {
-			var options = { // параметры обращения к серваку
-			  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
-			  json: true,
-			  body: {
-				  busiId: 'ai_painting_anime_img_entry',
-				  images: [img] // img - пикча в формате base64. Сайт точно кушает jpg и png
-			  }
-			};
-			
+		function work(kitsune, msg, img, proxy) {
+			var options
+			if (proxy) {
+				options = { // параметры обращения к серваку
+				  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
+				  proxy: 'http://' + proxy[0],
+				  json: true,
+				  body: {
+					  busiId: 'ai_painting_anime_img_entry',
+					  images: [img] // img - пикча в формате base64. Сайт точно кушает jpg и png
+				  }
+				};
+			} else {
+				options = { // параметры обращения к серваку
+				  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
+				  json: true,
+				  body: {
+					  busiId: 'ai_painting_anime_img_entry',
+					  images: [img] // img - пикча в формате base64. Сайт точно кушает jpg и png
+				  }
+				};
+			}
+				
 			request.post(options, (err, res, body) => { // обращаемся к серваку
+				//console.log(res);
 				if (err) {
-					if (body.msg) {
-						let embed = new Discord.EmbedBuilder()
-						embed.setTitle(kitsune.user.username + ' - Error')
-						embed.setColor(`#F00000`)
-						embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
-						embed.setFooter({ text: body.code + " " + body.msg })
-						msg.reply({ embeds: [embed] });
-						return;
+					console.log(err)
+					if (body) {
+						if (body.msg) {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+							return;
+						} else {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+							embed.setFooter({ text: String(err) })
+							msg.reply({ embeds: [embed] });
+							return;
+						}
 					} else {
 						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+						embed.setFooter({ text: String(err) })
 						msg.reply({ embeds: [embed] });
 						return;
 					}
@@ -158,15 +184,17 @@ class Socialcredit {
 					outlink = outlink.slice(outlink.indexOf('https'), (outlink.indexOf('jpg') + 3) ) // обрезаем до ссылки
 					msg.reply({content: outlink})
 				} catch(err) {
+					
 					// known codes
 					
 					// code  - description (message from server)
 					// 0     - Work done, no errors ()
-					// 1     - Wrong format, decoding failure (service codec...)
+					// 1     - Internal decoding failure ()
 					// -2100 - Wrong format (PARAM_INVALID)
 					// 1001  - No face in image (b'no face in img')
 					// 2111  - Too often? (VOLUMN_LIMIT)
 					// 2114  - NSFW, politics (IMG_ILLEGAL)
+					// 2119  - Blocked region (user_ip_country <country>)
 					
 					if (body.msg && body.code) {
 						if (body.code == 1 || body.code == -2100 || body.msg == 'PARAM_INVALID') {
@@ -188,6 +216,17 @@ class Socialcredit {
 							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Произошла ошибка! Наверное, недавно было слишком много одинаковых запросов.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+						} else if (body.code == 2119 || body.msg.startsWith('user_ip_country')) {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							if (proxy) {
+								embed.setDescription("Регион заблокирован. У бота неправильно настроен прокси сервер или прокси сервер не отвечает.")
+							} else {
+								embed.setDescription("Регион заблокирован. У бота не задан прокси сервер.")
+							}
 							embed.setFooter({ text: body.code + " " + body.msg })
 							msg.reply({ embeds: [embed] });
 						} else if (body.code == 1001 || body.msg == "b'no face in img'") {

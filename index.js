@@ -220,6 +220,14 @@ kitsune.on("messageCreate", async msg => {
 						return;
 					};
 				};
+				if (msg.author.id == "482209243714551818" || msg.author.id == "842879459132833813" && command.name == "china") { // бан чумы за долбоебизм
+					let embed = new Discord.EmbedBuilder()
+					embed.setTitle('банан')
+					embed.setColor(`#ffb8c2`)
+					embed.setDescription("ха-ха. плоти нологи :money_with_wings:")
+					msg.reply({ embeds: [embed] });
+					return;
+				}
 				try {
 					console.log(getTimestamp() + " [INFO] executed command " + command.name); // логирование о проходе всех проверок и начале запуске команды
 					command.run(kitsune, msg, args); // запуск команды

@@ -4,5 +4,6 @@ src/values/maintenance.json
 src/values/unstable.json
 src/values/stable.json
 src/values/ping_failure.json
+src/values/proxy.json
 src/assets/mesh/mesh/__pycache__/
 promo/
