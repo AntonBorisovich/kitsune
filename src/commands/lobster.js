@@ -69,7 +69,7 @@ class Lobster {
 							embed.setTitle(client.user.username + ' - Error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
-							msg.channel.send({ embeds: [embed] });
+							msg.reply({ embeds: [embed] });
 							return;
 						}
 					} else { // if msg isnt reply check last 10 messages for attach
@@ -98,7 +98,7 @@ class Lobster {
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
-						msg.channel.send({ embeds: [embed] });
+						msg.reply({ embeds: [embed] });
 						return;
 					}
 				}
@@ -115,7 +115,7 @@ class Lobster {
 					embed.setTitle(client.user.username + ' - Error');
 					embed.setColor(`#F00000`);
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
-					msg.channel.send({ embeds: [embed] });
+					msg.reply({ embeds: [embed] });
 					return;	
 				};
 				if (!msg.attachments.first().contentType.startsWith('image')) {
@@ -123,7 +123,7 @@ class Lobster {
 					embed.setTitle(client.user.username + ' - Error');
 					embed.setColor(`#F00000`);
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
-					msg.channel.send({ embeds: [embed] });
+					msg.reply({ embeds: [embed] });
 					return;
 				};
 				
@@ -134,14 +134,14 @@ class Lobster {
 				msg.channel.sendTyping();
 				
 				const image = await demotivatorImage(attach, data, msg.attachments.first().width, msg.attachments.first().height);
-				msg.channel.send({files: [image]});
+				msg.reply({files: [image]});
 			};
 		} catch(err) {
             let embed = new Discord.EmbedBuilder();
 			embed.setTitle(client.user.username + ' - Error');
 			embed.setColor(`#F00000`);
 			embed.setDescription("Ошибка:\n```" + err + "\n```");
-			msg.channel.send({ embeds: [embed] });
+			msg.reply({ embeds: [embed] });
 		};
     };
 };

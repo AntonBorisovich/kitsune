@@ -36,7 +36,7 @@ const demotivatorImage = async (img, title, subtitle, width, height) => {
 }
 
 class Dem {
-    constructor(kitsune, config, commands, values){
+    constructor(kitsune, commands, values){
 		//задать полученые значения для дальнейшего использования в коде команды
 		this.values = values;
         this.kitsune = kitsune;
@@ -67,7 +67,7 @@ class Dem {
 							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
-							msg.channel.send({ embeds: [embed] });
+							msg.reply({ embeds: [embed] });
 							return;
 						}
 					} else { // if msg isnt reply check last 10 messages for attach
@@ -96,7 +96,7 @@ class Dem {
 						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
-						msg.channel.send({ embeds: [embed] });
+						msg.reply({ embeds: [embed] });
 						return;
 					}
 				}
@@ -112,7 +112,7 @@ class Dem {
 					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
-					msg.channel.send({ embeds: [embed] });
+					msg.reply({ embeds: [embed] });
 					return;	
 				};
 				if (!msg.attachments.first().contentType.startsWith('image')) {
@@ -120,7 +120,7 @@ class Dem {
 					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение")
-					msg.channel.send({ embeds: [embed] });
+					msg.reply({ embeds: [embed] });
 					return;
 				};
 				
@@ -152,7 +152,7 @@ class Dem {
 				msg.channel.sendTyping()
 				
 				const image = await demotivatorImage(attach, data[0], data[1], Math.floor((msg.attachments.first().width * wide_multiplier)), msg.attachments.first().height)
-				await msg.channel.send({files: [image]})
+				await msg.reply({files: [image]})
 				return;
 			}
 		} catch(err) {

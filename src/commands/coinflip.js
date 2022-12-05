@@ -1,10 +1,9 @@
 const Discord = require("discord.js")
 
 class coinflip {
-    constructor(client, config, commands, customvars){
+    constructor(client, commands, customvars){
 		this.customvars = customvars;
         this.client = client;
-        this.config = config;
         this.commands = commands;
 		this.perms = [""];
 		this.category = "Fun";
@@ -24,20 +23,20 @@ class coinflip {
 				embed.setTitle(client.user.username + ' - coinflip')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Ребро! :last_quarter_moon:")
-				msg.channel.send({ embeds: [embed] });
+				msg.reply({ embeds: [embed] });
 			} else {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(client.user.username + ' - coinflip')
 				embed.setColor(`#F36B00`)
 				embed.setDescription("Решка! :new_moon:")
-				msg.channel.send({ embeds: [embed] });
+				msg.reply({ embeds: [embed] });
 			}
 		} else {
 			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(client.user.username + ' - coinflip')
 			embed.setColor(`#F36B00`)
 			embed.setDescription("Орел! :full_moon:")
-			msg.channel.send({ embeds: [embed] });
+			msg.reply({ embeds: [embed] });
 		}
 
     }

@@ -38,7 +38,7 @@ class Pat {
 							embed.setTitle(client.user.username + ' - Error')
 							embed.setColor(`#F00000`)
 							embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
-							msg.channel.send({ embeds: [embed] });
+							msg.reply({ embeds: [embed] });
 							return;
 						}
 					} else { // if msg isnt reply check last 10 messages for attach
@@ -66,7 +66,7 @@ class Pat {
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
-						msg.channel.send({ embeds: [embed] });
+						msg.reply({ embeds: [embed] });
 						return;
 					}
 				}
@@ -80,14 +80,14 @@ class Pat {
 				if (imgurl) {
 					msg.channel.sendTyping()		
 					const image = await pet(imgurl.replace(/webp/g, "png"),{resolution: 160, delay: 24})
-					msg.channel.send({files: [{attachment: image, name: 'pat.gif'}]})
+					msg.reply({files: [{attachment: image, name: 'pat.gif'}]})
 				} else {
 					if (!msg.attachments.first().contentType) {
 						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
-						msg.channel.send({ embeds: [embed] });
+						msg.reply({ embeds: [embed] });
 						return;	
 					}
 					if (!msg.attachments.first().contentType.startsWith('image')) {
@@ -95,7 +95,7 @@ class Pat {
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение, ответь на сообщение, которое содержит изображение или пингани человека, чью аватарку ты хочешь использовать")
-						msg.channel.send({ embeds: [embed] });
+						msg.reply({ embeds: [embed] });
 						return;
 					}
 					if (msg.attachments.first().height > 15000) {
@@ -103,7 +103,7 @@ class Pat {
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение слишком большое")
-						msg.channel.send({ embeds: [embed] });
+						msg.reply({ embeds: [embed] });
 						return;
 					}
 					if (msg.attachments.first().width > 15000) {
@@ -111,12 +111,12 @@ class Pat {
 						embed.setTitle(client.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение слишком большое")
-						msg.channel.send({ embeds: [embed] });
+						msg.reply({ embeds: [embed] });
 						return;
 					}
 					msg.channel.sendTyping()
 					const image = await pet(msg.attachments.first().attachment,{resolution: 160, delay: 24})
-					msg.channel.send({files: [{attachment: image, name: 'pat.gif'}]})
+					msg.reply({files: [{attachment: image, name: 'pat.gif'}]})
 				}
 			}
 		} catch(err) {
@@ -124,7 +124,7 @@ class Pat {
 			embed.setTitle(client.user.username + ' - Error')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Ошибка:\n```" + err + "\n```")
-			msg.channel.send({ embeds: [embed] });;
+			msg.reply({ embeds: [embed] });;
 			
 		}
     }

@@ -83,7 +83,7 @@ class Look {
 							embed.setTitle(kitsune.user.username + ' - Error');
 							embed.setColor(`#F00000`);
 							embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
-							msg.channel.send({ embeds: [embed] });
+							msg.reply({ embeds: [embed] });
 							return;
 						};
 					} else { // if msg isnt reply check last 10 messages for attach
@@ -112,7 +112,7 @@ class Look {
 						embed.setTitle(kitsune.user.username + ' - Error');
 						embed.setColor(`#F00000`);
 						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
-						msg.channel.send({ embeds: [embed] });
+						msg.reply({ embeds: [embed] });
 						return;
 					};
 				};
@@ -128,7 +128,7 @@ class Look {
 					embed.setTitle(kitsune.user.username + ' - Error');
 					embed.setColor(`#F00000`);
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
-					msg.channel.send({ embeds: [embed] });
+					msg.reply({ embeds: [embed] });
 					return;	
 				};
 				if (!msg.attachments.first().contentType.startsWith('image')) {
@@ -136,7 +136,7 @@ class Look {
 					embed.setTitle(kitsune.user.username + ' - Error');
 					embed.setColor(`#F00000`);
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение");
-					msg.channel.send({ embeds: [embed] });
+					msg.reply({ embeds: [embed] });
 					return;
 				};
 				
@@ -166,7 +166,7 @@ class Look {
 				const image = await LookAtThisImage(attach, Math.floor((msg.attachments.first().width * wide_multiplier)), msg.attachments.first().height);
 				const imageName = msg.attachments.first().name;
 				const finalImage = new Discord.AttachmentBuilder(image, { name: 'look_at_' + imageName.substring(0,imageName.length-4) + '.png' });
-				await msg.channel.send({files: [finalImage]})
+				await msg.reply({files: [finalImage]})
 				return;
 			};
 		} catch(err) {
