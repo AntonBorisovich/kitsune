@@ -24,7 +24,7 @@ class Ping {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Ping')
 				embed.setColor(`#F36B00`)
-				embed.setDescription("Понг! (" + ping + " мс)\nПоследние пинги: " + this.values.pings.join('мс, ') + "мс")
+				embed.setDescription("Понг! (" + ping + " мс)") // "\nПоследние пинги: " + this.values.pings.join('мс, ') + "мс")
 				msg.channel.send({ embeds: [embed] });	
 				//this.funcs.error(kitsune, msg, args, this, "pizda)")
 			}

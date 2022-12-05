@@ -146,12 +146,12 @@ function getTimestamp() {
 	return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + hours + ":" + mins + ":" + seconds; // выводим красивую поеботу
 };
 
-function checkInternet(kitsune) { // Проверка интернета каждые 60 секунд. Если пинг будет одним и тем же 8 раз подряд, то будем считать, что соединение оборвано
+function checkInternet(kitsune) { // Проверка интернета каждые 50 секунд. Если пинг будет одним и тем же 10 раз подряд, то будем считать, что соединение оборвано
 	//console.log(getTimestamp() + ' [DEBUG] Ping: ' + kitsune.ws.ping)
-	if (values.pings.length == 8) { values.pings.shift() }; // если слишком много пингов, то удалить самый старый
+	if (values.pings.length == 10) { values.pings.shift() }; // если слишком много пингов, то удалить самый старый
 	values.pings.push(kitsune.ws.ping);
 	
-	if (values.pings.filter(item => item === values.pings[0]).length == 8) { // если в массиве 8 одинаковых пингов
+	if (values.pings.filter(item => item === values.pings[0]).length == 10) { // если в массиве 10 одинаковых пингов
 		console.log(getTimestamp() + ' [ERROR] Latest latencies (' + values.pings + ') are identical. We might lost connection to discord server!');
 		console.log(getTimestamp() + ' [INFO] Logging out...');
 		fs.writeFile('./src/values/ping_failure.json', '{"ping_failure": true}', function (err) {
@@ -160,11 +160,11 @@ function checkInternet(kitsune) { // Проверка интернета каж�
 		kitsune.destroy() // отключаемся
 		setTimeout(() => {
 			process.exit(1); // выходим из js
-		}, 2000);
+		}, 2500);
 	} else {
-		setTimeout(() => { // repeat again in 10 secs
+		setTimeout(() => { // repeat again in 50 secs
 			checkInternet(kitsune)
-		}, 60000);
+		}, 50000);
 	};
 };
 
@@ -314,6 +314,7 @@ kitsune.once('ready', () => {
 			kitsune.user.setActivity(values.prefix + 'help'); // играет в <prefix>help
 		};
 		console.log(getTimestamp() + " [INFO] " + `Total launch time: ${((Date.now() - launch_time) / 1000 )}s`);
-		console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} (ver: ${values.version}) is ready to work!`);
+		//console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} (ver: ${values.version}) is ready to work!`);
+		funcs.log(kitsune, 'sysinfo', kitsune.user.username + ' (ver: ' + values.version + ') is ready to work!', values); // отсылаем отчёт
 	};
 });
