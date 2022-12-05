@@ -1,25 +1,75 @@
 const Discord = require("discord.js")
 const request = require("request");
 const https = require("https");
+const { createCanvas, loadImage } = require('canvas');
+const { Buffer } = require('buffer');
+const manfile = 'src/assets/china/man.png';
 
 let timeoutidextend = []; // список id пользователей, которые находятся в 20 секундном тайм-ауте
 
+const FryazinoMan = async (img, owidth, oheight) => {
+	//console.log('loading...')
+	const man = await loadImage(manfile) // loading dude
+	//console.log('loaded man')
+	const orig = await loadImage(img.attachment)
+	//console.log('loaded orig')
+	// scaling
+	// man.png width  = 330
+	// man.png height = 850
+	
+	//console.log("before " + width + "x" + height)
+	const fwidth = Math.floor((310*oheight)/850)
+	//console.log("after " + width + "x" + height)
+	
+
+	// picture settings
+	const canvas = createCanvas(owidth + (fwidth*2), oheight)
+	const ctx = canvas.getContext('2d')
+	
+	// bg
+	//ctx.fillStyle = '#fff' // choosing bg color
+	//ctx.fillRect(0, 0, (width + 576), 512) // drawing bg
+	
+	// left man
+	
+	ctx.drawImage(man, 0, 0, fwidth, oheight) // drawing left dude
+	
+	// pic
+	//const avatar = await loadImage(img.attachment) // loading user's pic
+	ctx.drawImage(orig, fwidth, 0, owidth, oheight) // drawing user's pic
+	
+	// right man
+	ctx.drawImage(man, (fwidth + owidth) , 0, fwidth, oheight) // drawing right dude
+	
+	// sending
+	const buffer = canvas.toDataURL('image/png').slice(22) // setting output format
+	//console.log(buffer)
+	return buffer // sending back
+}
 class Socialcredit {
 	constructor(kitsune, commands, values){
 		//задать полученые значения для дальнейшего использования в коде команды
 		this.values = values;
         this.kitsune = kitsune;
         this.commands = commands;
-		
+		let proxydate = "нету прокси"
+		if (values.proxy) {
+			proxydate = values.proxy[1]
+		}
 		//this.twofa = false; // запуск только разработчикам
 		this.perms = ["AttachFiles"];
         this.name = "china"; // имя команды
 		this.desc = "аниме-фильтр"; // описание команды в общем списке команд
-		this.advdesc = "Преобразует вашу фотокарточку с помощью нейронных сетей, и в итоге будто кадр из аниме.\nПоддерживаются форматы png и jpeg. Цензуру не проходят нагота и политика, а с 3 декабря нейронка больше не принимает фотки без лиц людей.\n\n**Прокси для этой команды будет работать до: " + this.values.proxy[1] + "**\n\nОригинальный сайт: https://h5.tu.qq.com/web/ai-2d/cartoon/index"; // описание команды в помоще по конкретной команде
+		this.advdesc =  "Преобразует вашу фотокарточку с помощью нейронных сетей, и в итоге будто кадр из аниме.\n" +
+						"Поддерживаются форматы png и jpeg. Цензуру не проходят нагота и политика, а с 3 декабря нейронка больше не принимает фотки без лиц людей.\n\n" +
+						"**Прокси для этой команды будет работать до: " + proxydate + "**\n\n" +
+						"Оригинальный сайт: https://h5.tu.qq.com/web/ai-2d/cartoon/index"; // описание команды в помоще по конкретной команде
 		this.args = ""; // аргументы в общем списке команд
-		this.argsdesc = ""; // описание аргументов в помоще по конкретной команде
-		this.advargs = ""; // аргументы в помоще по конкретной команде
+		this.argsdesc = "<-f> - добавляет свидетеля из фрязина по бокам картинки, что бы обмануть нейронку и заставить её обработать картинку без человеческих лиц"; // описание аргументов в помоще по конкретной команде
+		this.advargs = "<-f>"; // аргументы в помоще по конкретной команде
     }
+	
+	
 
     async run(kitsune, msg, args){
 		if (timeoutidextend.indexOf(msg.author.id) != -1) { // проверяем в тайм-ауте ли пользователь
@@ -86,7 +136,7 @@ class Socialcredit {
 			return;
 		}
 		
-		function downloadimg(kitsune, msg, args, proxy) {
+		async function downloadimg(kitsune, msg, args, proxy) {
 			if (!msg.attachments.first().contentType) {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Error')
@@ -104,24 +154,32 @@ class Socialcredit {
 				return;
 			};
 			const attach = new Discord.AttachmentBuilder(msg.attachments.first().attachment)
-			let attachu = ""
-			let data
-			https.get(attach.attachment, (resp) => { // скачиваем картинку с дискорда сразу в формате base64
-				resp.setEncoding('base64');
-				resp.on('data', (data) => { attachu += data});
-				resp.on('end', () => { // закончили. всё норм
-					msg.channel.sendTyping()
-					work(kitsune, msg, attachu, proxy) // работать
+			msg.channel.sendTyping()
+			if (args[1] != "-f") {
+				let attachu = ""
+				let data
+				https.get(attach.attachment, resp => { // скачиваем картинку с дискорда сразу в формате base64
+					resp.setEncoding('base64');
+					resp.on('data', (data) => { attachu += data});
+					resp.on('end', () => { // закончили. всё норм
+						work(kitsune, msg, attachu, proxy) // работать
+					});
+				}).on('error', (e) => {
+					console.log(`Got error while downloading image from discord: ${e.message}`);
+					let embed = new Discord.EmbedBuilder()
+					embed.setTitle(kitsune.user.username + ' - Error')
+					embed.setColor(`#F00000`)
+					embed.setDescription("Не удалось загрузить изображение. Попробуйте ещё раз.")
+					msg.reply({ embeds: [embed] });
+					return;
 				});
-			}).on('error', (e) => {
-				console.log(`Got error while downloading image from discord: ${e.message}`);
-				let embed = new Discord.EmbedBuilder()
-				embed.setTitle(kitsune.user.username + ' - Error')
-				embed.setColor(`#F00000`)
-				embed.setDescription("Не удалось загрузить изображение. Попробуйте ещё раз.")
-				msg.reply({ embeds: [embed] });
+			} else {
+				//attachu = Buffer.from(attachu, 'base64');
+				const fixedimg = await FryazinoMan(attach, msg.attachments.first().width, msg.attachments.first().height)
+				
+				work(kitsune, msg, fixedimg, proxy) // работать
 				return;
-			});
+			}
 		}
 		
 		function work(kitsune, msg, img, proxy) {
@@ -233,7 +291,7 @@ class Socialcredit {
 							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
-							embed.setDescription("Лицо не обнаружено. Китайцы хотят больше лиц в свою базу данных, поэтому картинки без человеческого лица больше не обрабатываются.")
+							embed.setDescription("Лицо не обнаружено. Нейронка не принимает картинки без человеческих лиц, но вы можете попробовать использовать аргумент `-f` для обмана нейросетки. Просто напишите `china -f` и попробуйте снова!")
 							embed.setFooter({ text: body.code + " " + body.msg })
 							msg.reply({ embeds: [embed] });
 						} else {
