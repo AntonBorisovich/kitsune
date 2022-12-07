@@ -1,3 +1,11 @@
+// TODO
+//
+// parsing "Process" request and requesting it through "https" module but chromium
+// Blocking "speed" and "upload v2" requests if they did not effect on workability
+// Opening new tab in alredy launched browser instead of launching new every time
+// Sending "Loading..." message for user while image is processing and then edit that message with result
+// 
+
 const Discord = require("discord.js")
 //const request = require("request");
 const https = require("https");
