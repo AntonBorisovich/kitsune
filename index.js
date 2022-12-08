@@ -146,12 +146,12 @@ function getTimestamp() {
 	return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + hours + ":" + mins + ":" + seconds; // выводим красивую поеботу
 };
 
-function checkInternet(kitsune) { // Проверка интернета каждые 55 секунд. Если пинг будет одним и тем же 12 раз подряд, то будем считать, что соединение оборвано
+function checkInternet(kitsune) { // Проверка интернета каждые 50 секунд. Если пинг будет одним и тем же 10 раз подряд, то будем считать, что соединение оборвано
 	//console.log(getTimestamp() + ' [DEBUG] Ping: ' + kitsune.ws.ping)
-	if (values.pings.length == 12) { values.pings.shift() }; // если слишком много пингов, то удалить самый старый
+	if (values.pings.length == 10) { values.pings.shift() }; // если слишком много пингов, то удалить самый старый
 	values.pings.push(kitsune.ws.ping);
 	
-	if (values.pings.filter(item => item === values.pings[0]).length == 12) { // если в массиве 12 одинаковых пингов
+	if (values.pings.filter(item => item === values.pings[0]).length == 10) { // если в массиве 10 одинаковых пингов
 		console.log(getTimestamp() + ' [ERROR] Latest latencies (' + values.pings + ') are identical. We might lost connection to discord server!');
 		console.log(getTimestamp() + ' [INFO] Logging out...');
 		fs.writeFile('./src/values/ping_failure.json', '{"ping_failure": true}', function (err) {
@@ -162,9 +162,9 @@ function checkInternet(kitsune) { // Проверка интернета каж�
 			process.exit(1); // выходим из js
 		}, 2500);
 	} else {
-		setTimeout(() => { // repeat again in 55 secs
+		setTimeout(() => { // repeat again in 50 secs
 			checkInternet(kitsune)
-		}, 55000);
+		}, 50000);
 	};
 };
 
