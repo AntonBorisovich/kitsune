@@ -102,6 +102,13 @@ class Socialcredit {
 	
 
     async run(kitsune, msg, args){
+		let embed = new Discord.EmbedBuilder()
+		embed.setTitle(kitsune.user.username + ' - китайцы...')
+		embed.setColor(`#fad201`)
+		embed.setDescription("Команда временно отключена до тех пор, пока китайцы не починят свой сайт.")
+		msg.reply({ embeds: [embed] });
+		return;
+		
 		if (timeoutidextend.indexOf(msg.author.id) != -1) { // проверяем в тайм-ауте ли пользователь
 			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(kitsune.user.username + ' - Cooldown')
