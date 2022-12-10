@@ -1,11 +1,3 @@
-// TODO
-//
-// parsing "Process" request and requesting it through "https" module but chromium
-// Blocking "speed" and "upload v2" requests if they did not effect on workability
-// Opening new tab in alredy launched browser instead of launching new every time
-// Sending "Loading..." message for user while image is processing and then edit that message with result
-// 
-
 const Discord = require("discord.js")
 const request = require("request");
 const https = require("https");
@@ -15,11 +7,17 @@ const manfile = 'src/assets/china/man.png';
 //const puppeteer = require('puppeteer');
 //const fs = require("fs");
 const md5 = require('md5');
+//const uuid4 = require('uuid4');
+const os = require('os'); // получение данных о системе для генерации useragent
 
 let timeoutidextend = []; // список id пользователей, которые находятся в 20 секундном тайм-ауте
-let workingon = []; // список id пользователей, пикчи которых обрабатываются
 
-let browseractive = false
+let useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0" // defualt agent
+if (os.platform().startsWith('win')){
+	useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+} else if (os.platform().startsWith('linux')) {
+	useragent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chromium/108.0.0.0 Safari/537.36"
+}
 
 const FryazinoMan = async (img, owidth, oheight, name) => {
 	//console.log('loading...')
@@ -96,19 +94,21 @@ class Socialcredit {
 						"Автор документации API: https://github.com/David-Lor/python-qqddm\n" +
 						"Оригинальный сайт нейронки: https://h5.tu.qq.com/web/ai-2d/cartoon/index"; // описание команды в помоще по конкретной команде
 		this.args = ""; // аргументы в общем списке команд
-		this.argsdesc = "<-f> - добавляет свидетеля из фрязина по бокам картинки, что бы обмануть нейронку и заставить её обработать картинку без человеческих лиц"; // описание аргументов в помоще по конкретной команде
-		this.advargs = "<-f>"; // аргументы в помоще по конкретной команде
+		this.argsdesc = "<-f> - добавляет свидетеля из фрязина по бокам картинки, что бы обмануть нейронку и заставить её обработать картинку без человеческих лиц\n" +
+						"<-h> - как разделять картинку. Если будет `-h`, то картинка разделится по горизонтале, а если без аргумента, то по вертикали"; // описание аргументов в помоще по конкретной команде
+		this.advargs = "<-f> <-h>"; // аргументы в помоще по конкретной команде
     }
 	
 	
 
     async run(kitsune, msg, args){	
+		const originalmsg = msg
 		if (timeoutidextend.indexOf(msg.author.id) != -1) { // проверяем в тайм-ауте ли пользователь
 			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(kitsune.user.username + ' - Cooldown')
 			embed.setColor(`#F00000`)
 			embed.setDescription("Погоди немного, чаще чем 20 секунд нельзя.")
-			msg.reply({ embeds: [embed] });
+			originalmsg.reply({ embeds: [embed] });
 			return;
 		}; 
 		
@@ -123,14 +123,14 @@ class Socialcredit {
 				if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.ReadMessageHistory]) && msg.type == "19" && msg.reference !== null) { // if reply check reply for attach
 					const msgrep = await msg.fetchReference()
 					if (msgrep.attachments.first()) {
-						await downloadimg(kitsune, msgrep, args, this.values.proxy);
+						await downloadimg(kitsune, msgrep, originalmsg, args, this.values.proxy);
 						return;
 					} else {
 						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(kitsune.user.username + ' - Error')
 						embed.setColor(`#F00000`)
 						embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение.")
-						msg.reply({ embeds: [embed] });
+						originalmsg.reply({ embeds: [embed] });
 						return;
 					}
 				} else { // if msg isnt reply check last 7 messages for attach
@@ -151,7 +151,7 @@ class Socialcredit {
 					})
 							
 					if (found) {
-						await downloadimg(kitsune, found, args, this.values.proxy);
+						await downloadimg(kitsune, found, originalmsg, args, this.values.proxy);
 						return;
 					}
 							
@@ -159,22 +159,22 @@ class Socialcredit {
 					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение.")
-					msg.reply({ embeds: [embed] });
+					originalmsg.reply({ embeds: [embed] });
 					return;
 				}
 			}
 		} else {
-			await downloadimg(kitsune, msg, args, this.values.proxy);
+			await downloadimg(kitsune, msg, originalmsg, args, this.values.proxy);
 			return;
 		}
 		
-		async function downloadimg(kitsune, msg, args, proxy) {
+		async function downloadimg(kitsune, msg, originalmsg, args, proxy) {
 			if (!msg.attachments.first().contentType) {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение.")
-				msg.reply({ embeds: [embed] });
+				originalmsg.reply({ embeds: [embed] });
 				return;	
 			};
 			if (!msg.attachments.first().contentType.startsWith('image')) {
@@ -182,12 +182,12 @@ class Socialcredit {
 				embed.setTitle(kitsune.user.username + ' - Error')
 				embed.setColor(`#F00000`)
 				embed.setDescription("Изображение не найдено. Прикрепи изображение или ответь на сообщение, которое содержит изображение.")
-				msg.reply({ embeds: [embed] });
+				originalmsg.reply({ embeds: [embed] });
 				return;
 			};
 			const attach = new Discord.AttachmentBuilder(msg.attachments.first().attachment)
 			msg.channel.sendTyping()
-			if (args[1] != "-f") { // если обычная работа
+			if (args[1] != "-f" || args[2] != "-f" || args[1] != "-F" || args[2] != "-F") { // если обычная работа
 				let attachu = ""
 				let data
 				https.get(attach.attachment, resp => { // скачиваем картинку с дискорда
@@ -196,7 +196,7 @@ class Socialcredit {
 					resp.on('end', async () => { // закончили. всё норм
 					    
 						//await fs.writeFileSync('src/assets/china/temp/' + msg.id + ".png", attachu, 'base64') // пишем во временный файл
-						work(kitsune, msg, attachu, proxy)
+						work(kitsune, originalmsg, attachu, proxy, args)
 					});
 				}).on('error', (e) => {
 					console.log(`Got error while downloading image from discord: ${e.message}`);
@@ -204,25 +204,30 @@ class Socialcredit {
 					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Не удалось загрузить изображение. Попробуйте ещё раз.")
-					msg.reply({ embeds: [embed] });
+					originalmsg.reply({ embeds: [embed] });
 					return;
-				});
-				
-				
+				});	
 			} else { // если надо добавить свидетеля по бокам
 				//attachu = Buffer.from(attachu, 'base64');
 				const fixedimg = await FryazinoMan(attach, msg.attachments.first().width, msg.attachments.first().height, msg.id) // добавить чудика
 				
-				work(kitsune, msg, fixedimg, proxy) // работать
+				work(kitsune, originalmsg, fixedimg, proxy, args) // работать
 				return;
 			}
 		}
 		
-		async function work(kitsune, msg, img, proxy) {
-			//console.log('work')
-			const reqbody = '{"busiId":"ai_painting_anime_img_entry","images":["' + img + '"]}'
-			const signkey = md5('https://h5.tu.qq.com' + reqbody.length + 'HQ31X02e') // чёрная магия с получением ключа (хэша)
+		async function work(kitsune, msg, img, proxy, args) {	
+			var picver = 1 // vertical result
+			if (args[1] != "-h" || args[2] != "-h" || args[1] != "-H" || args[2] != "-H") {  // if user need horizontal image
+				picver = 2 // horizontal result
+			}
+
+			const reqbody = '{"busiId":"ai_painting_anime_img_entry","images":["' + img + '"],"extra":"{\\"face_rects\\":[],\\"version\\":' + picver + ',\\"platform\\":\\"web\\",\\"root_channel\\":\\"\\",\\"level\\":1}"}'
+			//console.log(reqbody);
+			//return;
 			
+			const signkey = md5('https://h5.tu.qq.com' + reqbody.length + 'HQ31X02e') // чёрная магия с получением ключа (хэша)
+
 			const options = { // параметры обращения к серваку
 			  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
 			  proxy: 'http://' + proxy[2] + ':' + proxy[3] + '@' + proxy[0],
@@ -230,21 +235,23 @@ class Socialcredit {
 			  headers: {
 				"Origin": "https://h5.tu.qq.com",
 				"Referer": "https://h5.tu.qq.com/",
-				"x-sign-value": signkey,
-				"x-sign-version": "v1"
+				"x-sign-value": signkey, // generated key
+				"x-sign-version": "v1",
+				//"User-Agent": useragent // it's not really needed, but just in case
 			  },
 			  body: {
-				  busiId: "ai_painting_anime_img_entry",
-				  images: [img]
+				busiId: "ai_painting_anime_img_entry",
+				images: [img],
+				extra: '{\"face_rects\":[],\"version\":' + picver + ',\"platform\":\"web\",\"root_channel\":\"\",\"level\":1}'
 			  }
 			};
 			request.post(options, (err, res, body) => { // обращаемся к серваку
-				//if (body) {
-					//console.log(body);
+				//if (res) {
+				//	console.log(res);
 				//}
 				if (err) {
-					console.log(err);
-					console.log(body);
+					//console.log(err);
+					//console.log(body);
 					if (body) {
 						if (body.msg) {
 							let embed = new Discord.EmbedBuilder()
@@ -276,6 +283,7 @@ class Socialcredit {
 				}
 				try {
 					let outlink = body.extra
+					//console.log(body)
 					outlink = outlink.slice(outlink.indexOf('https'), (outlink.indexOf('jpg') + 3) ) // обрезаем до ссылки
 					msg.reply({content: outlink})
 				} catch(err) {
@@ -285,6 +293,7 @@ class Socialcredit {
 					// code  - description (message from server)
 					// 0     - Work done, no errors ()
 					// 1     - Internal decoding failure ()
+					// -2111 - wrong x-sign-value (AUTH_FAILED)
 					// -2100 - Wrong format (PARAM_INVALID)
 					// 1001  - No face in image (b'no face in img')
 					// 2111  - Too often? (VOLUMN_LIMIT)
@@ -303,7 +312,7 @@ class Socialcredit {
 							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
-							embed.setDescription("Ошибка входа. Китайцы опять что-то намудрили. Скоро исправим!")
+							embed.setDescription("Ошибка входа. Тут вы ничего не сможете исправить, только ждать исправления от автора бота.")
 							embed.setFooter({ text: body.code + " " + body.msg })
 							msg.reply({ embeds: [embed] });
 						} else if (body.code == 2114 || body.msg == 'IMG_ILLEGAL') {
@@ -317,7 +326,7 @@ class Socialcredit {
 							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
-							embed.setDescription("Произошла ошибка! Наверное, недавно было слишком много одинаковых запросов.")
+							embed.setDescription("Произошла ошибка! Наверное, недавно было слишком много запросов или ваша фотокарточка слишком большая. Попробуйте сделать скриншот и попробовать ещё раз.")
 							embed.setFooter({ text: body.code + " " + body.msg })
 							msg.reply({ embeds: [embed] });
 						} else if (body.code == 2119 || body.msg.startsWith('user_ip_country')) {
