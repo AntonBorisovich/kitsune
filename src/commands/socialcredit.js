@@ -187,7 +187,13 @@ class Socialcredit {
 			};
 			const attach = new Discord.AttachmentBuilder(msg.attachments.first().attachment)
 			msg.channel.sendTyping()
-			if (args[1] != "-f" || args[2] != "-f" || args[1] != "-F" || args[2] != "-F") { // если обычная работа
+			if (args[1] == "-f" || args[2] == "-f" || args[1] == "-F" || args[2] == "-F") { // если обычная работа
+				//attachu = Buffer.from(attachu, 'base64');
+				const fixedimg = await FryazinoMan(attach, msg.attachments.first().width, msg.attachments.first().height, msg.id) // добавить чудика
+				
+				work(kitsune, originalmsg, fixedimg, proxy, args) // работать
+				return;
+			} else { // если надо добавить свидетеля по бокам
 				let attachu = ""
 				let data
 				https.get(attach.attachment, resp => { // скачиваем картинку с дискорда
@@ -207,12 +213,6 @@ class Socialcredit {
 					originalmsg.reply({ embeds: [embed] });
 					return;
 				});	
-			} else { // если надо добавить свидетеля по бокам
-				//attachu = Buffer.from(attachu, 'base64');
-				const fixedimg = await FryazinoMan(attach, msg.attachments.first().width, msg.attachments.first().height, msg.id) // добавить чудика
-				
-				work(kitsune, originalmsg, fixedimg, proxy, args) // работать
-				return;
 			}
 		}
 		
