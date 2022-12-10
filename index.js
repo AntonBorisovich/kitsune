@@ -317,6 +317,14 @@ kitsune.once('ready', () => {
 			delete values.ping_failure
 			funcs.log(kitsune, 'syswarning', 'A connection error occurred last boot, but we successfully reloaded and ready to go!', values); // отсылаем отчёт
 		};
+		if (values.msgonce) {
+			const oncechannel = kitsune.channels.cache.get(values.msgonce[1]);
+			oncechannel.send({ content: values.msgonce[0] })
+			fs.unlink('./src/values/msgonce.json', (err) => {
+			  if (err) throw err;
+			});
+			delete values.msgonce
+		};
 		values.pings.push(kitsune.ws.ping) // пишем пинг
 		setTimeout(() => { // запуск цикла проверки интернета
 			checkInternet(kitsune)
