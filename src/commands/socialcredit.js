@@ -7,13 +7,14 @@
 // 
 
 const Discord = require("discord.js")
-//const request = require("request");
+const request = require("request");
 const https = require("https");
 const { createCanvas, loadImage } = require('canvas');
 //const { Buffer } = require('buffer');
 const manfile = 'src/assets/china/man.png';
-const puppeteer = require('puppeteer');
-const fs = require("fs");
+//const puppeteer = require('puppeteer');
+//const fs = require("fs");
+const md5 = require('md5');
 
 let timeoutidextend = []; // список id пользователей, которые находятся в 20 секундном тайм-ауте
 let workingon = []; // список id пользователей, пикчи которых обрабатываются
@@ -55,7 +56,7 @@ const FryazinoMan = async (img, owidth, oheight, name) => {
 	ctx.drawImage(man, (fwidth + owidth) , 0, fwidth, oheight) // drawing right dude
 	
 	// sending
-	//const buffer = canvas.toDataURL('image/png').slice(22) // setting output format
+	const buffer = canvas.toDataURL('image/png').slice(22) // setting output format
 	//const buffer = canvas.toBuffer('image/png') // setting output format
 	//console.log(buffer)
 	
@@ -66,9 +67,9 @@ const FryazinoMan = async (img, owidth, oheight, name) => {
 	
 	//const buffer = await canvas.toBuffer('image/jpeg')
 	//await fs.writeFileSync('src/assets/china/temp/' + name + '.jpg', buffer)
-	const buffer = await canvas.toBuffer("image/png");
-	await fs.writeFileSync('src/assets/china/temp/' + name + '.png', buffer);
-	return 'src/assets/china/temp/' + name + '.png'
+	//const buffer = await canvas.toBuffer("image/png");
+	//await fs.writeFileSync('src/assets/china/temp/' + name + '.png', buffer);
+	return buffer
 	
 	
 	//return buffer // sending back
@@ -101,14 +102,7 @@ class Socialcredit {
 	
 	
 
-    async run(kitsune, msg, args){
-		let embed = new Discord.EmbedBuilder()
-		embed.setTitle(kitsune.user.username + ' - китайцы...')
-		embed.setColor(`#fad201`)
-		embed.setDescription("Мы уже ведём работы по восстановлению работоспособности этой команды. Ждите обнолвений!")
-		msg.reply({ embeds: [embed] });
-		return;
-		
+    async run(kitsune, msg, args){	
 		if (timeoutidextend.indexOf(msg.author.id) != -1) { // проверяем в тайм-ауте ли пользователь
 			let embed = new Discord.EmbedBuilder()
 			embed.setTitle(kitsune.user.username + ' - Cooldown')
@@ -123,15 +117,6 @@ class Socialcredit {
 			const index = timeoutidextend.indexOf(msg.author.id); // чекаем есть ли id в тайм-ауте
 			if (index !== -1) { timeoutidextend.splice(index, 1) }; // удаляем из тайм-аута
 		}, 20000);
-		
-		if (browseractive) { // проверяем включен ли уже браузер
-			let embed = new Discord.EmbedBuilder()
-			embed.setTitle(kitsune.user.username + ' - браузер хочет оперативу')
-			embed.setColor(`#F00000`)
-			embed.setDescription("Кто-то уже обрабатывает картинку. Мы ещё не умеем обрабатывать одновременно несколько картинок. Подождите немного и попробуйте снова.")
-			msg.reply({ embeds: [embed] });
-			return;
-		}; 
 		
 		if (!msg.attachments.first()) {
 			if (msg.guild) { // if guild
@@ -210,8 +195,8 @@ class Socialcredit {
 					resp.on('data', (data) => { attachu += data});
 					resp.on('end', async () => { // закончили. всё норм
 					    
-						await fs.writeFileSync('src/assets/china/temp/' + msg.id + ".png", attachu, 'base64') // пишем во временный файл
-						work(kitsune, msg, 'src/assets/china/temp/' + msg.id + ".png", proxy)
+						//await fs.writeFileSync('src/assets/china/temp/' + msg.id + ".png", attachu, 'base64') // пишем во временный файл
+						work(kitsune, msg, attachu, proxy)
 					});
 				}).on('error', (e) => {
 					console.log(`Got error while downloading image from discord: ${e.message}`);
@@ -234,258 +219,136 @@ class Socialcredit {
 		}
 		
 		async function work(kitsune, msg, img, proxy) {
-			// var options
-			// if (false) {
-				// options = { // параметры обращения к серваку
-				  // uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
-				  // proxy: 'http://' + proxy[0],
-				  // json: true,
-				  // headers: {
-					// "Accept": "application/json, text/plain, */*",
-					// "Accept-Encoding": "gzip, deflate, br",
-					// "Accept-Language": "en-US;q=0.9,ja;q=0.8",
-					// "Origin": "https://h5.tu.qq.com",
-					// "Referer": "https://h5.tu.qq.com/",
-					// "Sec-Fetch-Dest": "empty",
-					// "Sec-Fetch-Mode": "cors",
-					// "Sec-Fetch-Site": "same-site",
-					// "sec-ch-ua": '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
-					// "sec-ch-ua-mobile": "?0",
-					// "sec-ch-ua-platform": "Windows",
-					// "x-sign-value": "3c8c1d787ce8f3ab8843aad168c1543e",
-					// "x-sign-version": "v1"
-				  // },
-				  // body: {
-					  // busiId: 'ai_painting_anime_img_entry',
-					  // images: [img] // img - пикча в формате base64. Сайт точно кушает jpg и png
-				  // }
-				// };
-			// } else {
+			//console.log('work')
+			const reqbody = '{"busiId":"ai_painting_anime_img_entry","images":["' + img + '"]}'
+			const signkey = md5('https://h5.tu.qq.com' + reqbody.length + 'HQ31X02e') // чёрная магия с получением ключа (хэша)
 			
-				// options = {
-				  // uri: 'https://otheve.beacon.qq.com/analytics/v2_upload?appkey=0WEB02VMLD4EVVMN',
-				  // proxy: 'http://' + proxy[0],
-				  // json: true,
-				  // "headers": {
-					// "accept": "application/json, text/plain, */*",
-					// "accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7,ja;q=0.6",
-					// "cache-control": "max-age=0",
-					// "content-type": "application/json;charset=utf-8",
-					// "sec-ch-ua": "\"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"108\", \"Google Chrome\";v=\"108\"",
-					// "sec-ch-ua-mobile": "?0",
-					// "sec-ch-ua-platform": "\"Windows\"",
-					// "sec-fetch-dest": "empty",
-					// "sec-fetch-mode": "cors",
-					// "sec-fetch-site": "same-site",
-					// "Referer": "https://h5.tu.qq.com/",
-					// "Referrer-Policy": "strict-origin-when-cross-origin"
-				  // },
-				  // "body": "{\"appVersion\":\"0.0.1\",\"sdkId\":\"js\",\"sdkVersion\":\"4.4.1-web\",\"mainAppKey\":\"0WEB02VMLD4EVVMN\",\"platformId\":3,\"common\":{\"A2\":\"xD1kfNBPxPT74jWtts0x9xyk8by0QsWP\",\"A8\":\"\",\"A12\":\"ru\",\"A17\":\"1920*1080*1\",\"A23\":\"\",\"A50\":\"\",\"A76\":\"0WEB02VMLD4EVVMN_1670335009214\",\"A101\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36\",\"A102\":\"https://h5.tu.qq.com/web/ai-2d/cartoon/index\",\"A104\":\"\",\"A119\":\"\"},\"events\":[{\"eventCode\":\"btn_click\",\"eventTime\":\"1670337044513\",\"mapValue\":{\"source\":\"link\",\"level\":\"0\",\"activity_id\":\"cartoon\",\"page_id\":\"index\",\"btn_id\":\"api:ai_painting_anime_entry\",\"platform_name\":\"PC\",\"user_agent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36\",\"trace_id\":\"83c70e11-df8d-c9f2-07fc-17ad1e7f3c76\",\"parent_trace_id\":\"83c70e11-df8d-c9f2-07fc-17ad1e7f3c76\",\"A99\":\"Y\",\"A100\":\"36\",\"A72\":\"4.4.1-web\",\"A88\":\"1670332010992\"}}]}",
-				  // "method": "POST"
-				// };
-			// }
-			try {
-				let finalimage
-				let finalvideo
-				
-				browseractive = true
-				workingon.push(msg.id)
-				
-				//console.log('launching browser...')
-				const browser = await puppeteer.launch({
-					headless: true,
-					slowMo: 0,
-					args: [ '--proxy-server=' + proxy[0] ]
-				});
-				//console.log('launched browser')
-				
-				//console.log('opening new tab...')
-				const page = await browser.newPage();
-				//console.log('opened new tab')
-				
-				//console.log('auth...')
-				await page.authenticate({username:proxy[2], password:proxy[3]});
-				//console.log('auth done')
-				
-				
-				//console.log('disabling images...')
-				await page.setRequestInterception(true);
-				page.on('request', (req) => {
-					if (req.resourceType() == 'font' || req.resourceType() == 'image' || req.url().endsWith('.mp4')) {
-						//console.log(req.url())
-						if (req.url() == "https://shadow-h5-prd-1251316161.file.myqcloud.com/oss/1/playBtn.png" || req.url().startsWith('data')) {
-							req.continue();
-						} else if (req.url().startsWith('https://activity.tu.qq.com/mqq/ai_painting_anime/share/')) {
-							finalimage = req.url()
-							req.abort();
-							if (finalvideo) {
-								post(kitsune, msg, finalimage, finalvideo)
-							}
-						} else if (req.url().endsWith('.mp4')) {
-							if (!finalvideo) {
-								finalvideo = req.url()
-								videodone(kitsune, msg, finalvideo)
-							}
-							req.abort();
-						} else {
-							req.abort();
-						}
-					} else {
-						//console.log('YES - ' + req.url())
-						req.continue();
-					}
-				});
-				//console.log('images disabled')
-				
-				//console.log('opening page in tab...')
-				await page.goto('https://h5.tu.qq.com/web/ai-2d/cartoon/index');
-				//console.log('opened page in tab')
-				
-				//console.log('waiting 3 seconds...')
-				//await page.waitFor(3000)
-					
-				//console.log('clicking on license button...')
-				await page.waitForSelector('#page-container > div > div._modal_f95ly_1 > div > div > div._confirm-btn_1fu81_42')
-				await page.click('#page-container > div > div._modal_f95ly_1 > div > div > div._confirm-btn_1fu81_42');
-				//console.log('clicked on license button')
-				
-				//console.log('clicking on play button...')
-				await page.click('#index-play-btn');
-				//console.log('clicked on play button')
-				
-				setTimeout( async () => { // 
-					workingon.forEach(async id => {
-						if (id == msg.id) { 
+			const options = { // параметры обращения к серваку
+			  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
+			  proxy: 'http://' + proxy[2] + ':' + proxy[3] + '@' + proxy[0],
+			  json: true,
+			  headers: {
+				"Origin": "https://h5.tu.qq.com",
+				"Referer": "https://h5.tu.qq.com/",
+				"x-sign-value": signkey,
+				"x-sign-version": "v1"
+			  },
+			  body: {
+				  busiId: "ai_painting_anime_img_entry",
+				  images: [img]
+			  }
+			};
+			request.post(options, (err, res, body) => { // обращаемся к серваку
+				//if (body) {
+					//console.log(body);
+				//}
+				if (err) {
+					console.log(err);
+					console.log(body);
+					if (body) {
+						if (body.msg) {
 							let embed = new Discord.EmbedBuilder()
 							embed.setTitle(kitsune.user.username + ' - Error')
 							embed.setColor(`#F00000`)
-							embed.setDescription('Ответа нет уже почти минуту, мы закрыли браузер. Попробуйте ещё раз')
+							embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+							embed.setFooter({ text: body.code + " " + body.msg })
 							msg.reply({ embeds: [embed] });
-							browseractive = false;
-							await browser.close()
-						}; 
-					});
-				}, 35000);
-				
-				//console.log('waiting for file chooser')
-				//console.log(img)
-				const [fileChooser] = await Promise.all([
-					page.waitForFileChooser('#page-container > div > div._modal_f95ly_1 > div > div > div > img'),
-					//console.log('clicking on choose photo button...'),
-					page.click('#page-container > div > div._modal_f95ly_1 > div > div > div > img')
-					//console.log('clicked on choose photo button')
-				]);
-				
-				
-				
-				await fileChooser.accept([img]);
-				
-				
-				
-				
-				// когда скачали видос
-				async function videodone(kitsune, msg, finalvideo) {
-					fs.unlink('src/assets/china/temp/' + msg.id + ".png", (err => {
-						if (err) console.log(err);
-					})); // удалить временный файл
-					await page.click('#page-view > div._olympic-result-page_mvguu_1 > div._result-page_mvguu_93 > div._action-panel_mvguu_144 > div._action-btn-group_mvguu_149 > img');
-					//console.log('clicked on save pic button')
+							return;
+						} else {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+							embed.setFooter({ text: String(err) })
+							msg.reply({ embeds: [embed] });
+							return;
+						}
+					} else {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - Error')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Прозошла ошибка! Наверное, китайцы прислали кирпич вместо картинки. Попробуйте ещё раз.")
+						embed.setFooter({ text: String(err) })
+						msg.reply({ embeds: [embed] });
+						return;
+					}
 					return;
 				}
-				async function post(kitsune, msg, finalimage, finalvideo) {
-					await browser.close()
-					browseractive = false
+				try {
+					let outlink = body.extra
+					outlink = outlink.slice(outlink.indexOf('https'), (outlink.indexOf('jpg') + 3) ) // обрезаем до ссылки
+					msg.reply({content: outlink})
+				} catch(err) {
 					
-					const index = workingon.indexOf(msg.id);
-					if (index !== -1) { workingon.splice(index, 1) };
+					// known codes
 					
-					msg.reply({ content: 'фотка: ' + finalimage + '\nвидос: ' + finalvideo });
-					return;
+					// code  - description (message from server)
+					// 0     - Work done, no errors ()
+					// 1     - Internal decoding failure ()
+					// -2100 - Wrong format (PARAM_INVALID)
+					// 1001  - No face in image (b'no face in img')
+					// 2111  - Too often? (VOLUMN_LIMIT)
+					// 2114  - NSFW, politics (IMG_ILLEGAL)
+					// 2119  - Blocked region (user_ip_country <country>)
+					
+					if (body.msg && body.code) {
+						if (body.code == 1 || body.code == -2100 || body.msg == 'PARAM_INVALID') {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Фотка не подошла по формату. Иногда помогает сделать скриншот и отправить его вместо оригинала.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+						} else if (body.code == 1 || body.code == -2111 || body.msg == 'AUTH_FAILED') {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Ошибка входа. Китайцы опять что-то намудрили. Скоро исправим!")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+						} else if (body.code == 2114 || body.msg == 'IMG_ILLEGAL') {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Запрещённая фотка. По неизвестным причинам содержание этой фотки не прошла проверку китайской цензуры.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+						} else if (body.code == 2111 || body.msg == 'VOLUMN_LIMIT') {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Произошла ошибка! Наверное, недавно было слишком много одинаковых запросов.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+						} else if (body.code == 2119 || body.msg.startsWith('user_ip_country')) {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							if (proxy) {
+								embed.setDescription("Регион заблокирован. У бота неправильно настроен прокси сервер или прокси сервер не отвечает.")
+							} else {
+								embed.setDescription("Регион заблокирован. У бота не задан прокси сервер.")
+							}
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+						} else if (body.code == 1001 || body.msg == "b'no face in img'") {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Лицо не обнаружено. Нейронка не принимает картинки без человеческих лиц, но вы можете попробовать использовать аргумент `-f` для обмана нейросетки. Просто напишите `china -f` и попробуйте снова!")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+						} else {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - Error')
+							embed.setColor(`#F00000`)
+							embed.setDescription("Произошла ошибка! Наверное, китайцы прислали кирпич вместо результата. Попробуйте ещё раз.")
+							embed.setFooter({ text: body.code + " " + body.msg })
+							msg.reply({ embeds: [embed] });
+						}
+					}
 				}
-				
-			} catch(err) {
-				console.log(err);
-				let embed = new Discord.EmbedBuilder()
-				embed.setTitle(kitsune.user.username + ' - Error')
-				embed.setColor(`#F00000`)
-				embed.setDescription("Произошла ошибка! Мы ещё не умеем сообщать, что именно пошло не так.")
-				embed.setFooter({ text: err.name })
-				
-				browseractive = false
-					
-				const index = workingon.indexOf(msg.id);
-				if (index !== -1) { workingon.splice(index, 1) };
-				
-				msg.reply({ embeds: [embed] });
-				// known codes
-				
-				// code  - description (message from server)
-				// 0     - Work done, no errors ()
-				// 1     - Internal decoding failure ()
-				// -2111 - auth error (AUTH_FAILED)
-				// -2100 - Wrong format (PARAM_INVALID)
-				// 1001  - No face in image (b'no face in img')
-				// 2111  - Too often? (VOLUMN_LIMIT)
-				// 2114  - NSFW, politics (IMG_ILLEGAL)
-				// 2119  - Blocked region (user_ip_country <country>)
-				
-				// if (body.msg && body.code) {
-					// if (body.code == 1 || body.code == -2100 || body.msg == 'PARAM_INVALID') {
-						// let embed = new Discord.EmbedBuilder()
-						// embed.setTitle(kitsune.user.username + ' - Error')
-						// embed.setColor(`#F00000`)
-						// embed.setDescription("Фотка не подошла по формату. Иногда помогает сделать скриншот и отправить его вместо оригинала.")
-						// embed.setFooter({ text: body.code + " " + body.msg })
-						// msg.reply({ embeds: [embed] });
-					// } else if (body.code == 1 || body.code == -2111 || body.msg == 'AUTH_FAILED') {
-						// let embed = new Discord.EmbedBuilder()
-						// embed.setTitle(kitsune.user.username + ' - Error')
-						// embed.setColor(`#F00000`)
-						// embed.setDescription("Ошибка входа. Китайцы опять что-то намудрили. Скоро исправим!")
-						// embed.setFooter({ text: body.code + " " + body.msg })
-						// msg.reply({ embeds: [embed] });
-					// } else if (body.code == 2114 || body.msg == 'IMG_ILLEGAL') {
-						// let embed = new Discord.EmbedBuilder()
-						// embed.setTitle(kitsune.user.username + ' - Error')
-						// embed.setColor(`#F00000`)
-						// embed.setDescription("Запрещённая фотка. По неизвестным причинам содержание этой фотки не прошла проверку китайской цензуры.")
-						// embed.setFooter({ text: body.code + " " + body.msg })
-						// msg.reply({ embeds: [embed] });
-					// } else if (body.code == 2111 || body.msg == 'VOLUMN_LIMIT') {
-						// let embed = new Discord.EmbedBuilder()
-						// embed.setTitle(kitsune.user.username + ' - Error')
-						// embed.setColor(`#F00000`)
-						// embed.setDescription("Произошла ошибка! Наверное, недавно было слишком много одинаковых запросов.")
-						// embed.setFooter({ text: body.code + " " + body.msg })
-						// msg.reply({ embeds: [embed] });
-					// } else if (body.code == 2119 || body.msg.startsWith('user_ip_country')) {
-						// let embed = new Discord.EmbedBuilder()
-						// embed.setTitle(kitsune.user.username + ' - Error')
-						// embed.setColor(`#F00000`)
-						// if (proxy) {
-							// embed.setDescription("Регион заблокирован. У бота неправильно настроен прокси сервер или прокси сервер не отвечает.")
-						// } else {
-							// embed.setDescription("Регион заблокирован. У бота не задан прокси сервер.")
-						// }
-						// embed.setFooter({ text: body.code + " " + body.msg })
-						// msg.reply({ embeds: [embed] });
-					// } else if (body.code == 1001 || body.msg == "b'no face in img'") {
-						// let embed = new Discord.EmbedBuilder()
-						// embed.setTitle(kitsune.user.username + ' - Error')
-						// embed.setColor(`#F00000`)
-						// embed.setDescription("Лицо не обнаружено. Нейронка не принимает картинки без человеческих лиц, но вы можете попробовать использовать аргумент `-f` для обмана нейросетки. Просто напишите `china -f` и попробуйте снова!")
-						// embed.setFooter({ text: body.code + " " + body.msg })
-						// msg.reply({ embeds: [embed] });
-					// } else {
-						// let embed = new Discord.EmbedBuilder()
-						// embed.setTitle(kitsune.user.username + ' - Error')
-						// embed.setColor(`#F00000`)
-						// embed.setDescription("Произошла ошибка! Наверное, китайцы прислали кирпич вместо результата. Попробуйте ещё раз.")
-						// embed.setFooter({ text: body.code + " " + body.msg })
-						// msg.reply({ embeds: [embed] });
-					// }
-				// }
-			}
+			});
 		}
     }
 }
