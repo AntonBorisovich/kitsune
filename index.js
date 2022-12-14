@@ -293,9 +293,57 @@ kitsune.on('messageUpdate', async (oldMsg, msg) => {
 	};
 });
 
+
 // обработка интерактивного элемента (кнопки, слэш-команды)
-// TODO
-//kitsune.on('interactionCreate', async (oldMsg, msg) => { });
+//
+// Образец переменной msg.customId:
+//   <ID Пользователя, который в первый раз нажал на кнопку>_<можно ли другим людям нажимать на кнопку (0 или 1)>_<исполяемая команда>_<данные>
+// Пример:
+//   929443921069752331_0_help_Guide0
+//
+kitsune.on('interactionCreate', async integration => {
+	const args = integration.customId.split("_")
+	const msg = integration.message
+	if (!integration.isButton()) { // если не кнопка
+		console.log(getTimestamp() + " [INFO] Not a button interaction got!");
+		return;
+	};	
+	if (!args[0].startsWith(integration.user.id) && args[1] == "0") { // если юзер с другим id и кнопку нельзя нажимать другим
+		console.log(getTimestamp() + " [INFO] User is trying to press on someone else's button!");
+		integration.reply({ content: 'Ты не можешь взаимодействовать с этой кнопкой. Только изначальный автор сообщения может жмякать кнопки.', ephemeral: true})
+		return;
+	}
+	
+	commands.forEach(command => { // перебираем список команд в боте
+		if (command.name == args[2]) { // если команда в сообщении совпала с командой из списка бота то работать
+			if (msg.guild) { // если вызвано на сервере то проверить права
+				let permissions = [];
+				if (msg.channel.type === Discord.ChannelType.GuildForum || msg.channel.type === Discord.ChannelType.GuildPublicThread || msg.channel.type === Discord.ChannelType.GuildPrivateThread) {
+					permissions = ['SendMessages', 'SendMessagesInThreads', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+				} else {
+					permissions = ['SendMessages', 'EmbedLinks', ...command.perms]; // задаём права, которые надо проверить
+				}
+				
+				let missing = []
+				permissions.forEach(perm => { // чекаем каждый пермишн
+						if (perm) { // если строка случайно не пустая
+							eval("if (!msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags." + perm + "])) { missing.push('" + perm + "') }") // дикий костыль но работает
+						};
+				});
+				if (!missing[0] == "") { // если какое либо право не найдено то паника
+					funcs.error(kitsune, values, msg, args, command.name, "Required permissions not found: " + missing.join(', '));
+					return;
+				};
+			};
+			try {
+				console.log(getTimestamp() + " [INFO] executed button for " + command.name); // логирование о проходе всех проверок и начале запуске команды
+				command.butt(kitsune, integration, args); // запуск команды
+			} catch (error) { // если ошибка то логировать ошибку
+				funcs.error(kitsune, values, msg, args, command.name, error);
+			};
+		}
+	})
+});
 
 // залогинились. теперь логируем об этом, задаём статусы и т.д.
 kitsune.once('ready', () => {

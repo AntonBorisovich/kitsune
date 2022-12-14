@@ -25,7 +25,7 @@ class Info {
 		let embed = new Discord.EmbedBuilder()
 		embed.setTitle(kitsune.user.username + ' - ' + this.name)
 		embed.setColor(`#F36B00`)
-		embed.setDescription(kitsune.user.username + ' - бот для Discord для генерации разных мемов.\nРазработчик: <@' + this.values.developers[0] + '>')
+		embed.setDescription(this.values.credits + '\nРазработчик: <@' + this.values.developers[0] + '>')
 		embed.setFooter({ text: 'Версия: ' + this.values.version });
 		// const buttonlink = new Discord.MessageButton()
 			// .setLabel('Политика конфиденциальности')
@@ -34,78 +34,78 @@ class Info {
 		// const buttons = new Discord.MessageActionRow()
 			// .addComponents(buttonlink)
 		//throw('error');
-		msg.channel.send({embeds: [embed]}) //, components: [buttons]
+		msg.reply({embeds: [embed]}) //, components: [buttons]
 	}
 			
 	// debug output
 	
 	// some functions
-	isowner(kitsune, msg, args){
-		if ( this.config.ownerID == msg.author.id ) {
-			return 'true' 
-		} else {
-			return 'false'
-		}
-	}
-	bot_uptime() {
-		let sec = Math.floor((Date.now() - launch_time) / 1000 )
-		let min = Math.floor(sec / 60)
-		let hour = Math.floor(min / 60)
-		let day = Math.floor(hour / 24)
+	// isowner(kitsune, msg, args){
+		// if ( this.config.ownerID == msg.author.id ) {
+			// return 'true' 
+		// } else {
+			// return 'false'
+		// }
+	// }
+	// bot_uptime() {
+		// let sec = Math.floor((Date.now() - launch_time) / 1000 )
+		// let min = Math.floor(sec / 60)
+		// let hour = Math.floor(min / 60)
+		// let day = Math.floor(hour / 24)
 
-		return day + ' days ' + (hour - (24 * day)) + ' hours ' + (min - (60 * hour)) + ' minutes ' + (sec - (60 * min)) + ' seconds';
-	}
+		// return day + ' days ' + (hour - (24 * day)) + ' hours ' + (min - (60 * hour)) + ' minutes ' + (sec - (60 * min)) + ' seconds';
+	// }
 
-	sec2time(seconds) {
-		let sec = Math.floor(seconds)
-		let min = Math.floor(sec / 60)
-		let hour = Math.floor(min / 60)
-		let day = Math.floor(hour / 24)
+	// sec2time(seconds) {
+		// let sec = Math.floor(seconds)
+		// let min = Math.floor(sec / 60)
+		// let hour = Math.floor(min / 60)
+		// let day = Math.floor(hour / 24)
 
-		return day + ' days ' + (hour - (24 * day)) + ' hours ' + (min - (60 * hour)) + ' minutes ' + (sec - (60 * min)) + ' seconds';
-	}
+		// return day + ' days ' + (hour - (24 * day)) + ' hours ' + (min - (60 * hour)) + ' minutes ' + (sec - (60 * min)) + ' seconds';
+	// }
 	
 	//writing output
-	advinfo(client, msg, args){
+	// advinfo(client, msg, args){
 		//console.log(msg)
 		//getting current date
-		let now = new Date()
+		// let now = new Date()
 		
 		//getting timezone
-		let hrsdif = -(new Date().getTimezoneOffset() / 60)	
+		// let hrsdif = -(new Date().getTimezoneOffset() / 60)	
 		
-		// correcting numbers
-		if (now.getDate() < 10) {
-			var date = `0${now.getDate()}`
-		} else {
-			var date = now.getDate()
-		}
-		if (now.getMonth() < 10) {
-			var month = `0${(now.getMonth() + 1)}`
-		} else {
-			var month = (now.getMonth() + 1)
-		}
-		if (now.getHours() < 10) {
-			var hour = `0${now.getHours()}`
-		} else {
-			var hour = now.getHours()
-		}
-		if (now.getSeconds() < 10) {
-			var secon = `0${now.getSeconds()}`
-		} else {
-			var secon = now.getSeconds()
-		}
+		//correcting numbers
+		// if (now.getDate() < 10) {
+			// var date = `0${now.getDate()}`
+		// } else {
+			// var date = now.getDate()
+		// }
+		// if (now.getMonth() < 10) {
+			// var month = `0${(now.getMonth() + 1)}`
+		// } else {
+			// var month = (now.getMonth() + 1)
+		// }
+		// if (now.getHours() < 10) {
+			// var hour = `0${now.getHours()}`
+		// } else {
+			// var hour = now.getHours()
+		// }
+		// if (now.getSeconds() < 10) {
+			// var secon = `0${now.getSeconds()}`
+		// } else {
+			// var secon = now.getSeconds()
+		// }
 		
-		let embed = new Discord.EmbedBuilder();
-		embed.setTitle(client.user.username + ' - Debug info')
-		embed.setColor(`#F36B00`)
+		// let embed = new Discord.EmbedBuilder();
+		// embed.setTitle(client.user.username + ' - Debug info')
+		// embed.setColor(`#F36B00`)
 		
-		embed = new Discord.EmbedBuilder()
-		embed.setTitle(client.user.username + ' - Advanced info')
-		embed.setColor(`#F36B00`)
-		embed.setDescription('Подробная информация выслана тебе в лс')
-		msg.channel.send({embeds: [embed]})
-	}
+		// embed = new Discord.EmbedBuilder()
+		// embed.setTitle(client.user.username + ' - Advanced info')
+		// embed.setColor(`#F36B00`)
+		// embed.setDescription('Подробная информация выслана тебе в лс')
+		// msg.channel.send({embeds: [embed]})
+	// }
 }
 
 module.exports = Info

@@ -20,22 +20,7 @@ class Help {
 	
     async run(kitsune, msg, args){
 		var Return = false
-		if ( args[1] == "-f" && this.config['ownerID'] == msg.author.id ) {
-				let command = this.commands.map(comm => `**${comm.name} ${comm.args}** - ${comm.desc}\n`).join("");
-				let embed = new Discord.EmbedBuilder()
-				embed.setTitle(kitsune.user.username + ' - Commands list')
-				embed.setColor(`#F36B00`)
-				embed.setDescription(command.toString() + '\nLoaded commands [FIXME]: ' + this.commands.length)
-				msg.author.send({ embeds: [embed] });
-				
-				embed = new Discord.EmbedBuilder()
-				embed.setTitle(kitsune.user.username + ' - Full command list')
-				embed.setColor(`#F36B00`)
-				embed.setDescription("Полный список команд отправлен тебе в лс")
-				msg.channel.send({ embeds: [embed] });
-				return
-		}
-		if (args[1]) {
+		if (args[1]) { // если пользователь хочет подробнее о команде
 			this.commands.forEach(command => {
 				if ( args[1].toLowerCase() == command.name.toLowerCase() ){
 					let embed = new Discord.EmbedBuilder()
@@ -46,7 +31,7 @@ class Help {
 					if (command.advargs != "") {
 						embed.addFields([{ name:"Аргументы:", value: command.argsdesc}]);
 					}
-					msg.channel.send({ embeds: [embed] });
+					msg.reply({ embeds: [embed] });
 					Return = true
 				}
 			})
@@ -63,12 +48,166 @@ class Help {
         embed.setTitle(kitsune.user.username + ' - Commands list')
 		embed.setColor(`#F36B00`)
 		embed.setDescription(command.toString() + '\n' + this.values.prefix + 'help <команда> для большей информации')
-		if (msg.isCommand == true) {
-			msg.reply({ embeds: [embed] });
-			return
-		}
-        msg.channel.send({ embeds: [embed] });
+		const row = new Discord.ActionRowBuilder().addComponents(
+			new Discord.ButtonBuilder()
+			.setCustomId(msg.author.id + '_0_help_GuideEntry')
+			.setLabel('Подробный гайд по использованию')
+			.setStyle(Discord.ButtonStyle.Primary)
+		);
+		
+        msg.reply({ embeds: [embed], components: [row] });
     }
+	
+	async butt(kitsune, msg, args){
+		let embed
+		let row
+		switch(args[3]) {
+			case 'GuideEntry':
+				embed = new Discord.EmbedBuilder()
+				embed.setTitle(kitsune.user.username + ' - Help guide')
+				embed.setColor(`#F36B00`)
+				embed.setDescription('Скоро тут будет инструкция и первые шаги пользования ботом.')
+				//embed.setFooter({ text: args[3] });
+				row = new Discord.ActionRowBuilder().addComponents(
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide0')
+					.setLabel('Общее')
+					.setStyle(Discord.ButtonStyle.Secondary)
+					.setDisabled(true),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide1')
+					.setLabel('Аргументы')
+					.setStyle(Discord.ButtonStyle.Primary)
+					.setDisabled(false),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide2')
+					.setLabel('Приколы')
+					.setStyle(Discord.ButtonStyle.Primary)
+					.setDisabled(false),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_goback')
+					.setLabel('Закрыть')
+					.setStyle(Discord.ButtonStyle.Danger)
+					.setDisabled(false),
+				);
+				msg.reply({ embeds: [embed], components: [row] })
+				break
+			case 'Guide0':
+				embed = new Discord.EmbedBuilder()
+				embed.setTitle(kitsune.user.username + ' - Help guide')
+				embed.setColor(`#F36B00`)
+				embed.setDescription('Скоро тут будет инструкция и первые шаги пользования ботом.')
+				//embed.setFooter({ text: args[3] });
+				row = new Discord.ActionRowBuilder().addComponents(
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide0')
+					.setLabel('Общее')
+					.setStyle(Discord.ButtonStyle.Secondary)
+					.setDisabled(true),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide1')
+					.setLabel('Аргументы')
+					.setStyle(Discord.ButtonStyle.Primary)
+					.setDisabled(false),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide2')
+					.setLabel('Приколы')
+					.setStyle(Discord.ButtonStyle.Primary)
+					.setDisabled(false),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_goback')
+					.setLabel('Закрыть')
+					.setStyle(Discord.ButtonStyle.Danger)
+					.setDisabled(false),
+				);
+				msg.deferUpdate();
+				msg.message.edit({ embeds: [embed], components: [row] })
+				break
+			case 'Guide1':
+				embed = new Discord.EmbedBuilder()
+				embed.setTitle(kitsune.user.username + ' - Arguments guide')
+				embed.setColor(`#F36B00`)
+				embed.setDescription('Скоро тут будет инструкция по аргументам к командам.')
+				//embed.setFooter({ text: args[3] });
+				row = new Discord.ActionRowBuilder().addComponents(
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide0')
+					.setLabel('Общее')
+					.setStyle(Discord.ButtonStyle.Primary)
+					.setDisabled(false),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide1')
+					.setLabel('Аргументы')
+					.setStyle(Discord.ButtonStyle.Secondary)
+					.setDisabled(true),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide2')
+					.setLabel('Приколы')
+					.setStyle(Discord.ButtonStyle.Primary)
+					.setDisabled(false),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_goback')
+					.setLabel('Закрыть')
+					.setStyle(Discord.ButtonStyle.Danger)
+					.setDisabled(false),
+				);
+				msg.deferUpdate();
+				msg.message.edit({ embeds: [embed], components: [row] })
+				break
+			case 'Guide2':
+				embed = new Discord.EmbedBuilder()
+				embed.setTitle(kitsune.user.username + ' - Some advanced info')
+				embed.setColor(`#F36B00`)
+				embed.setDescription('Скоро тут будут всякие трюки и полезное о боте.')
+				//embed.setFooter({ text: args[3] });
+				row = new Discord.ActionRowBuilder().addComponents(
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide0')
+					.setLabel('Общее')
+					.setStyle(Discord.ButtonStyle.Primary)
+					.setDisabled(false),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide1')
+					.setLabel('Аргументы')
+					.setStyle(Discord.ButtonStyle.Primary)
+					.setDisabled(false),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_Guide2')
+					.setLabel('Приколы')
+					.setStyle(Discord.ButtonStyle.Secondary)
+					.setDisabled(true),
+					new Discord.ButtonBuilder()
+					.setCustomId(args[0] + '_0_help_goback')
+					.setLabel('Закрыть')
+					.setStyle(Discord.ButtonStyle.Danger)
+					.setDisabled(false)
+				);
+				msg.deferUpdate();
+				msg.message.edit({ embeds: [embed], components: [row] })
+				break
+				
+			case 'goback':
+				msg.message.delete()
+				break
+				
+			default:
+				embed = new Discord.EmbedBuilder()
+				embed.setTitle(kitsune.user.username + ' - Error')
+				embed.setColor(`#F00000`)
+				embed.setDescription('Не получилось понять данные с кнопки.')
+				embed.setFooter({ text: args.join('_') });
+				row = new Discord.ActionRowBuilder().addComponents(
+					new Discord.ButtonBuilder()
+					.setCustomId('sus')
+					.setLabel('Исправить')
+					.setDisabled(true)
+					.setStyle(Discord.ButtonStyle.Secondary)
+				);
+				msg.reply({ embeds: [embed], components: [row] })
+				break
+		}
+		
+	}
 }
 
 module.exports = Help
