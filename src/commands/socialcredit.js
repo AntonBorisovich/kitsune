@@ -20,57 +20,62 @@ if (os.platform().startsWith('win')){
 }
 
 const FryazinoMan = async (img, owidth, oheight, name) => {
-	//console.log('loading...')
-	const man = await loadImage(manfile) // loading dude
-	//console.log('loaded man')
-	const orig = await loadImage(img.attachment)
-	//console.log('loaded orig')
-	// scaling
-	// man.png width  = 330
-	// man.png height = 850
-	
-	//console.log("before " + width + "x" + height)
-	const fwidth = Math.floor((310*oheight)/850)
-	//console.log("after " + width + "x" + height)
-	
+	try {
+		//console.log('loading...')
+		const man = await loadImage(manfile) // loading dude
+		//console.log('loaded man')
+		const orig = await loadImage(img.attachment)
+		//console.log('loaded orig')
+		// scaling
+		// man.png width  = 330
+		// man.png height = 850
+		
+		//console.log("before " + width + "x" + height)
+		const fwidth = Math.floor((310*oheight)/850)
+		//console.log("after " + width + "x" + height)
+		
 
-	// picture settings
-	const canvas = createCanvas(owidth + (fwidth*2), oheight)
-	const ctx = canvas.getContext('2d')
-	
-	// bg
-	//ctx.fillStyle = '#fff' // choosing bg color
-	//ctx.fillRect(0, 0, (width + 576), 512) // drawing bg
-	
-	// left man
-	
-	ctx.drawImage(man, 0, 0, fwidth, oheight) // drawing left dude
-	
-	// pic
-	//const avatar = await loadImage(img.attachment) // loading user's pic
-	ctx.drawImage(orig, fwidth, 0, owidth, oheight) // drawing user's pic
-	
-	// right man
-	ctx.drawImage(man, (fwidth + owidth) , 0, fwidth, oheight) // drawing right dude
-	
-	// sending
-	const buffer = canvas.toDataURL('image/png').slice(22) // setting output format
-	//const buffer = canvas.toBuffer('image/png') // setting output format
-	//console.log(buffer)
-	
-	//let stream = canvas.pngStream();
-	//stream.on('data', function(chunk){
-	//  fs.createWriteStream('src/assets/china/temp/' + name + '.png').write(chunk);
-	//});
-	
-	//const buffer = await canvas.toBuffer('image/jpeg')
-	//await fs.writeFileSync('src/assets/china/temp/' + name + '.jpg', buffer)
-	//const buffer = await canvas.toBuffer("image/png");
-	//await fs.writeFileSync('src/assets/china/temp/' + name + '.png', buffer);
-	return buffer
-	
-	
-	//return buffer // sending back
+		// picture settings
+		const canvas = createCanvas(owidth + (fwidth*2), oheight)
+		const ctx = canvas.getContext('2d')
+		
+		// bg
+		//ctx.fillStyle = '#fff' // choosing bg color
+		//ctx.fillRect(0, 0, (width + 576), 512) // drawing bg
+		
+		// left man
+		
+		ctx.drawImage(man, 0, 0, fwidth, oheight) // drawing left dude
+		
+		// pic
+		//const avatar = await loadImage(img.attachment) // loading user's pic
+		ctx.drawImage(orig, fwidth, 0, owidth, oheight) // drawing user's pic
+		
+		// right man
+		ctx.drawImage(man, (fwidth + owidth) , 0, fwidth, oheight) // drawing right dude
+		
+		// sending
+		const buffer = canvas.toDataURL('image/png').slice(22) // setting output format
+		//const buffer = canvas.toBuffer('image/png') // setting output format
+		//console.log(buffer)
+		
+		//let stream = canvas.pngStream();
+		//stream.on('data', function(chunk){
+		//  fs.createWriteStream('src/assets/china/temp/' + name + '.png').write(chunk);
+		//});
+		
+		//const buffer = await canvas.toBuffer('image/jpeg')
+		//await fs.writeFileSync('src/assets/china/temp/' + name + '.jpg', buffer)
+		//const buffer = await canvas.toBuffer("image/png");
+		//await fs.writeFileSync('src/assets/china/temp/' + name + '.png', buffer);
+		return buffer
+		
+		
+		//return buffer // sending back
+	} catch (err) {
+		console.log(err)
+		return "CANVAS " + err.message
+	}
 }
 class Socialcredit {
 	constructor(kitsune, commands, values){
@@ -185,12 +190,28 @@ class Socialcredit {
 				originalmsg.reply({ embeds: [embed] });
 				return;
 			};
+			if (msg.attachments.first().contentType.endsWith('webp') || msg.attachments.first().contentType.endsWith('tiff') || msg.attachments.first().contentType.endsWith('gif')) {
+				let embed = new Discord.EmbedBuilder()
+				embed.setTitle(kitsune.user.username + ' - Error')
+				embed.setColor(`#F00000`)
+				embed.setDescription("Изображение этого формата не поддерживается.")
+				originalmsg.reply({ embeds: [embed] });
+				return;
+			};
 			const attach = new Discord.AttachmentBuilder(msg.attachments.first().attachment)
 			msg.channel.sendTyping()
 			if (args[1] == "-f" || args[2] == "-f" || args[1] == "-F" || args[2] == "-F") { // если обычная работа
 				//attachu = Buffer.from(attachu, 'base64');
 				const fixedimg = await FryazinoMan(attach, msg.attachments.first().width, msg.attachments.first().height, msg.id) // добавить чудика
-				
+				if (fixedimg.startsWith("CANVAS")) {
+					let embed = new Discord.EmbedBuilder()
+					embed.setTitle(kitsune.user.username + ' - Error')
+					embed.setColor(`#F00000`)
+					embed.setDescription("Не удалось обработать изображение. Попробуйте сделать скриншот и отправить его вместо оригинала.")
+					embed.setFooter({ text: String(fixedimg) })
+					originalmsg.reply({ embeds: [embed] });
+					return;
+				};
 				work(kitsune, originalmsg, fixedimg, proxy, args) // работать
 				return;
 			} else { // если надо добавить свидетеля по бокам
@@ -210,6 +231,7 @@ class Socialcredit {
 					embed.setTitle(kitsune.user.username + ' - Error')
 					embed.setColor(`#F00000`)
 					embed.setDescription("Не удалось загрузить изображение. Попробуйте ещё раз.")
+					embed.setFooter({ text: e.message })
 					originalmsg.reply({ embeds: [embed] });
 					return;
 				});	

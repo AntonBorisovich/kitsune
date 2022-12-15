@@ -392,6 +392,14 @@ kitsune.once('ready', () => {
 		};
 		console.log(getTimestamp() + " [INFO] " + `Total launch time: ${((Date.now() - launch_time) / 1000 )}s`);
 		//console.log(getTimestamp() + " [INFO] " + `${kitsune.user.username} (ver: ${values.version}) is ready to work!`);
-		funcs.log(kitsune, 'sysinfo', kitsune.user.username + ' (ver: ' + values.version + ') is ready to work!', values); // отсылаем отчёт
+		try {
+			funcs.log(kitsune, 'sysinfo', kitsune.user.username + ' (ver: ' + values.version + ') is ready to work!', values); // отсылаем отчёт
+		} catch(err) {
+			console.log(getTimestamp() + " [ERROR] Failed to send logs to developer through Discord");
+			kitsune.destroy(); // выходим из дискорда
+			setTimeout(() => {
+				process.exit(1); // выходим из js
+			}, 3000);
+		}
 	};
 });
