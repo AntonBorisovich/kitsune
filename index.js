@@ -363,7 +363,7 @@ kitsune.once('ready', () => {
 			  if (err) throw err;
 			});
 			delete values.ping_failure
-			funcs.log(kitsune, 'syswarning', 'A connection error occurred last boot, but we successfully reloaded and ready to go!', values); // отсылаем отчёт
+			funcs.log(kitsune, 'syswarning', 'A connection error occurred, but we successfully reloaded and ready to go!', values); // отсылаем отчёт
 		};
 		if (values.msgonce) {
 			try{
