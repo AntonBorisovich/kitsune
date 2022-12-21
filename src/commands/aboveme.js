@@ -38,9 +38,9 @@ const canvasImage = async (img, width, height, type) => {
   
   // drawing arrow
   ctx.beginPath();
-  ctx.moveTo(width/3*2, 0);
+  ctx.moveTo(width/3*1.8, 0);
   ctx.lineTo(width/1.82, height/6);
-  ctx.lineTo(width/1.2, 0);
+  ctx.lineTo(width/1.1, 0);
   ctx.fill();
   
   
