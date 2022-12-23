@@ -312,21 +312,26 @@ kitsune.on('messageUpdate', async (oldMsg, msg) => {
 // Пример:
 //   929443921069752331_0_help_Guide0
 //
-kitsune.on('interactionCreate', async integration => {
-	const args = integration.customId.split("_")
-	const msg = integration.message
-	if (!integration.isButton()) { // если не кнопка
-		console.log(getTimestamp() + " [INFO] Not a button interaction got!");
+kitsune.on('interactionCreate', async interaction => {
+	if (interaction.isChatInputCommand()) {
+		console.log(getTimestamp() + " [INFO] Slash command interaction got!");
+		interaction.reply({ content: 'Слэш команды ещё не поддерживаются! Используйте ' + values.prefix + 'help для вывода списка команд.', ephemeral: true})
+		return;
+	};
+	if (!interaction.isButton()) { // если не кнопка
+		console.log(getTimestamp() + " [INFO] Unknown interaction got!");
 		return;
 	};	
-	if (!integration.customId) {
+	const args = interaction.customId.split("_")
+	const msg = interaction.message
+	if (!interaction.customId) {
 		console.log(getTimestamp() + " [INFO] CustomId in interaction not found!");
 		return;
 	}
 	
-	if (!args[0].startsWith(integration.user.id) && args[1] == "0") { // если юзер с другим id и кнопку нельзя нажимать другим
+	if (!args[0].startsWith(interaction.user.id) && args[1] == "0") { // если юзер с другим id и кнопку нельзя нажимать другим
 		console.log(getTimestamp() + " [INFO] User is trying to press on someone else's button!");
-		integration.reply({ content: 'Ты не можешь взаимодействовать с этой кнопкой. Только изначальный автор сообщения может жмякать кнопки.', ephemeral: true})
+		interaction.reply({ content: 'Ты не можешь взаимодействовать с этой кнопкой. Только изначальный автор сообщения может жмякать кнопки.', ephemeral: true})
 		return;
 	}
 	
@@ -353,7 +358,7 @@ kitsune.on('interactionCreate', async integration => {
 			};
 			try {
 				console.log(getTimestamp() + " [INFO] executed button for " + command.name); // логирование о проходе всех проверок и начале запуске команды
-				command.butt(kitsune, integration, args); // запуск команды
+				command.butt(kitsune, interaction, args); // запуск команды
 			} catch (error) { // если ошибка то логировать ошибку
 				funcs.error(kitsune, values, msg, args, command.name, error);
 			};
