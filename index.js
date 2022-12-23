@@ -1,5 +1,32 @@
 console.log(getTimestamp() + " [INFO] Starting kitsune for Discord...");
 
+let LoggedIn = false; // задаём переменную завершенности запуска бота
+let gotErrorLmao = false; // задаём переменную получения кртической ошибки
+
+process.on('uncaughtException', function (err) {
+	if (!gotErrorLmao) {
+		gotErrorLmao = true;
+		try {
+			console.log(err);
+			console.log(getTimestamp() + ' [ERROR] ' + String(err));
+			fs.writeFile('./src/values/errorstring.json', '{"errorstring": "' + String(err) + '"}', function (err) {
+			  if (err) return console.log(err);
+			});
+			setTimeout(() => {
+				process.exit(1); // выходим из js
+			}, 2500);
+			return;
+		} catch(e) {
+			console.log(e);
+			process.exit(1); // выходим из js
+		}
+	} else {
+		console.log(err);
+		console.log(getTimestamp() + " [ERROR] Got cycle-error lmao. Closing this shit down.");
+		process.exit(1); // выходим из js
+	}
+});
+
 const os = require('os'); // подключение библиотеки получение данных о системе (os)
 console.log(getTimestamp() + ' [INFO] Running node ' + process.version + ' on ' + os.platform() + ' with ' + Math.floor((os.totalmem() / 1048576)) + 'MB of RAM');
 
@@ -153,10 +180,10 @@ function checkInternet(kitsune) { // Проверка интернета каж�
 	
 	if (values.pings.filter(item => item === values.pings[0]).length == 10) { // если в массиве 10 одинаковых пингов
 		console.log(getTimestamp() + ' [ERROR] Latest latencies (' + values.pings + ') are identical. We might lost connection to discord server!');
-		console.log(getTimestamp() + ' [INFO] Logging out...');
-		fs.writeFile('./src/values/ping_failure.json', '{"ping_failure": true}', function (err) {
+		fs.writeFile('./src/values/errorstring.json', '{"errorstring": "ping_failure"}', function (err) {
 		  if (err) return console.log(err);
 		});
+		console.log(getTimestamp() + ' [INFO] Logging out...');
 		kitsune.destroy() // отключаемся
 		setTimeout(() => {
 			process.exit(1); // выходим из js
@@ -220,14 +247,6 @@ kitsune.on("messageCreate", async msg => {
 						return;
 					};
 				};
-				if (msg.author.id == "482209243714551818" || msg.author.id == "842879459132833813" && command.name == "china") { // бан чумы за долбоебизм
-					let embed = new Discord.EmbedBuilder()
-					embed.setTitle('банан')
-					embed.setColor(`#ffb8c2`)
-					embed.setDescription("ха-ха. плоти нологи :money_with_wings:")
-					msg.reply({ embeds: [embed] });
-					return;
-				}
 				try {
 					console.log(getTimestamp() + " [INFO] executed command " + command.name); // логирование о проходе всех проверок и начале запуске команды
 					command.run(kitsune, msg, args); // запуск команды
@@ -274,14 +293,6 @@ kitsune.on('messageUpdate', async (oldMsg, msg) => {
 						return;
 					};
 				};
-				if (msg.author.id == "482209243714551818" || msg.author.id == "842879459132833813" && command.name == "china") { // бан чумы за долбоебизм
-					let embed = new Discord.EmbedBuilder()
-					embed.setTitle('банан')
-					embed.setColor(`#ffb8c2`)
-					embed.setDescription("ха-ха. плоти нологи :money_with_wings:")
-					msg.reply({ embeds: [embed] });
-					return;
-				}
 				try {
 					console.log(getTimestamp() + " [INFO] executed command " + command.name); // логирование о проходе всех проверок и начале запуске команды
 					command.run(kitsune, msg, args); // запуск команды
@@ -308,6 +319,11 @@ kitsune.on('interactionCreate', async integration => {
 		console.log(getTimestamp() + " [INFO] Not a button interaction got!");
 		return;
 	};	
+	if (!integration.customId) {
+		console.log(getTimestamp() + " [INFO] CustomId in interaction not found!");
+		return;
+	}
+	
 	if (!args[0].startsWith(integration.user.id) && args[1] == "0") { // если юзер с другим id и кнопку нельзя нажимать другим
 		console.log(getTimestamp() + " [INFO] User is trying to press on someone else's button!");
 		integration.reply({ content: 'Ты не можешь взаимодействовать с этой кнопкой. Только изначальный автор сообщения может жмякать кнопки.', ephemeral: true})
@@ -358,12 +374,13 @@ kitsune.once('ready', () => {
 			process.exit(1); // выходим из js
 		}, 3000);
 	} else { // если нет ошибок то запуск
-		if (values.ping_failure) {
-			fs.unlink('./src/values/ping_failure.json', (err) => {
+		LoggedIn = true;
+		if (values.errorstring) {
+			fs.unlink('./src/values/errorstring.json', (err) => {
 			  if (err) throw err;
 			});
-			delete values.ping_failure
-			funcs.log(kitsune, 'syswarning', 'A connection error occurred, but we successfully reloaded and ready to go!', values); // отсылаем отчёт
+			funcs.log(kitsune, 'syswarning', 'An error has occurred!\n`' + values.errorstring + '`\nCheck console for more info!', values); // отсылаем отчёт
+			delete values.errorstring
 		};
 		if (values.msgonce) {
 			try{

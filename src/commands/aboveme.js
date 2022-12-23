@@ -1,7 +1,7 @@
 const Discord = require("discord.js")
 const GIFEncoder = require('gif-encoder-2')
 const { createCanvas, loadImage } = require('canvas')
-const arrow = '././assets/giffer/arrows/1.png'
+//const arrow = '././assets/giffer/arrows/1.png'
 
 const canvasImage = async (img, width, height, type) => {
   
@@ -39,8 +39,8 @@ const canvasImage = async (img, width, height, type) => {
   // drawing arrow
   ctx.beginPath();
   ctx.moveTo(width/3*1.8, 0);
-  ctx.lineTo(width/1.82, height/6);
-  ctx.lineTo(width/1.1, 0);
+  ctx.lineTo(width/1.88, height/5);
+  ctx.lineTo(width/1.15, 0);
   ctx.fill();
   
   
@@ -127,7 +127,6 @@ class Above {
 			
 			//work
 			async function work(kitsune, msg, args) {
-				
 				if (!msg.attachments.first().contentType) {
 					let embed = new Discord.EmbedBuilder();
 					embed.setTitle(kitsune.user.username + ' - Error');
@@ -145,21 +144,10 @@ class Above {
 					return;
 				};
 				
-				let imgtype = 1
-				
-				// type 1 - just convert to gif
-				// type 2 - convert to gif and add arrow over
-				
-				if (args[1]) {
-					if (args[1].toLowerCase() == "-a") {
-						imgtype = 2
-					}
-				}
-				
 				const attach = new Discord.AttachmentBuilder(msg.attachments.first().attachment);
 				msg.channel.sendTyping();
 				try {
-					const image = await canvasImage(attach, msg.attachments.first().width, msg.attachments.first().height, imgtype);
+					const image = await canvasImage(attach, msg.attachments.first().width, msg.attachments.first().height);
 					const finalImage = new Discord.AttachmentBuilder(image, { name: msg.id + ".gif" });
 					msg.reply({files: [finalImage]});
 				} catch(err) {

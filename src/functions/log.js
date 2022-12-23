@@ -68,7 +68,7 @@ workfunc = async function(kitsune, type, log, values) { // задание пер
 			console.log(textColor + getTimestamp() + ' [' + typeString + '] ' + log + resetColor);
 					
 			let embed = new Discord.EmbedBuilder();
-			embed.setTitle(kitsune.user.username + ' - Log');
+			embed.setTitle(kitsune.user.username + ' - ' + typeString);
 			embed.setColor(embedColor);
 			embed.setDescription(getTimestamp());
 			embed.addFields([{name: typeString, value: '```\n' + String(log) + '\n```'}]);
@@ -102,7 +102,7 @@ workfunc = async function(kitsune, type, log, values) { // задание пер
 			
 			console.log(textColor + getTimestamp() + ' [' + typeString + '] ' + log + resetColor);
 			let embed = new Discord.EmbedBuilder();
-			embed.setTitle(kitsune.user.username + ' - Log');
+			embed.setTitle(kitsune.user.username + ' - ' + typeString);
 			embed.setColor(embedColor);
 			embed.setDescription(getTimestamp());
 			embed.addFields([{name: typeString, value: '```\n' + String(log) + '\n```'}]);
