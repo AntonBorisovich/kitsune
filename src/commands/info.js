@@ -2,6 +2,8 @@ const Discord = require("discord.js");
 const {dependencies} = require('../../package.json');
 const os = require('os');
 const launch_time = Date.now();
+let invitelink = false
+
 
 class Info {
     constructor(kitsune, commands, values){
@@ -22,19 +24,31 @@ class Info {
     }
 
     run(kitsune, msg, args){
+		if (!invitelink) {
+			invitelink = kitsune.generateInvite({
+				permissions: [
+					Discord.PermissionFlagsBits.SendMessages,
+					Discord.PermissionFlagsBits.EmbedLinks,
+					Discord.PermissionFlagsBits.SendMessagesInThreads,
+					Discord.PermissionFlagsBits.AttachFiles,
+					Discord.PermissionFlagsBits.ReadMessageHistory,
+				],
+				scopes: [Discord.OAuth2Scopes.Bot]
+			});
+		};
+		
 		let embed = new Discord.EmbedBuilder()
 		embed.setTitle(kitsune.user.username + ' - ' + this.name)
 		embed.setColor(`#F36B00`)
 		embed.setDescription(this.values.credits + '\nРазработчик: <@' + this.values.developers[0] + '>')
-		embed.setFooter({ text: 'Версия: ' + this.values.version });
-		// const buttonlink = new Discord.MessageButton()
-			// .setLabel('Политика конфиденциальности')
-			// .setURL("https://docs.google.com/document/d/e/2PACX-1vQK2d9hAjIXB5Ck9zdTbLALsradpgM6sHxc_J2btYr_vvNVStKgZLHb4ZOdyC-5kn8A1lqzBMszyNbQ/pub")
-			// .setStyle('LINK')
-		// const buttons = new Discord.MessageActionRow()
-			// .addComponents(buttonlink)
-		//throw('error');
-		msg.reply({embeds: [embed]}) //, components: [buttons]
+		embed.setFooter({ text: 'Версия бота: ' + this.values.version + "\nВерсия node: " + process.version + "\nВерсия Discord.js: v14" });
+		const row = new Discord.ActionRowBuilder().addComponents(
+			new Discord.ButtonBuilder()
+			.setURL(invitelink)
+			.setLabel('Пригласить бота на свой сервер')
+			.setStyle(Discord.ButtonStyle.Link)
+		);
+		msg.reply({ embeds: [embed], components: [row] });
 	}
 			
 	// debug output
