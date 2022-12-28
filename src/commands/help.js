@@ -52,7 +52,11 @@ class Help {
 			new Discord.ButtonBuilder()
 			.setCustomId(msg.author.id + '_0_help_GuideEntry')
 			.setLabel('Подробный гайд по использованию')
-			.setStyle(Discord.ButtonStyle.Primary)
+			.setStyle(Discord.ButtonStyle.Primary),
+			new Discord.ButtonBuilder()
+			.setURL('https://boosty.to/antonboris')
+			.setLabel('Поддержать автора на Boosty')
+			.setStyle(Discord.ButtonStyle.Link)
 		);
 		
         msg.reply({ embeds: [embed], components: [row] });

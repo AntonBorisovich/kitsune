@@ -190,7 +190,7 @@ class Socialcredit {
 				originalmsg.reply({ embeds: [embed] });
 				return;
 			};
-			if (msg.attachments.first().contentType.endsWith('webp') || msg.attachments.first().contentType.endsWith('tiff') || msg.attachments.first().contentType.endsWith('gif')) {
+			if (msg.attachments.first().contentType.endsWith('webp') || msg.attachments.first().contentType.endsWith('gif')) {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - Error')
 				embed.setColor(`#F00000`)
