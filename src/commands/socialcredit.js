@@ -249,24 +249,64 @@ class Socialcredit {
 			//return;
 			
 			const signkey = md5('https://h5.tu.qq.com' + reqbody.length + 'HQ31X02e') // чёрная магия с получением ключа (хэша)
-
-			const options = { // параметры обращения к серваку
-			  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
-			  proxy: 'http://' + proxy[2] + ':' + proxy[3] + '@' + proxy[0],
-			  json: true,
-			  headers: {
-				"Origin": "https://h5.tu.qq.com",
-				"Referer": "https://h5.tu.qq.com/",
-				"x-sign-value": signkey, // generated key
-				"x-sign-version": "v1",
-				//"User-Agent": useragent // it's not really needed, but just in case
-			  },
-			  body: {
-				busiId: "ai_painting_anime_img_entry",
-				images: [img],
-				extra: '{\"face_rects\":[],\"version\":' + picver + ',\"platform\":\"web\",\"root_channel\":\"\",\"level\":1}'
-			  }
-			};
+			let options
+			if (proxy) {
+				if (proxy[2] && proxy[3]) {
+					options = { // параметры обращения к серваку
+					  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
+					  proxy: 'http://' + proxy[2] + ':' + proxy[3] + '@' + proxy[0],
+					  json: true,
+					  headers: {
+						"Origin": "https://h5.tu.qq.com",
+						"Referer": "https://h5.tu.qq.com/",
+						"x-sign-value": signkey, // generated key
+						"x-sign-version": "v1",
+						"User-Agent": useragent // it's not really needed, but just in case
+					  },
+					  body: {
+						busiId: "ai_painting_anime_img_entry",
+						images: [img],
+						extra: '{\"face_rects\":[],\"version\":' + picver + ',\"platform\":\"web\",\"root_channel\":\"\",\"level\":1}'
+					  }
+					};
+				} else {
+					console.log('pipi pupu')
+					options = { // параметры обращения к серваку
+					  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
+					  proxy: 'http://' + proxy[0],
+					  json: true,
+					  headers: {
+						"Origin": "https://h5.tu.qq.com",
+						"Referer": "https://h5.tu.qq.com/",
+						"x-sign-value": signkey, // generated key
+						"x-sign-version": "v1",
+						"User-Agent": useragent // it's not really needed, but just in case
+					  },
+					  body: {
+						busiId: "ai_painting_anime_img_entry",
+						images: [img],
+						extra: '{\"face_rects\":[],\"version\":' + picver + ',\"platform\":\"web\",\"root_channel\":\"\",\"level\":1}'
+					  }
+					};
+				}
+			} else {
+				options = { // параметры обращения к серваку
+				  uri: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
+				  json: true,
+				  headers: {
+					"Origin": "https://h5.tu.qq.com",
+					"Referer": "https://h5.tu.qq.com/",
+					"x-sign-value": signkey, // generated key
+					"x-sign-version": "v1",
+					"User-Agent": useragent // it's not really needed, but just in case
+				  },
+				  body: {
+					busiId: "ai_painting_anime_img_entry",
+					images: [img],
+					extra: '{\"face_rects\":[],\"version\":' + picver + ',\"platform\":\"web\",\"root_channel\":\"\",\"level\":1}'
+				  }
+				};
+			}
 			request.post(options, (err, res, body) => { // обращаемся к серваку
 				//if (res) {
 				//	console.log(res);
@@ -307,7 +347,7 @@ class Socialcredit {
 					let outlink = body.extra
 					//console.log(body)
 					outlink = outlink.slice(outlink.indexOf('https'), (outlink.indexOf('jpg') + 3) ) // обрезаем до ссылки
-					msg.reply({content: outlink})
+					msg.reply({files: [{attachment: outlink}]})
 				} catch(err) {
 					
 					// known codes
