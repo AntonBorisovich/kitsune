@@ -149,6 +149,18 @@ async function init_step4() { // проверка ошибок
 	// всё ок. логируем о хорошем и входим в дискорд
 	console.log(getTimestamp() + ' [INFO] Initialization completed successful. ' + ((Date.now() - launch_time) / 1000 ) + 's');
 	console.log(getTimestamp() + ' [INFO] Logging in Discord...' );
+	LoggedIn = 'wait';
+	setTimeout(() => {
+		if (LoggedIn == 'wait') {
+			console.log(getTimestamp() + ' [ERROR] Login timeout (60s). Shutting down...' );
+			fs.writeFile('./src/values/errorstring.json', '{"errorstring": "login_failure"}', function (err) {
+			  if (err) return console.log(err);
+			});
+			setTimeout(() => {
+				process.exit(1); // выходим из js
+			}, 2000);
+		}
+	}, 60000);
 	kitsune.login(values.discordtoken); // логинимся
 };
 
