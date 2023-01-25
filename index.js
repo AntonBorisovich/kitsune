@@ -185,7 +185,7 @@ function getTimestamp() {
 	return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + hours + ":" + mins + ":" + seconds; // выводим красивую поеботу
 };
 
-function checkInternet(kitsune) { // Проверка интернета каждые 50 секунд. Если пинг будет одним и тем же 10 раз подряд, то будем считать, что соединение оборвано
+function checkInternet(kitsune) { // Проверка интернета каждые 25 секунд. Если пинг будет одним и тем же 10 раз подряд, то будем считать, что соединение оборвано
 	//console.log(getTimestamp() + ' [DEBUG] Ping: ' + kitsune.ws.ping)
 	if (values.pings.length == 10) { values.pings.shift() }; // если слишком много пингов, то удалить самый старый
 	values.pings.push(kitsune.ws.ping);
@@ -201,9 +201,9 @@ function checkInternet(kitsune) { // Проверка интернета каж�
 			process.exit(1); // выходим из js
 		}, 2500);
 	} else {
-		setTimeout(() => { // repeat again in 50 secs
+		setTimeout(() => { // repeat again in 25 secs
 			checkInternet(kitsune)
-		}, 50000);
+		}, 25000);
 	};
 };
 
