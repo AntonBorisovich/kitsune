@@ -31,25 +31,14 @@ class Orgp {
         this.commands = commands;
 		this.perms = [];
         this.name = "orgp"; // имя команды
-		this.desc = "ебать меня в пердак питерский бот"; // описание команды в общем списке команд
-		this.advdesc = "сас"; // описание команды в помоще по конкретной команде
+		this.desc = "питерский транспорт"; // описание команды в общем списке команд
+		this.advdesc = "Берёт информацию о маршрутах в Санкт-Петербурге с [сайта \"Портал Общественного Транспорта Санкт-Петербурга\"](https://transport.orgp.spb.ru/Portal/transport/main).\nФото и данные о машинах предоставляются сайтом [transphoto.org](https://transphoto.org).\n\nСделано специально для <@374144960221413386>"; // описание команды в помоще по конкретной команде
 		this.args = "<тип> <номер>"; // аргументы в общем списке команд
-		this.argsdesc = "<тип> - троллейбус (тро..), автобус (а..), трамвай (тра)\n<номер> - номер маршрута"; // описание аргументов в помоще по конкретной команде
+		this.argsdesc = "<тип> - троллейбус (тро..), автобус (ав..), трамвай (тра)\n<номер> - номер маршрута"; // описание аргументов в помоще по конкретной команде
 		this.advargs = "<тип> <номер>"; // аргументы в помоще по конкретной команде
     };
 
     async run(kitsune, msg, args){
-		if (msg.author.id == 374144960221413386 || msg.author.id == 391635525603426305) {
-			
-		} else {
-			let embed = new Discord.EmbedBuilder()
-			embed.setTitle(kitsune.user.username + ' - orgp')
-			embed.setColor(`#F36B00`)
-			embed.setDescription("Команда находится в тестовом режиме и пока не доступна всем.")
-			msg.reply({ embeds: [embed] });
-			return;
-		}
-		
 		// чекаем аргументы
 		let type = false
 		let route = false
@@ -354,10 +343,24 @@ class Orgp {
 				if (body) {
 					
 					let model_info = false
+					let park_info = false
+					let park_link = false
 					let photo_place = false
 					let photo_date = false
+					let photo_author = false
 					let photo_img = false
 					let photo_link = false
+					if (body.indexOf('<a href="/list.php?did=') != 1) {
+						park_info = body.slice(body.indexOf('<a href="/list.php?did='))
+						park_info = park_info.slice(park_info.indexOf('">')+2,park_info.indexOf('</a>'))
+					};
+					if (body.indexOf('<a href="/list.php?did=') != 1) {
+						park_link = body.slice(body.indexOf('<a href="/list.php?did=')+9, )
+						park_link = park_link.slice(0,park_link.indexOf('">'))
+						if (park_link.length > 64) {
+							park_link = "https://youtu.be/dQw4w9WgXcQ"
+						}
+					};
 					if (body.indexOf('<a href="/model/') != 1) {
 						model_info = body.slice(body.indexOf('<a href="/model/'))
 						model_info = model_info.slice(model_info.indexOf('/">')+3,model_info.indexOf('</b>'))
@@ -367,10 +370,21 @@ class Orgp {
 						photo_place = photo_place.slice(0,photo_place.indexOf('</b>'))
 						photo_place = photo_place.replace(/&quot;/g, '"')
 						photo_place = photo_place.replace(/<img src=\"\/img\/place_arrow.gif\" alt=\"→\" width=\"15\" height=\"11\" style=\"position:relative; top:-1px; margin:0 3px\">/g, '▶')
-					};
+						if (photo_place.length > 196) {
+							photo_place = "нету"
+						}
+					}
 					if (body.indexOf('<p class="sm"><b>') != 1 ) { 
 						photo_date = body.slice(body.indexOf('<p class="sm"><b>')+17)
+						photo_author = photo_date.slice(photo_date.indexOf('<a gref=')+8, photo_date.indexOf('</a>'))
+						photo_author = photo_author.slice(photo_author.indexOf('/">')+3)
+						if (photo_author.length > 64) {
+							photo_author = "*(не получилось узнать)*"
+						}
 						photo_date = photo_date.slice(0,photo_date.indexOf('</b>'))
+						if (photo_date.length > 64) {
+							photo_date = "нету"
+						}
 					};
 					if (body.indexOf('<td class="pb_photo">') != 1 ) { 
 						photo_img = body.slice(body.indexOf('<td class="pb_photo">')+21)
@@ -378,17 +392,23 @@ class Orgp {
 						photo_link = photo_img.slice(photo_img.indexOf('<a href="')+9)
 						photo_link = photo_link.slice(0, photo_link.indexOf('"'))
 						photo_link = 'https://transphoto.org' + photo_link
+						if (photo_link.length > 128) {
+							photo_link = "https://youtu.be/dQw4w9WgXcQ"
+						}
 						
 						photo_img = photo_img.slice(photo_img.indexOf('<img class="f" src="')+20)
 						photo_img = photo_img.slice(0, photo_img.indexOf('" alt'))
 						photo_img = 'https://transphoto.org' + photo_img
+						if (photo_img.length > 128) {
+							photo_img = "https://i.imgur.com/oJGKR0l.png"
+						}
 					};
-					if (model_info && photo_place && photo_date && photo_img && photo_link) {
+					if (model_info && photo_place && photo_date && photo_img && photo_link && photo_author && park_info && park_link) {
 						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(kitsune.user.username + ' - orgp')
 						embed.setColor(`#F36B00`)
-						embed.setDescription("[**" + model_info + " №" + label + "**](" + photo_link + ")")
-						embed.addFields({ name: "Последнее фото " + label + " на transphoto.org", value: "Улица: " + photo_place + "\nДата: " + photo_date})
+						embed.setDescription("[**" + model_info + " №" + label + "**](" + photo_link + ")\n[" + park_info +"](https://transphoto.org" + park_link + ")")
+						embed.addFields({ name: "Последнее фото №" + label + " на transphoto.org", value: "Улица: " + photo_place + "\nДата: " + photo_date + "\nАвтор: " + photo_author})
 						embed.setImage(photo_img)
 						
 						let list = new Discord.StringSelectMenuBuilder()
