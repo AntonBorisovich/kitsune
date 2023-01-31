@@ -1,0 +1,426 @@
+const Discord = require("discord.js");
+const request = require("request");
+const https = require("https");
+const os = require('os'); // получение данных о системе для генерации useragent
+
+const bbox = "754522.5047236,6680543.9238783,5904162.1488232,10277276.671411" // в каком четырёхугольнике искать машины на карте
+
+// кэш
+let cache_cookie = false
+let cache_scope = false
+let cache_routes = false
+
+// для нормального отображения типа транспорта
+let readableType = []
+readableType['trolley'] = "Троллейбус"
+readableType['bus'] = "Автобус"
+readableType['tram'] = "Трамвай"
+
+// типо браузер
+let useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0" // defualt agent
+if (os.platform().startsWith('win')){
+	useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+} else if (os.platform().startsWith('linux')) {
+	useragent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chromium/108.0.0.0 Safari/537.36"
+}
+class Orgp {
+	constructor(kitsune, commands, values){
+		//задать полученые значения для дальнейшего использования в коде команды
+		this.values = values;
+        this.kitsune = kitsune;
+        this.commands = commands;
+		this.perms = [];
+        this.name = "orgp"; // имя команды
+		this.desc = "ебать меня в пердак питерский бот"; // описание команды в общем списке команд
+		this.advdesc = "сас"; // описание команды в помоще по конкретной команде
+		this.args = "<тип> <номер>"; // аргументы в общем списке команд
+		this.argsdesc = "<тип> - троллейбус (тро..), автобус (а..), трамвай (тра)\n<номер> - номер маршрута"; // описание аргументов в помоще по конкретной команде
+		this.advargs = "<тип> <номер>"; // аргументы в помоще по конкретной команде
+    };
+
+    async run(kitsune, msg, args){
+		if (msg.author.id == 374144960221413386 || msg.author.id == 391635525603426305) {
+			
+		} else {
+			let embed = new Discord.EmbedBuilder()
+			embed.setTitle(kitsune.user.username + ' - orgp')
+			embed.setColor(`#F36B00`)
+			embed.setDescription("Команда находится в тестовом режиме и пока не доступна всем.")
+			msg.reply({ embeds: [embed] });
+			return;
+		}
+		
+		// чекаем аргументы
+		let type = false
+		let route = false
+		args.shift()
+		for await (const arg of args) {  
+			if (arg.toLowerCase().startsWith('тро')) { // троллейбус
+				type = "trolley";
+			} else if (arg.toLowerCase().startsWith('ав')) { // автобус
+				type = "bus";
+			} else if (arg.toLowerCase().startsWith('тра')) { // трамвай
+				type = "tram";
+			} else { // предположительно номер маршрута
+				route = arg.toLowerCase();
+			};
+		};
+		
+		// проверка наличия маршрута
+		if (!route) {
+			let embed = new Discord.EmbedBuilder()
+			embed.setTitle(kitsune.user.username + ' - orgp')
+			embed.setColor(`#F00000`)
+			embed.setDescription("Ты не указал маршрут!")
+			msg.reply({ embeds: [embed] });
+			return;
+		}
+		
+		// проверка наличия кэша
+		if (!cache_routes) {
+			update_routes(kitsune, msg, args)
+		} else {
+			//console.log('found routes in cache')
+			search_routes(kitsune, msg, args, type, route)
+		}
+
+		function search_routes(kitsune, msg, args, type, route) { // поиск по маршруту в кэше
+			if (type) { // если указан тип
+				if (cache_routes[type+route]) { // если маршрут существует
+					get_cock(kitsune, msg, args, cache_routes[type+route].id, route.toUpperCase(), readableType[type]) // начать копать информацию о маршруте с сайта
+					return;
+				} else { // если не существует то шашипка
+					let embed = new Discord.EmbedBuilder()
+					embed.setTitle(kitsune.user.username + ' - orgp')
+					embed.setColor(`#F00000`)
+					embed.setDescription("Мы искали везде, но такого маршрута не знаем.")
+					msg.reply({ embeds: [embed] });
+				}
+			} else { // если тип не указан, то смотреть все типы
+				let foundAtLeastOne = false
+				let embed = new Discord.EmbedBuilder()
+				if (cache_routes["trolley"+route]) { // смотрим троллейбусы
+					foundAtLeastOne = true
+					embed.addFields(
+						{name: readableType["trolley"] + " " + route.toUpperCase(), value: "ИД: " + cache_routes["trolley"+route].id}
+					)
+				}
+				if (cache_routes["bus"+route]) { // смотрим автобусы
+					foundAtLeastOne = true
+					embed.addFields(
+						{name: readableType["bus"] + " " + route.toUpperCase(), value: "ИД: " + cache_routes["bus"+route].id}
+					)
+				}
+				if (cache_routes["tram"+route]) { // смотрим трамваи
+					foundAtLeastOne = true
+					embed.addFields(
+						{name: readableType["tram"] + " " + route.toUpperCase(), value: "ИД: " + cache_routes["tram"+route].id}
+					)
+				}
+				if (foundAtLeastOne) {
+					embed.setTitle(kitsune.user.username + ' - orgp')
+					embed.setColor(`#F36B00`)
+					embed.setDescription("Вы не указали тип транспорта. Вот что мы нашли по всем типам транспорта:")
+					msg.reply({ embeds: [embed] });
+					return;
+				} else {
+					embed.setTitle(kitsune.user.username + ' - orgp')
+					embed.setColor(`#F00000`)
+					embed.setDescription("Мы искали везде, но такого маршрута не знаем.")
+					msg.reply({ embeds: [embed] });
+					return;
+				}
+			}
+		}
+		
+		function get_cock(kitsune, msg, args, id, routenum, type) { // получить cookie и scope
+			const options = { // параметры обращения к серваку
+			  uri: 'https://transport.orgp.spb.ru/Portal/transport/route/' + id,
+			  headers: {
+				"authority": "transport.orgp.spb.ru",
+				"scheme": "https"
+			  }
+			};
+			request.get(options, (err, res, body) => { // обращаемся к серваку
+				if (body) {
+					if (body.indexOf('scope: "') != -1) { // если есть scope, то обрезать и запомнить
+						cache_scope = body.slice(body.indexOf('scope: "')+8)
+						cache_scope = cache_scope.slice(0, cache_scope.indexOf('"'))
+						cache_scope = cache_scope.replace(/\+/g, "%2B")
+					};
+				};
+				if (res.rawHeaders) {
+					if (String(res.rawHeaders).indexOf('JSESSIONID=')) { // если сайт выдал cookie, то обрезать и запомнить
+						cache_cookie = String(res.rawHeaders);
+						cache_cookie = cache_cookie.slice(cache_cookie.indexOf('JSESSIONID=')+11);
+						cache_cookie = cache_cookie.slice(0, cache_cookie.indexOf(';'));
+					} else {
+						console.log('no cookie');
+						return;
+					};
+				} else {
+					console.log('no headers');
+					return;
+				};
+				get_cars_on_route(kitsune, msg, args, id, routenum, type) // чекаем на сайте какие машины на маршруте
+			});
+		};
+		function get_cars_on_route(kitsune, msg, args, id, routenum, type) { // получить список машин на маршруте (обязательно в кэше должен быть scope и cookie)
+			const options = { // параметры обращения к серваку
+			  uri: 'https://transport.orgp.spb.ru/Portal/transport/mapx/innerRouteVehicle?ROUTE=' + id + "&SCOPE=" + cache_scope + "&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetFeature&LAYERS=&WHEELCHAIRONLY=false&BBOX=" + bbox,
+			  headers: {
+				"cookie": "JSESSIONID=" + cache_cookie, // это кот куки
+				"authority": "transport.orgp.spb.ru",
+				"scheme": "https"
+			  }
+			};
+			request.get(options, (err, res, body) => { // обращаемся к серваку
+				if (body) {
+					let bus = false
+					let ccars_list = "\n"
+					let ccars_menulist = []
+					let ccars_labels = ""
+					let ccars = JSON.parse(body) // парсим инфу
+					let embed = new Discord.EmbedBuilder()
+					if (!ccars.features[0]) {
+						embed.setTitle(kitsune.user.username + ' - orgp')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Ни одной машины сейчас нету на маршруте")
+						msg.reply({ embeds: [embed] });
+						return;
+					}
+					ccars.features.forEach((car) => { // чекаем все машины и пишем в список
+						if (car.properties.transportTypeId == "trolley") {
+							ccars_labels = ccars_labels + car.properties.label + "-"
+							ccars_menulist.push({label: car.properties.label, description: "", value: car.properties.transportTypeId + "_" + car.properties.label})
+							ccars_list = ccars_list + "[" + car.properties.label + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=2&num=" + car.properties.label + ")\n"
+						} else if (car.properties.transportTypeId == "tram") {
+							ccars_labels = ccars_labels + car.properties.label + "-"
+							ccars_menulist.push({label: car.properties.label, description: "", value: car.properties.transportTypeId + "_" + car.properties.label})
+							ccars_list = ccars_list + "[" + car.properties.label + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=1&num=" + car.properties.label + ")\n"
+						} else {
+							bus = true
+							ccars_list = ccars_list + car.properties.label + "\n"
+						};
+					})
+					if (!bus) { // если не автобус то добавить возможность смотреть доп. инфу на transphoto.org
+						let list = new Discord.StringSelectMenuBuilder()
+						list.setCustomId(msg.author.id + "_0_orgp_getstts")
+						list.setPlaceholder('Получить больше инфы о...')
+						ccars.features.forEach((car) => {
+							list.addOptions({
+								label: String(car.properties.label),
+								value: String(car.properties.transportTypeId + "_" + car.properties.label + "_" + ccars_labels)
+							});
+						});
+						let row = new Discord.ActionRowBuilder().addComponents(list);
+						embed.setTitle(kitsune.user.username + ' - orgp')
+						embed.setColor(`#F36B00`)
+						embed.setDescription("Вот машины на маршруте " + routenum + " (" + type + "):" + ccars_list)
+						msg.reply({ embeds: [embed], components: [row] });
+					} else { // если автобус то ничего не мудрить
+						embed.setTitle(kitsune.user.username + ' - orgp')
+						embed.setColor(`#F36B00`)
+						embed.setDescription("Вот машины на маршруте " + routenum + " (" + type + "):" + ccars_list)
+						msg.reply({ embeds: [embed] });
+					}
+				}
+			});
+		}
+		function update_routes(kitsune, msg, args) {
+			const bodymine ="sEcho=0&"+ // ?
+							"iColumns=3&"+ // кол-во столбцов с информацией
+							"sColumns=id,transportType,routeNumber&"+ // содержание столбцов (какое кол-во столько и пунктов)
+							"iDisplayStart=0&"+ // ?
+							"iDisplayLength=800&"+ // сколько выпукнуть
+							"sNames=id,transportType,routeNumber&"+ // тоже самое, что и sColumns
+							"iSortingCols=1&"+ // ?
+							"iSortCol_0=2&"+ // по какой колонке сортировать
+							"sSortDir_0=asc&"+ // ?
+							"bSortable_0=true&"+ // сортировать ли
+							"bSortable_1=true&"+ // сортировать ли
+							"bSortable_2=true&"+ // сортировать ли
+							"transport-type=0&"+ // отображать ли этот тип транспорта
+							"transport-type=2&"+ // отображать ли этот тип транспорта
+							"transport-type=1" // отображать ли этот тип транспорта
+				
+			//const bodysite = "sEcho=2&iColumns=11&sColumns=id%2CtransportType%2CrouteNumber%2Cname%2Curban%2CpoiStart%2CpoiFinish%2Ccost%2CforDisabled%2CscheduleLinkColumn%2CmapLinkColumn&iDisplayStart=0&iDisplayLength=25&sNames=id%2CtransportType%2CrouteNumber%2Cname%2Curban%2CpoiStart%2CpoiFinish%2Ccost%2CforDisabled%2CscheduleLinkColumn%2CmapLinkColumn&iSortingCols=1&iSortCol_0=2&sSortDir_0=asc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&bSortable_6=true&bSortable_7=true&bSortable_8=true&bSortable_9=false&bSortable_10=false&transport-type=0&transport-type=2&transport-type=1"
+			const options = { // параметры обращения к серваку
+			  hostname: 'transport.orgp.spb.ru',
+			  port: 443,
+			  path: '/Portal/transport/routes/list',
+			  method: 'POST',
+			  headers: {
+				//"cookie": "JSESSIONID=" + sessionid,
+				"content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+			  },
+			}
+			const reqr = https.request(options, (res) => { // обращаемся к серваку
+				//console.log('connected')
+				//console.log(res)
+				let data = ""
+				res.on('data', (d) => {
+					data = data + d
+				});
+				res.on('end', () => {
+					cache_routes = [];
+					let rroutes = JSON.parse(data).aaData
+					//console.log(rroutes)
+					rroutes.forEach((route) => {
+						cache_routes[route[1].systemName+route[2].toLowerCase()] = {
+							"id": route[0],
+							"type": route[1].systemName
+						}
+					});
+					search_routes(kitsune, msg, args, type, route);
+					return;
+				})
+			});
+			reqr.on('error', (e) => {
+			  console.error(e);
+			});
+			reqr.write(bodymine); // пишем данные в сайт
+			reqr.end();
+		};
+	};
+	async butt(kitsune, interaction, args){
+		if (interaction.values[0]) {
+			let type = interaction.values[0].split("_")[0];
+			let label = interaction.values[0].split("_")[1];
+			get_stts_vehicle(kitsune, interaction, args, type, label)
+		} else {
+			return;
+		};
+		function get_stts_vehicle(kitsune, interaction, args, type, label) { // get last photo from transphoto.org
+		
+			// types
+			//
+			// 1 - tram
+			// 2 - trolleybus
+			
+			// bus is not supported on this site!
+			let numtype
+			if (type == "tram") {
+				numtype = 1;
+			} else if (type = 'trolley') {
+				numtype = 2;
+			} else {
+				console.log('no you cant search that type of transphoto.org ')
+				return;
+			}
+			const options = { // параметры обращения к серваку
+			  uri: 'https://transphoto.org/api.php?action=index-qsearch&cid=2&type=' + numtype + '&num=' + label,
+			  headers: {
+				"authority": "transphoto.org",
+				"scheme": "https"
+			  }
+			};
+			request.get(options, (err, res, body) => { // обращаемся к серваку
+				if (body) {
+					if (body.indexOf('href') != -1) {
+						let vehicle_page = body.slice(body.indexOf('href')+6)
+						vehicle_page = vehicle_page.slice(0, vehicle_page.indexOf('"'))
+						vehicle_page = 'https://transphoto.org' + vehicle_page
+						get_stts_photodate(kitsune, interaction, args, type, label, vehicle_page)
+					} else {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - orgp')
+						embed.setColor(`#F00000`)
+						embed.setDescription('Не удалось получить информацию о ' + label)
+						interaction.reply({ embeds: [embed]})
+						return;
+					}
+				} else {
+					embed = new Discord.EmbedBuilder()
+					embed.setTitle(kitsune.user.username + ' - orgp')
+					embed.setColor(`#F00000`)
+					embed.setDescription('Не удалось получить информацию о ' + label)
+					interaction.reply({ embeds: [embed]})
+					return;
+				}
+			});
+		};
+		
+		function get_stts_photodate(kitsune, msg, args, type, label, link) { // get last photo data from transphoto.org vehicle page
+			msg.deferUpdate();
+			const options = { // параметры обращения к серваку
+			  uri: link,
+			  headers: {
+				"authority": "transphoto.org",
+				"scheme": "https"
+			  }
+			};
+			request.get(options, (err, res, body) => { // обращаемся к серваку
+				if (body) {
+					
+					let model_info = false
+					let photo_place = false
+					let photo_date = false
+					let photo_img = false
+					let photo_link = false
+					if (body.indexOf('<a href="/model/') != 1) {
+						model_info = body.slice(body.indexOf('<a href="/model/'))
+						model_info = model_info.slice(model_info.indexOf('/">')+3,model_info.indexOf('</b>'))
+					};
+					if (body.indexOf('<b class="pw-place">') != 1 ) { 
+						photo_place = body.slice(body.indexOf('<b class="pw-place">')+20)
+						photo_place = photo_place.slice(0,photo_place.indexOf('</b>'))
+						photo_place = photo_place.replace(/&quot;/g, '"')
+						photo_place = photo_place.replace(/<img src=\"\/img\/place_arrow.gif\" alt=\"→\" width=\"15\" height=\"11\" style=\"position:relative; top:-1px; margin:0 3px\">/g, '▶')
+					};
+					if (body.indexOf('<p class="sm"><b>') != 1 ) { 
+						photo_date = body.slice(body.indexOf('<p class="sm"><b>')+17)
+						photo_date = photo_date.slice(0,photo_date.indexOf('</b>'))
+					};
+					if (body.indexOf('<td class="pb_photo">') != 1 ) { 
+						photo_img = body.slice(body.indexOf('<td class="pb_photo">')+21)
+						
+						photo_link = photo_img.slice(photo_img.indexOf('<a href="')+9)
+						photo_link = photo_link.slice(0, photo_link.indexOf('"'))
+						photo_link = 'https://transphoto.org' + photo_link
+						
+						photo_img = photo_img.slice(photo_img.indexOf('<img class="f" src="')+20)
+						photo_img = photo_img.slice(0, photo_img.indexOf('" alt'))
+						photo_img = 'https://transphoto.org' + photo_img
+					};
+					if (model_info && photo_place && photo_date && photo_img && photo_link) {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - orgp')
+						embed.setColor(`#F36B00`)
+						embed.setDescription("[**" + model_info + " №" + label + "**](" + photo_link + ")")
+						embed.addFields({ name: "Последнее фото " + label + " на transphoto.org", value: "Улица: " + photo_place + "\nДата: " + photo_date})
+						embed.setImage(photo_img)
+						
+						let list = new Discord.StringSelectMenuBuilder()
+						list.setCustomId(msg.customId + "1")
+						list.setPlaceholder('Получить больше инфы о...')
+						msg.values[0].split("_")[2].split("-").forEach((car) => {
+							if (car != "") {
+								list.addOptions({
+									label: String(car),
+									value: type + "_" + car + "_" + msg.values[0].split("_")[2]
+								});
+							}
+						});
+						
+						let row = new Discord.ActionRowBuilder().addComponents(list);
+						msg.message.edit({ embeds: [embed], components: [row] });
+					} else {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - orgp')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Ну удалось получить данные о " + label)
+						msg.reply({ embeds: [embed] });
+					}
+					
+					
+				}
+				//get_cars_on_route(kitsune, msg, args, id)
+			});
+		};
+		
+	}
+};
+
+module.exports = Orgp;
+

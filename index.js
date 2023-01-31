@@ -9,7 +9,7 @@ process.on('uncaughtException', function (err) {
 		try {
 			console.log(err);
 			console.log(getTimestamp() + ' [ERROR] ' + String(err));
-			fs.writeFile('./src/values/errorstring.json', '{"errorstring": "' + String(err) + '"}', function (err) {
+			fs.writeFile('./src/values/errorstring.json', '{"errorstring": "' + String(err).replace(/\"/g, "'") + '"}', function (err) {
 			  if (err) return console.log(err);
 			});
 			setTimeout(() => {
@@ -210,17 +210,9 @@ function checkInternet(kitsune) { // Проверка интернета каж�
 // обработка нового сообщения
 kitsune.on("messageCreate", async msg => {
 	/* try {
-		if (msg.channelId == 750403949202243695) { // новости ъеъ
-			msg.react('<:neeet:1039589647032012930>'); // ?
-		};
-		if (msg.channelId == 838430531188162640) { // dev-log ъеъ
-			var date = new Date(); // задаём текущую поеботу
-			msg.react('🤮'); // озон одобряет
-			msg.channel.threads.create({ // пишем отзыв об обновлении
-				name: 'бл (' + date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + ')',
-				startMessage: msg,
-				reason: 'вадим любит коки (' + (date.getMonth() + 1) + "." + date.getDate() + ')'
-			}).then(threadChannel => threadChannel.send('кринжатина. лучше бы не писал ничего <:bravo:1039589650773315584>'));
+		if (msg.channelId == 879339393410793512 && msg.author.id == 505801500077981721 && Math.floor(Math.random() * 2) == 0) { // новости ъеъ
+			console.log('react')
+			msg.react('🤡'); // ?
 		};
 	} catch(err) {
 		console.log('Failed to place reaction to the message')
@@ -330,22 +322,22 @@ kitsune.on('interactionCreate', async interaction => {
 		interaction.reply({ content: 'Слэш команды ещё не поддерживаются! Используйте ' + values.prefix + 'help для вывода списка команд.', ephemeral: true})
 		return;
 	};
-	if (!interaction.isButton()) { // если не кнопка
+	if (!interaction.isButton() && !interaction.isStringSelectMenu()) { // если не кнопка и не список
 		console.log(getTimestamp() + " [INFO] Unknown interaction got!");
 		return;
 	};	
-	const args = interaction.customId.split("_")
-	const msg = interaction.message
+	const args = interaction.customId.split("_");
+	const msg = interaction.message;
 	if (!interaction.customId) {
 		console.log(getTimestamp() + " [INFO] CustomId in interaction not found!");
 		return;
-	}
+	};
 	
 	if (!args[0].startsWith(interaction.user.id) && args[1] == "0") { // если юзер с другим id и кнопку нельзя нажимать другим
-		console.log(getTimestamp() + " [INFO] User is trying to press on someone else's button!");
-		interaction.reply({ content: 'Ты не можешь взаимодействовать с этой кнопкой. Только изначальный автор сообщения может жмякать кнопки.', ephemeral: true})
+		console.log(getTimestamp() + " [INFO] User is trying to press on someone else's interaction!");
+		interaction.reply({ content: 'Ты не можешь взаимодействовать с этим. Только изначальный автор сообщения может сделать это.', ephemeral: true});
 		return;
-	}
+	};
 	
 	commands.forEach(command => { // перебираем список команд в боте
 		if (command.name == args[2]) { // если команда в сообщении совпала с командой из списка бота то работать
@@ -369,7 +361,7 @@ kitsune.on('interactionCreate', async interaction => {
 				};
 			};
 			try {
-				console.log(getTimestamp() + " [INFO] executed button for " + command.name); // логирование о проходе всех проверок и начале запуске команды
+				console.log(getTimestamp() + " [INFO] executed interaction for " + command.name); // логирование о проходе всех проверок и начале запуске команды
 				command.butt(kitsune, interaction, args); // запуск команды
 			} catch (error) { // если ошибка то логировать ошибку
 				funcs.error(kitsune, values, msg, args, command.name, error);
