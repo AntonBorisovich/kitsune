@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const request = require("request");
 const https = require("https");
+const numco = require("numco")
 const os = require('os'); // получение данных о системе для генерации useragent
 
 const bbox = "754522.5047236,6680543.9238783,5904162.1488232,10277276.671411" // в каком четырёхугольнике искать машины на карте
@@ -32,9 +33,9 @@ class Orgp {
 		this.perms = [];
         this.name = "orgp"; // имя команды
 		this.desc = "питерский транспорт"; // описание команды в общем списке команд
-		this.advdesc = "Берёт информацию о маршрутах в Санкт-Петербурге с [сайта \"Портал Общественного Транспорта Санкт-Петербурга\"](https://transport.orgp.spb.ru/Portal/transport/main).\nФото и данные о машинах предоставляются сайтом [transphoto.org](https://transphoto.org).\n\nСделано специально для <@374144960221413386>"; // описание команды в помоще по конкретной команде
+		this.advdesc = "Берёт информацию о маршрутах в Санкт-Петербурге со [старого сайта \"Портал Общественного Транспорта Санкт-Петербурга\"](https://transport.orgp.spb.ru/Portal/transport/main).\nФото и данные о машинах предоставляются сайтом [transphoto.org](https://transphoto.org).\n\nСделано специально для <@374144960221413386>"; // описание команды в помоще по конкретной команде
 		this.args = "<тип> <номер>"; // аргументы в общем списке команд
-		this.argsdesc = "<тип> - троллейбус (тро..), автобус (ав..), трамвай (тра)\n<номер> - номер маршрута"; // описание аргументов в помоще по конкретной команде
+		this.argsdesc = "<тип> - троллейбус (тро..), автобус (ав..), трамвай (тра..)\n<номер> - номер маршрута"; // описание аргументов в помоще по конкретной команде
 		this.advargs = "<тип> <номер>"; // аргументы в помоще по конкретной команде
     };
 
@@ -44,11 +45,11 @@ class Orgp {
 		let route = false
 		args.shift()
 		for await (const arg of args) {  
-			if (arg.toLowerCase().startsWith('тро')) { // троллейбус
+			if (arg.toLowerCase().startsWith('тро') || arg.toLowerCase().startsWith('nhj')) { // троллейбус
 				type = "trolley";
-			} else if (arg.toLowerCase().startsWith('ав')) { // автобус
+			} else if (arg.toLowerCase().startsWith('ав') || arg.toLowerCase().startsWith('fd')) { // автобус
 				type = "bus";
-			} else if (arg.toLowerCase().startsWith('тра')) { // трамвай
+			} else if (arg.toLowerCase().startsWith('тра') || arg.toLowerCase().startsWith('nhf')) { // трамвай
 				type = "tram";
 			} else { // предположительно номер маршрута
 				route = arg.toLowerCase();
@@ -86,30 +87,21 @@ class Orgp {
 					msg.reply({ embeds: [embed] });
 				}
 			} else { // если тип не указан, то смотреть все типы
-				let foundAtLeastOne = false
+				let found = ""
 				let embed = new Discord.EmbedBuilder()
 				if (cache_routes["trolley"+route]) { // смотрим троллейбусы
-					foundAtLeastOne = true
-					embed.addFields(
-						{name: readableType["trolley"] + " " + route.toUpperCase(), value: "ИД: " + cache_routes["trolley"+route].id}
-					)
+					found = found + readableType["trolley"] + " №"+route+"\n"
 				}
 				if (cache_routes["bus"+route]) { // смотрим автобусы
-					foundAtLeastOne = true
-					embed.addFields(
-						{name: readableType["bus"] + " " + route.toUpperCase(), value: "ИД: " + cache_routes["bus"+route].id}
-					)
+					found = found + readableType["bus"] + " №"+route+"\n"
 				}
 				if (cache_routes["tram"+route]) { // смотрим трамваи
-					foundAtLeastOne = true
-					embed.addFields(
-						{name: readableType["tram"] + " " + route.toUpperCase(), value: "ИД: " + cache_routes["tram"+route].id}
-					)
+					found = found + readableType["tram"] + " №"+route+"\n"
 				}
-				if (foundAtLeastOne) {
+				if (found != "") {
 					embed.setTitle(kitsune.user.username + ' - orgp')
 					embed.setColor(`#F36B00`)
-					embed.setDescription("Вы не указали тип транспорта. Вот что мы нашли по всем типам транспорта:")
+					embed.setDescription("Вы не указали тип транспорта. Вот что мы нашли по всем типам транспорта:\n\n" + found)
 					msg.reply({ embeds: [embed] });
 					return;
 				} else {
@@ -123,6 +115,7 @@ class Orgp {
 		}
 		
 		function get_cock(kitsune, msg, args, id, routenum, type) { // получить cookie и scope
+			//console.log('getting cock')
 			const options = { // параметры обращения к серваку
 			  uri: 'https://transport.orgp.spb.ru/Portal/transport/route/' + id,
 			  headers: {
@@ -131,30 +124,54 @@ class Orgp {
 			  }
 			};
 			request.get(options, (err, res, body) => { // обращаемся к серваку
+				
 				if (body) {
 					if (body.indexOf('scope: "') != -1) { // если есть scope, то обрезать и запомнить
 						cache_scope = body.slice(body.indexOf('scope: "')+8)
 						cache_scope = cache_scope.slice(0, cache_scope.indexOf('"'))
 						cache_scope = cache_scope.replace(/\+/g, "%2B")
 					};
-				};
-				if (res.rawHeaders) {
-					if (String(res.rawHeaders).indexOf('JSESSIONID=')) { // если сайт выдал cookie, то обрезать и запомнить
-						cache_cookie = String(res.rawHeaders);
-						cache_cookie = cache_cookie.slice(cache_cookie.indexOf('JSESSIONID=')+11);
-						cache_cookie = cache_cookie.slice(0, cache_cookie.indexOf(';'));
-					} else {
-						console.log('no cookie');
-						return;
-					};
 				} else {
-					console.log('no headers');
+					let embed = new Discord.EmbedBuilder()
+					embed.setTitle(kitsune.user.username + ' - orgp')
+					embed.setColor(`#F00000`)
+					embed.setDescription("Что-то пошло не так. Не удалось получить данные")
+					msg.reply({ embeds: [embed] });
+					return;
+				}
+				if (res) {
+					if (res.rawHeaders) {
+						if (String(res.rawHeaders).indexOf('JSESSIONID=')) { // если сайт выдал cookie, то обрезать и запомнить
+							cache_cookie = String(res.rawHeaders);
+							cache_cookie = cache_cookie.slice(cache_cookie.indexOf('JSESSIONID=')+11);
+							cache_cookie = cache_cookie.slice(0, cache_cookie.indexOf(';'));
+						} else {
+							console.log('no cookie');
+							return;
+						};
+					} else {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - orgp')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Что-то пошло не так. Не удалось получить данные")
+						msg.reply({ embeds: [embed] });
+						return;
+					}
+				} else {
+					let embed = new Discord.EmbedBuilder()
+					embed.setTitle(kitsune.user.username + ' - orgp')
+					embed.setColor(`#F00000`)
+					embed.setDescription("Что-то пошло не так. Не удалось получить данные")
+					msg.reply({ embeds: [embed] });
 					return;
 				};
 				get_cars_on_route(kitsune, msg, args, id, routenum, type) // чекаем на сайте какие машины на маршруте
 			});
 		};
 		function get_cars_on_route(kitsune, msg, args, id, routenum, type) { // получить список машин на маршруте (обязательно в кэше должен быть scope и cookie)
+			function compare(field, order) {
+					return (a, b) => (a[field] < b[field] && -1) || (a[field] > b[field] && 1) || 0;
+			}
 			const options = { // параметры обращения к серваку
 			  uri: 'https://transport.orgp.spb.ru/Portal/transport/mapx/innerRouteVehicle?ROUTE=' + id + "&SCOPE=" + cache_scope + "&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetFeature&LAYERS=&WHEELCHAIRONLY=false&BBOX=" + bbox,
 			  headers: {
@@ -166,9 +183,9 @@ class Orgp {
 			request.get(options, (err, res, body) => { // обращаемся к серваку
 				if (body) {
 					let bus = false
-					let ccars_list = "\n"
+					let ccars_list = []
 					let ccars_menulist = []
-					let ccars_labels = ""
+					let ccars_labels = []
 					let ccars = JSON.parse(body) // парсим инфу
 					let embed = new Discord.EmbedBuilder()
 					if (!ccars.features[0]) {
@@ -180,37 +197,48 @@ class Orgp {
 					}
 					ccars.features.forEach((car) => { // чекаем все машины и пишем в список
 						if (car.properties.transportTypeId == "trolley") {
-							ccars_labels = ccars_labels + car.properties.label + "-"
+							ccars_labels.push(car.properties.label)
 							ccars_menulist.push({label: car.properties.label, description: "", value: car.properties.transportTypeId + "_" + car.properties.label})
-							ccars_list = ccars_list + "[" + car.properties.label + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=2&num=" + car.properties.label + ")\n"
+							ccars_list.push("[" + car.properties.label + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=2&num=" + car.properties.label + ")")
 						} else if (car.properties.transportTypeId == "tram") {
-							ccars_labels = ccars_labels + car.properties.label + "-"
+							ccars_labels.push(car.properties.label)
 							ccars_menulist.push({label: car.properties.label, description: "", value: car.properties.transportTypeId + "_" + car.properties.label})
-							ccars_list = ccars_list + "[" + car.properties.label + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=1&num=" + car.properties.label + ")\n"
+							ccars_list.push("[" + car.properties.label + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=1&num=" + car.properties.label + ")")
 						} else {
 							bus = true
-							ccars_list = ccars_list + car.properties.label + "\n"
+							ccars_list.push(car.properties.label)
 						};
 					})
+					
+					ccars_list.sort()
+					ccars_list = ccars_list.join("\n")
+					ccars_labels.sort()
+					
+					embed.setTitle(kitsune.user.username + ' - orgp')
+					embed.setColor(`#F36B00`)
+					embed.setDescription("Вот машины (" + ccars.features.length + " шт) на маршруте " + routenum + " (" + type + "):\n" + ccars_list + "\n\nКарта: [🆕 Новый сайт](https://transport.orgp.spb.ru/routes/" + id +") / [🧓 Старый сайт](https://transport.orgp.spb.ru/Portal/transport/route/" + id +")")
+					if (ccars_labels.length > 25 || ccars.features > 25) {
+						ccars_labels = ccars_labels.slice(0,25)
+						//console.log(ccars_labels)
+						ccars.features = ccars.features.slice(0,25)
+						//console.log(ccars.features)
+						embed.setFooter({ text: "На маршруте сейчас много машин, так что, к сожалению, в списке ниже возможно выбрать только первые 25" })
+					}
 					if (!bus) { // если не автобус то добавить возможность смотреть доп. инфу на transphoto.org
 						let list = new Discord.StringSelectMenuBuilder()
 						list.setCustomId(msg.author.id + "_0_orgp_getstts")
 						list.setPlaceholder('Получить больше инфы о...')
-						ccars.features.forEach((car) => {
+						ccars_labels.forEach((car) => {
 							list.addOptions({
-								label: String(car.properties.label),
-								value: String(car.properties.transportTypeId + "_" + car.properties.label + "_" + ccars_labels)
+								label: String(car),
+								value: String(ccars.features[0].properties.transportTypeId + "_" + car + "_" + numco.compress(ccars_labels))
 							});
 						});
+						
 						let row = new Discord.ActionRowBuilder().addComponents(list);
-						embed.setTitle(kitsune.user.username + ' - orgp')
-						embed.setColor(`#F36B00`)
-						embed.setDescription("Вот машины на маршруте " + routenum + " (" + type + "):" + ccars_list)
+						
 						msg.reply({ embeds: [embed], components: [row] });
 					} else { // если автобус то ничего не мудрить
-						embed.setTitle(kitsune.user.username + ' - orgp')
-						embed.setColor(`#F36B00`)
-						embed.setDescription("Вот машины на маршруте " + routenum + " (" + type + "):" + ccars_list)
 						msg.reply({ embeds: [embed] });
 					}
 				}
@@ -252,17 +280,35 @@ class Orgp {
 					data = data + d
 				});
 				res.on('end', () => {
-					cache_routes = [];
-					let rroutes = JSON.parse(data).aaData
-					//console.log(rroutes)
-					rroutes.forEach((route) => {
-						cache_routes[route[1].systemName+route[2].toLowerCase()] = {
-							"id": route[0],
-							"type": route[1].systemName
-						}
-					});
-					search_routes(kitsune, msg, args, type, route);
-					return;
+					if (data) {
+						//console.log(data)
+						if (data.indexOf("405 Not Allowed") != -1) {
+							let embed = new Discord.EmbedBuilder()
+							embed.setTitle(kitsune.user.username + ' - orgp')
+							embed.setColor(`#F00000`)
+							embed.setDescription("На сервере ведутся работы! Попробуйте позже!")
+							msg.reply({ embeds: [embed] });
+							cache_routes = false
+							return;
+						};
+						cache_routes = [];
+						let rroutes = JSON.parse(data).aaData
+						rroutes.forEach((route) => {
+							cache_routes[route[1].systemName+route[2].toLowerCase()] = {
+								"id": route[0],
+								"type": route[1].systemName
+							}
+						});
+						search_routes(kitsune, msg, args, type, route);
+						return;
+					} else {
+						let embed = new Discord.EmbedBuilder()
+						embed.setTitle(kitsune.user.username + ' - orgp')
+						embed.setColor(`#F00000`)
+						embed.setDescription("Ни одной машины сейчас нету на маршруте")
+						msg.reply({ embeds: [embed] });
+						return;
+					}
 				})
 			});
 			reqr.on('error', (e) => {
@@ -274,13 +320,11 @@ class Orgp {
 	};
 	async butt(kitsune, interaction, args){
 		if (interaction.values[0]) {
-			let type = interaction.values[0].split("_")[0];
-			let label = interaction.values[0].split("_")[1];
-			get_stts_vehicle(kitsune, interaction, args, type, label)
+			get_stts_vehicle(kitsune, interaction, args, interaction.values[0].split("_"))
 		} else {
 			return;
 		};
-		function get_stts_vehicle(kitsune, interaction, args, type, label) { // get last photo from transphoto.org
+		function get_stts_vehicle(kitsune, interaction, args, vallu) { // get last photo from transphoto.org
 		
 			// types
 			//
@@ -289,16 +333,16 @@ class Orgp {
 			
 			// bus is not supported on this site!
 			let numtype
-			if (type == "tram") {
+			if (vallu[0] == "tram") {
 				numtype = 1;
-			} else if (type = 'trolley') {
+			} else if (vallu[0] = 'trolley') {
 				numtype = 2;
 			} else {
 				console.log('no you cant search that type of transphoto.org ')
 				return;
 			}
 			const options = { // параметры обращения к серваку
-			  uri: 'https://transphoto.org/api.php?action=index-qsearch&cid=2&type=' + numtype + '&num=' + label,
+			  uri: 'https://transphoto.org/api.php?action=index-qsearch&cid=2&type=' + numtype + '&num=' + vallu[1],
 			  headers: {
 				"authority": "transphoto.org",
 				"scheme": "https"
@@ -310,12 +354,12 @@ class Orgp {
 						let vehicle_page = body.slice(body.indexOf('href')+6)
 						vehicle_page = vehicle_page.slice(0, vehicle_page.indexOf('"'))
 						vehicle_page = 'https://transphoto.org' + vehicle_page
-						get_stts_photodate(kitsune, interaction, args, type, label, vehicle_page)
+						get_stts_photodate(kitsune, interaction, args, vallu, vehicle_page)
 					} else {
 						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(kitsune.user.username + ' - orgp')
 						embed.setColor(`#F00000`)
-						embed.setDescription('Не удалось получить информацию о ' + label)
+						embed.setDescription('Не удалось получить информацию о ' + vallu[1])
 						interaction.reply({ embeds: [embed]})
 						return;
 					}
@@ -323,14 +367,14 @@ class Orgp {
 					embed = new Discord.EmbedBuilder()
 					embed.setTitle(kitsune.user.username + ' - orgp')
 					embed.setColor(`#F00000`)
-					embed.setDescription('Не удалось получить информацию о ' + label)
+					embed.setDescription('Не удалось получить информацию о ' + vallu[1])
 					interaction.reply({ embeds: [embed]})
 					return;
 				}
 			});
 		};
 		
-		function get_stts_photodate(kitsune, msg, args, type, label, link) { // get last photo data from transphoto.org vehicle page
+		function get_stts_photodate(kitsune, msg, args, vallu, link) { // get last photo data from transphoto.org vehicle page
 			msg.deferUpdate();
 			const options = { // параметры обращения к серваку
 			  uri: link,
@@ -341,15 +385,19 @@ class Orgp {
 			};
 			request.get(options, (err, res, body) => { // обращаемся к серваку
 				if (body) {
-					
 					let model_info = false
 					let park_info = false
 					let park_link = false
 					let photo_place = false
 					let photo_date = false
 					let photo_author = false
-					let photo_img = false
 					let photo_link = false
+					let photo_img = false
+					
+					if (body.indexOf('<a href="/model/') != 1) {
+						model_info = body.slice(body.indexOf('<a href="/model/'))
+						model_info = model_info.slice(model_info.indexOf('/">')+3,model_info.indexOf('</b>'))
+					};
 					if (body.indexOf('<a href="/list.php?did=') != 1) {
 						park_info = body.slice(body.indexOf('<a href="/list.php?did='))
 						park_info = park_info.slice(park_info.indexOf('">')+2,park_info.indexOf('</a>'))
@@ -360,10 +408,6 @@ class Orgp {
 						if (park_link.length > 64) {
 							park_link = "https://youtu.be/dQw4w9WgXcQ"
 						}
-					};
-					if (body.indexOf('<a href="/model/') != 1) {
-						model_info = body.slice(body.indexOf('<a href="/model/'))
-						model_info = model_info.slice(model_info.indexOf('/">')+3,model_info.indexOf('</b>'))
 					};
 					if (body.indexOf('<b class="pw-place">') != 1 ) { 
 						photo_place = body.slice(body.indexOf('<b class="pw-place">')+20)
@@ -399,26 +443,27 @@ class Orgp {
 						photo_img = photo_img.slice(photo_img.indexOf('<img class="f" src="')+20)
 						photo_img = photo_img.slice(0, photo_img.indexOf('" alt'))
 						photo_img = 'https://transphoto.org' + photo_img
+						photo_img = photo_img.replace(/_s/g, "")
 						if (photo_img.length > 128) {
 							photo_img = "https://i.imgur.com/oJGKR0l.png"
 						}
 					};
-					if (model_info && photo_place && photo_date && photo_img && photo_link && photo_author && park_info && park_link) {
+					if (model_info && park_info && park_link && photo_place && photo_date && photo_author && photo_link && photo_img) {
 						let embed = new Discord.EmbedBuilder()
 						embed.setTitle(kitsune.user.username + ' - orgp')
 						embed.setColor(`#F36B00`)
-						embed.setDescription("[**" + model_info + " №" + label + "**](" + photo_link + ")\n[" + park_info +"](https://transphoto.org" + park_link + ")")
-						embed.addFields({ name: "Последнее фото №" + label + " на transphoto.org", value: "Улица: " + photo_place + "\nДата: " + photo_date + "\nАвтор: " + photo_author})
+						embed.setDescription("[**" + model_info + " №" + vallu[1] + "**](" + photo_link + ")\n[" + park_info +"](https://transphoto.org" + park_link + ")")
+						embed.addFields({ name: "Последнее фото №" + vallu[1] + " на transphoto.org", value: "Улица: " + photo_place + "\nДата: " + photo_date + "\nАвтор: " + photo_author})
 						embed.setImage(photo_img)
 						
 						let list = new Discord.StringSelectMenuBuilder()
 						list.setCustomId(msg.customId + "1")
 						list.setPlaceholder('Получить больше инфы о...')
-						msg.values[0].split("_")[2].split("-").forEach((car) => {
+						numco.decompress(vallu[2]).forEach((car) => {
 							if (car != "") {
 								list.addOptions({
 									label: String(car),
-									value: type + "_" + car + "_" + msg.values[0].split("_")[2]
+									value: String(vallu[0] + "_" + car + "_" + vallu[2])
 								});
 							}
 						});

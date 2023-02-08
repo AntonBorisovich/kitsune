@@ -18,10 +18,12 @@
   "homepage": "https://github.com/AntonBorisovich/kitsune#readme",
   "dependencies": {
     "canvas": "^2.10.2",
+    "compress-str": "^1.0.2",
     "discord.js": "^14.7.0",
     "gif-encoder-2": "^1.0.5",
     "md5": "^2.3.0",
     "minecraft-server-util": "^5.3.0",
+    "numco": "^1.0.0",
     "pet-pet-gif": "^1.0.9",
     "puppeteer": "^19.3.0",
     "puppeteer-proxy": "^2.1.2",
