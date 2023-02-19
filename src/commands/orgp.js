@@ -196,17 +196,22 @@ class Orgp {
 						return;
 					}
 					ccars.features.forEach((car) => { // чекаем все машины и пишем в список
+						//console.log(car)
+						let wheel = ""
+						if (car.properties.wheelchair) {
+							wheel = " ♿"
+						}
 						if (car.properties.transportTypeId == "trolley") {
 							ccars_labels.push(car.properties.label)
 							ccars_menulist.push({label: car.properties.label, description: "", value: car.properties.transportTypeId + "_" + car.properties.label})
-							ccars_list.push("[" + car.properties.label + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=2&num=" + car.properties.label + ")")
+							ccars_list.push("[" + car.properties.label + wheel + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=2&num=" + car.properties.label + ")")
 						} else if (car.properties.transportTypeId == "tram") {
 							ccars_labels.push(car.properties.label)
 							ccars_menulist.push({label: car.properties.label, description: "", value: car.properties.transportTypeId + "_" + car.properties.label})
-							ccars_list.push("[" + car.properties.label + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=1&num=" + car.properties.label + ")")
+							ccars_list.push("[" + car.properties.label + wheel + "](https://transphoto.org/api.php?action=index-qsearch&cid=2&type=1&num=" + car.properties.label + ")")
 						} else {
 							bus = true
-							ccars_list.push(car.properties.label)
+							ccars_list.push(car.properties.label + wheel)
 						};
 					})
 					
@@ -216,7 +221,7 @@ class Orgp {
 					
 					embed.setTitle(kitsune.user.username + ' - orgp')
 					embed.setColor(`#F36B00`)
-					embed.setDescription("Вот машины (" + ccars.features.length + " шт) на маршруте " + routenum + " (" + type + "):\n" + ccars_list + "\n\nКарта: [🆕 Новый сайт](https://transport.orgp.spb.ru/routes/" + id +") / [🧓 Старый сайт](https://transport.orgp.spb.ru/Portal/transport/route/" + id +")")
+					embed.setDescription("Вот машины (" + ccars.features.length + " шт) на маршруте " + routenum + " (" + type + "):\n**" + ccars_list + "**\n\nКарта: [🆕 Новый сайт](https://transport.orgp.spb.ru/routes/" + id +") / [🧓 Старый сайт](https://transport.orgp.spb.ru/Portal/transport/route/" + id +")")
 					if (ccars_labels.length > 25 || ccars.features > 25) {
 						ccars_labels = ccars_labels.slice(0,25)
 						//console.log(ccars_labels)

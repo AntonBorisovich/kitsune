@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const os = require('os');
 const launch_time = Date.now();
+const embedfreepic = "https://cdn.discordapp.com/attachments/879339393410793512/1073591842660175872/rushia-uruha-rushia.gif"
 
 class Error {
     constructor(){
@@ -83,8 +84,10 @@ class Error {
 					pubembed.setDescription("Произошла ошибка: `" + shorterr + '`');
 					pubembed.setFooter({ text: 'Отчёт об ошибке был отправлен разработчикам (' + msg.id + ')'})
 					msg.channel.send({ embeds: [pubembed] });
-				} else { // если не можем отправить embed то отправить текстом
-					msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nПроизошла ошибка: `" + shorterr + '`\n\nОтчёт об ошибке был отправлен разработчикам (' + msg.id + ')'}); // embed-free ошибка
+				} else if (msg.guild.members.me.permissionsIn(msg.channel).has([Discord.PermissionsBitField.Flags.AttachFiles])) { // если не можем отправить embed то отправить текстом
+					msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nПроизошла ошибка: `" + shorterr + '`\n\nОтчёт об ошибке был отправлен разработчикам (' + msg.id + ')', files: [{attachment: embedfreepic}]}); // embed-free ошибка с приколом
+				} else {
+					msg.channel.send({ content: "**" + kitsune.user.username + " - Error**\n\nПроизошла ошибка: `" + shorterr + '`\n\nОтчёт об ошибке был отправлен разработчикам (' + msg.id + ')'}); // true embed-free ошибка
 				};
 			};
 		};

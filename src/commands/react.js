@@ -48,7 +48,7 @@ class React {
 				let embed = new Discord.EmbedBuilder()
 				embed.setTitle(kitsune.user.username + ' - error')
 				embed.setColor(`#F00000`)
-				embed.setDescription("Не удалось поставить реакцию. Возможно, у бота нету прав на это сообщение или сообщения не существует.")
+				embed.setDescription("Не удалось поставить реакцию. Возможно, у бота нету прав на это сообщение или сообщения не существует. А ну или вы просто не указали сообщение")
 				msg.channel.send({ embeds: [embed] });
 			};
 			
